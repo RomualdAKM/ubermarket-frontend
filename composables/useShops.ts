@@ -98,6 +98,59 @@ export const useShops = () => {
     }
   }
 
+  // Vérifier la disponibilité d'un domaine personnalisé
+  const checkCustomDomainAvailability = async (customDomain: string, shopId?: number): Promise<{ available: boolean; message: string }> => {
+    try {
+      const body: any = { custom_domain: customDomain }
+      if (shopId) {
+        body.shop_id = shopId
+      }
+      
+      const response = await apiRequest<{ available: boolean; message: string }>('/shops/check-domain', {
+        method: 'POST',
+        body: JSON.stringify(body)
+      })
+      
+      return {
+        available: response.data?.available || false,
+        message: response.message || ''
+      }
+    } catch (error: any) {
+      console.error('Erreur lors de la vérification du domaine:', error)
+      return {
+        available: false,
+        message: error.message || 'Erreur lors de la vérification'
+      }
+    }
+  }
+
+  // Mettre à jour une boutique
+  const updateShop = async (shopId: number, data: Partial<Shop>): Promise<ApiResponse<Shop>> => {
+    try {
+      const response = await apiRequest<Shop>(`/shops/${shopId}`, {
+        method: 'PUT',
+        body: JSON.stringify(data)
+      })
+
+      if (response.success && response.data) {
+        // Mettre à jour dans la liste
+        const index = shops.value.findIndex(s => s.id === shopId)
+        if (index !== -1) {
+          shops.value[index] = response.data
+        }
+        
+        // Mettre à jour currentShop si c'est la même boutique
+        if (currentShop.value?.id === shopId) {
+          currentShop.value = response.data
+        }
+      }
+
+      return response
+    } catch (error: any) {
+      throw error
+    }
+  }
+
   // Définir la boutique courante
   const setCurrentShop = (shop: Shop | null) => {
     currentShop.value = shop
@@ -109,6 +162,8 @@ export const useShops = () => {
     createShop,
     fetchShops,
     checkSubdomainAvailability,
+    checkCustomDomainAvailability,
+    updateShop,
     setCurrentShop
   }
 }

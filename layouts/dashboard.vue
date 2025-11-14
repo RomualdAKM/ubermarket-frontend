@@ -139,7 +139,7 @@
                 </span>
               </NuxtLink>
             </li>
-            <li>
+            <!-- <li>
               <NuxtLink 
                 :to="getDashboardLink('analytics/analyses')" 
                 class="flex items-center px-3 py-2 text-sm font-medium text-gray-700 rounded hover:bg-gray-100 transition-all duration-200"
@@ -156,7 +156,7 @@
                   Analyses
                 </span>
               </NuxtLink>
-            </li>
+            </li> -->
             <li>
               <NuxtLink 
                 :to="getDashboardLink('discount-code/codes-promo')" 
@@ -211,7 +211,7 @@
                 </span>
               </NuxtLink>
             </li>
-            <li>
+            <!-- <li>
               <NuxtLink 
                 :to="getDashboardLink('returns/retours')" 
                 class="flex items-center px-3 py-2 text-sm font-medium text-gray-700 rounded hover:bg-gray-100 transition-all duration-200"
@@ -228,7 +228,7 @@
                   Retours produits
                 </span>
               </NuxtLink>
-            </li>
+            </li> -->
           </ul>
         </div>
         

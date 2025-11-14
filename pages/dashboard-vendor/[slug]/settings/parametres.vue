@@ -12,6 +12,9 @@
           <button @click="activeTab = 'general'" :class="[activeTab === 'general' ? 'border-secondary text-primary' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300', 'whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm']">
             Général
           </button>
+          <button @click="activeTab = 'domaine'" :class="[activeTab === 'domaine' ? 'border-secondary text-primary' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300', 'whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm']">
+            Domaine
+          </button>
           <button @click="activeTab = 'paiement'" :class="[activeTab === 'paiement' ? 'border-secondary text-primary' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300', 'whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm']">
             Paiement
           </button>
@@ -67,6 +70,125 @@
           </button>
         </div>
       </form>
+    </div>
+
+    <!-- Section Domaine -->
+    <div v-if="activeTab === 'domaine'" class="bg-white p-6 border-t border-gray-200">
+      <h2 class="text-lg font-medium text-gray-900 mb-4">Configuration du domaine</h2>
+      
+      <!-- Messages -->
+      <div v-if="successMessage" class="mb-4 p-3 bg-green-50 border border-green-200 rounded-md">
+        <p class="text-sm text-green-800">{{ successMessage }}</p>
+      </div>
+      
+      <div v-if="errorMessage" class="mb-4 p-3 bg-red-50 border border-red-200 rounded-md">
+        <p class="text-sm text-red-800">{{ errorMessage }}</p>
+      </div>
+      
+      <!-- Sous-domaine -->
+      <div class="mb-8">
+        <h3 class="text-md font-medium text-gray-900 mb-3">Sous-domaine</h3>
+        <p class="text-sm text-gray-600 mb-4">
+          Votre boutique est accessible via le sous-domaine suivant :
+        </p>
+        
+        <div class="flex items-center space-x-2 p-4 bg-gray-50 border border-gray-200 rounded-md">
+          <div class="flex-1">
+            <p class="text-sm font-mono text-gray-900">{{ currentShopSubdomain }}.uber-market.com</p>
+          </div>
+          <button 
+            @click="copyToClipboard(currentShopSubdomain + '.uber-market.com')"
+            class="px-3 py-1 text-sm bg-gray-100 text-gray-700 rounded hover:bg-gray-200"
+          >
+            Copier
+          </button>
+        </div>
+        
+        <p class="text-xs text-gray-500 mt-2">
+          Le sous-domaine est généré automatiquement à partir du nom de votre boutique.
+        </p>
+      </div>
+      
+      <!-- Domaine personnalisé -->
+      <div class="border-t border-gray-200 pt-6">
+        <h3 class="text-md font-medium text-gray-900 mb-3">Domaine personnalisé</h3>
+        <p class="text-sm text-gray-600 mb-4">
+          Utilisez votre propre nom de domaine pour votre boutique (ex: www.maboutique.com)
+        </p>
+        
+        <!-- Domaine actuel -->
+        <div v-if="customDomain" class="mb-4 p-4 bg-blue-50 border border-blue-200 rounded-md">
+          <div class="flex items-center justify-between">
+            <div>
+              <p class="text-sm font-medium text-blue-900">Domaine actif</p>
+              <p class="text-sm font-mono text-blue-700 mt-1">{{ customDomain }}</p>
+            </div>
+            <button 
+              @click="removeDomain"
+              :disabled="isUpdating"
+              class="px-3 py-1 text-sm bg-red-100 text-red-700 rounded hover:bg-red-200 disabled:opacity-50"
+            >
+              Retirer
+            </button>
+          </div>
+        </div>
+        
+        <!-- Formulaire d'ajout -->
+        <div class="space-y-4">
+          <div>
+            <label for="custom_domain" class="block text-sm font-medium text-gray-700 mb-1">
+              Nom de domaine
+            </label>
+            <div class="flex space-x-2">
+              <input 
+                type="text" 
+                id="custom_domain" 
+                v-model="customDomainInput"
+                @input="domainCheckMessage = ''"
+                :disabled="isUpdating"
+                placeholder="www.maboutique.com"
+                class="flex-1 border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-secondary focus:border-secondary disabled:bg-gray-100"
+              >
+              <button 
+                @click="checkDomain"
+                :disabled="!customDomainInput || isChecking"
+                class="px-4 py-2 bg-gray-100 text-gray-700 text-sm font-medium rounded hover:bg-gray-200 disabled:opacity-50"
+              >
+                {{ isChecking ? 'Vérification...' : 'Vérifier' }}
+              </button>
+            </div>
+            
+            <p v-if="domainCheckMessage" :class="[
+              'text-xs mt-2',
+              domainAvailable ? 'text-green-600' : 'text-red-600'
+            ]">
+              {{ domainCheckMessage }}
+            </p>
+          </div>
+          
+          <button 
+            @click="updateDomain"
+            :disabled="!customDomainInput || isUpdating || !domainAvailable"
+            class="w-full px-4 py-2 bg-primary text-white text-sm font-medium rounded hover:bg-secondary disabled:opacity-50"
+          >
+            {{ isUpdating ? 'Mise à jour...' : (customDomain ? 'Changer le domaine' : 'Configurer le domaine') }}
+          </button>
+        </div>
+        
+        <!-- Instructions de configuration -->
+        <div class="mt-6 p-4 bg-yellow-50 border border-yellow-200 rounded-md">
+          <h4 class="text-sm font-medium text-yellow-900 mb-2">Instructions de configuration DNS</h4>
+          <div class="text-xs text-yellow-800 space-y-2">
+            <p>Pour utiliser votre domaine personnalisé, configurez les enregistrements DNS suivants chez votre registrar :</p>
+            <div class="mt-2 p-2 bg-white rounded border border-yellow-300">
+              <p class="font-mono">Type: A</p>
+              <p class="font-mono">Nom: @ (ou votre sous-domaine)</p>
+              <p class="font-mono">Valeur: [IP du serveur - fournie par support]</p>
+            </div>
+            <p class="mt-2">Contactez le support pour obtenir l'adresse IP du serveur.</p>
+          </div>
+        </div>
+      </div>
     </div>
 
     <!-- Section Paiement -->
@@ -289,10 +411,129 @@
 </template>
 
 <script setup lang="ts">
+import type { Shop } from '~/types/auth'
+
 definePageMeta({
   layout: 'dashboard',
   middleware: 'shop-access'
 })
 
+const route = useRoute()
+const { shops, checkCustomDomainAvailability, updateShop } = useShops()
+
 const activeTab = ref('general')
+const customDomainInput = ref('')
+const customDomain = ref<string | null>(null)
+const currentShopSubdomain = ref('')
+const isChecking = ref(false)
+const isUpdating = ref(false)
+const domainAvailable = ref(false)
+const domainCheckMessage = ref('')
+const successMessage = ref('')
+const errorMessage = ref('')
+
+// Récupérer la boutique actuelle
+const currentShop = computed(() => {
+  const slug = route.params.slug as string
+  return shops.value.find(s => s.slug === slug) || null
+})
+
+// Initialiser les données au montage
+onMounted(() => {
+  if (currentShop.value) {
+    currentShopSubdomain.value = currentShop.value.subdomain || ''
+    customDomain.value = currentShop.value.custom_domain || null
+    customDomainInput.value = customDomain.value || ''
+  }
+})
+
+// Vérifier la disponibilité du domaine
+const checkDomain = async () => {
+  if (!customDomainInput.value || !currentShop.value) return
+  
+  isChecking.value = true
+  domainCheckMessage.value = ''
+  domainAvailable.value = false
+  
+  try {
+    const result = await checkCustomDomainAvailability(customDomainInput.value, currentShop.value.id)
+    domainAvailable.value = result.available
+    domainCheckMessage.value = result.message
+  } catch (error) {
+    domainCheckMessage.value = 'Erreur lors de la vérification'
+  } finally {
+    isChecking.value = false
+  }
+}
+
+// Mettre à jour le domaine
+const updateDomain = async () => {
+  if (!customDomainInput.value || !currentShop.value) return
+  
+  isUpdating.value = true
+  errorMessage.value = ''
+  successMessage.value = ''
+  
+  try {
+    const response = await updateShop(currentShop.value.id, {
+      custom_domain: customDomainInput.value
+    })
+    
+    if (response.success) {
+      customDomain.value = customDomainInput.value
+      successMessage.value = 'Domaine configuré avec succès'
+      domainCheckMessage.value = ''
+      domainAvailable.value = false
+      setTimeout(() => successMessage.value = '', 3000)
+    } else {
+      errorMessage.value = response.message || 'Erreur lors de la mise à jour'
+    }
+  } catch (error: any) {
+    errorMessage.value = error.message || 'Erreur lors de la mise à jour'
+  } finally {
+    isUpdating.value = false
+  }
+}
+
+// Retirer le domaine personnalisé
+const removeDomain = async () => {
+  if (!currentShop.value) return
+  
+  if (!confirm('Voulez-vous vraiment retirer le domaine personnalisé ?')) return
+  
+  isUpdating.value = true
+  errorMessage.value = ''
+  successMessage.value = ''
+  
+  try {
+    const response = await updateShop(currentShop.value.id, {
+      custom_domain: null
+    })
+    
+    if (response.success) {
+      customDomain.value = null
+      customDomainInput.value = ''
+      successMessage.value = 'Domaine retiré avec succès'
+      setTimeout(() => successMessage.value = '', 3000)
+    } else {
+      errorMessage.value = response.message || 'Erreur lors de la mise à jour'
+    }
+  } catch (error: any) {
+    errorMessage.value = error.message || 'Erreur lors de la mise à jour'
+  } finally {
+    isUpdating.value = false
+  }
+}
+
+// Copier dans le presse-papier
+const copyToClipboard = async (text: string) => {
+  try {
+    await navigator.clipboard.writeText(text)
+    successMessage.value = 'Copié dans le presse-papier'
+    setTimeout(() => successMessage.value = '', 2000)
+  } catch (error) {
+    errorMessage.value = 'Erreur lors de la copie'
+    setTimeout(() => errorMessage.value = '', 2000)
+  }
+}
 </script>

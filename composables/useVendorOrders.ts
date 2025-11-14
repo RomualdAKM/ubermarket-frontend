@@ -124,7 +124,7 @@ export const useVendorOrders = () => {
   /**
    * Récupérer les détails d'une commande
    */
-  const fetchOrderDetails = async (shopId: number, orderId: number): Promise<VendorOrder | null> => {
+  const fetchOrderDetails = async (shopId: number, orderId: number): Promise<any> => {
     isLoading.value = true
     error.value = null
 
@@ -133,7 +133,8 @@ export const useVendorOrders = () => {
 
       if (response.success && response.order) {
         currentOrder.value = response.order
-        return response.order
+        // Retourner la réponse complète (order + courier)
+        return response
       }
 
       return null

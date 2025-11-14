@@ -233,7 +233,7 @@
 
           <div class="px-6 py-4">
             <!-- Informations générales -->
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
               <div class="border border-gray-200 p-4 rounded-md">
                 <h3 class="text-sm font-medium text-gray-900 mb-3">Informations client</h3>
                 <p class="text-sm text-gray-600">{{ selectedOrder.customer_name }}</p>
@@ -254,6 +254,45 @@
                 <p v-if="selectedOrder.tracking_code" class="text-sm text-gray-600 mt-2">
                   Suivi: <span class="font-medium">{{ selectedOrder.tracking_code }}</span>
                 </p>
+              </div>
+              
+              <div class="border border-gray-200 p-4 rounded-md">
+                <h3 class="text-sm font-medium text-gray-900 mb-3">Livreur</h3>
+                
+                <!-- Livreur actuel -->
+                <div v-if="currentCourier" class="mb-3 p-3 bg-blue-50 border border-blue-200 rounded-md">
+                  <p class="text-sm font-medium text-gray-900">{{ currentCourier.name }}</p>
+                  <p class="text-xs text-gray-600">{{ currentCourier.phone }}</p>
+                  <p v-if="currentCourier.is_platform" class="text-xs text-blue-600 mt-1">Livreur de la plateforme</p>
+                </div>
+                
+                <!-- Message si commande livrée/annulée -->
+                <div v-if="!canAssignCourier" class="p-3 bg-gray-50 border border-gray-200 rounded-md">
+                  <p class="text-sm text-gray-600">
+                    Impossible de {{ currentCourier ? 'changer' : 'assigner' }} un livreur : commande {{ selectedOrder.order_status === 'delivered' ? 'livrée' : 'annulée' }}
+                  </p>
+                </div>
+                
+                <!-- Formulaire d'assignation -->
+                <div v-else class="space-y-2">
+                  <select 
+                    v-model="selectedCourierId"
+                    :disabled="isAssigningCourier"
+                    class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-secondary focus:border-secondary"
+                  >
+                    <option :value="null">{{ currentCourier ? 'Changer de livreur' : 'Sélectionner un livreur' }}</option>
+                    <option v-for="courier in couriers" :key="courier.id" :value="courier.id">
+                      {{ courier.name }} {{ courier.is_platform ? '(Plateforme)' : '' }}
+                    </option>
+                  </select>
+                  <button 
+                    @click="handleAssignCourier"
+                    :disabled="isAssigningCourier || !selectedCourierId"
+                    class="w-full px-3 py-2 bg-primary text-white text-sm rounded-md hover:bg-secondary disabled:opacity-50"
+                  >
+                    {{ isAssigningCourier ? 'Assignation...' : (currentCourier ? 'Changer' : 'Assigner') }}
+                  </button>
+                </div>
               </div>
               
               <div class="border border-gray-200 p-4 rounded-md">
@@ -303,7 +342,7 @@
                   class="p-4 flex items-center gap-4"
                 >
                   <img 
-                    v-if="item.product?.product_images?.[0]" 
+                    v-if="item.product && item.product.product_images && item.product.product_images.length > 0" 
                     :src="getProductImage(item.product)" 
                     :alt="item.product_name"
                     class="w-16 h-16 object-cover rounded"
@@ -377,6 +416,7 @@ const shopSlug = route.params.slug as string
 
 const { fetchShopOrders, fetchOrderDetails, updateOrderStatus, updateTracking, orders, ordersMeta, currentOrder, isLoading, error } = useVendorOrders()
 const { shops, fetchShops } = useShops()
+const { couriers, fetchCouriers, assignToOrder } = useCouriers()
 
 // Computed pour obtenir l'ID de la boutique actuelle
 const currentShopId = computed(() => {
@@ -404,6 +444,16 @@ const isUpdating = ref(false)
 const trackingCodeInput = ref('')
 const successMessage = ref('')
 const errorMessage = ref('')
+const selectedCourierId = ref<number | null>(null)
+const isAssigningCourier = ref(false)
+const currentCourier = ref<any>(null)
+
+// Computed pour déterminer si on peut assigner/changer un livreur
+const canAssignCourier = computed(() => {
+  if (!selectedOrder.value) return false
+  // On ne peut pas assigner/changer si la commande est livrée ou annulée
+  return !['delivered', 'cancelled'].includes(selectedOrder.value.order_status)
+})
 
 // Chargement des commandes
 const loadOrders = async () => {
@@ -430,10 +480,26 @@ const debouncedSearch = () => {
 const viewOrderDetails = async (orderId: number) => {
   if (!currentShopId.value) return
   
-  const order = await fetchOrderDetails(currentShopId.value, orderId)
-  if (order) {
-    selectedOrder.value = order
-    trackingCodeInput.value = order.tracking_code || ''
+  const result: any = await fetchOrderDetails(currentShopId.value, orderId)
+  if (result) {
+    // result peut être soit l'order directement, soit un objet avec order et courier
+    if (result.order) {
+      // Nouveau format du backend avec courier
+      selectedOrder.value = result.order
+      trackingCodeInput.value = result.order.tracking_code || ''
+      currentCourier.value = result.courier || null
+    } else {
+      // Ancien format
+      selectedOrder.value = result
+      trackingCodeInput.value = result.tracking_code || ''
+      currentCourier.value = null
+    }
+    
+    selectedCourierId.value = null
+    
+    // Charger les livreurs disponibles
+    await fetchCouriers(currentShopId.value)
+    
     showOrderDetailsModal.value = true
   }
 }
@@ -443,6 +509,8 @@ const closeModal = () => {
   showOrderDetailsModal.value = false
   selectedOrder.value = null
   trackingCodeInput.value = ''
+  currentCourier.value = null
+  selectedCourierId.value = null
 }
 
 // Mettre à jour le statut
@@ -484,6 +552,32 @@ const updateTrackingCode = async () => {
   }
   
   isUpdating.value = false
+}
+
+// Assigner un livreur à la commande
+const handleAssignCourier = async () => {
+  if (!selectedOrder.value || !selectedCourierId.value || isAssigningCourier.value) return
+  
+  isAssigningCourier.value = true
+  errorMessage.value = ''
+  successMessage.value = ''
+  
+  const result: any = await assignToOrder(selectedOrder.value.id, selectedCourierId.value)
+  
+  if (result) {
+    // Mettre à jour le livreur actuel avec les informations retournées
+    if (result.courier) {
+      currentCourier.value = result.courier
+    }
+    
+    successMessage.value = currentCourier.value ? 'Livreur changé avec succès' : 'Livreur assigné avec succès'
+    selectedCourierId.value = null
+    setTimeout(() => successMessage.value = '', 3000)
+  } else {
+    errorMessage.value = 'Erreur lors de l\'assignation du livreur'
+  }
+  
+  isAssigningCourier.value = false
 }
 
 // Pagination
