@@ -15,7 +15,7 @@ onMounted(() => {
   
   if (subdomain) {
     // On est sur un sous-domaine de boutique
-    // Vérifier qu'on n'est pas déjà sur la page boutique
+    // Vérifier qu'on n'est pas déjà sur la boutique
     if (!route.path.startsWith('/boutique/')) {
       // Rediriger vers la page de la boutique
       router.push(`/boutique/${subdomain}`)
