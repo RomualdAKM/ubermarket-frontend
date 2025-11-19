@@ -79,4 +79,5 @@ export interface ApiResponse<T = any> {
   user?: User
   token?: string
   errors?: Record<string, string[]>
+  dns_config?: any 
 }
