@@ -173,6 +173,25 @@
           >
             {{ isUpdating ? 'Mise à jour...' : (customDomain ? 'Changer le domaine' : 'Configurer le domaine') }}
           </button>
+          <!-- Instructions DNS -->
+          <div v-if="dnsConfig" class="mt-4 p-4 bg-blue-50 border border-blue-200 rounded-md">
+            <h4 class="text-sm font-medium text-blue-900 mb-2">Configuration DNS requise</h4>
+            <p class="text-xs text-blue-700 mb-3">
+              Ajoutez cet enregistrement chez votre registrar (GoDaddy, Namecheap, OVH...) :
+            </p>
+            
+            <div class="p-3 bg-white border border-blue-300 rounded">
+              <p class="text-xs font-mono text-gray-700">
+                <strong>Type:</strong> CNAME<br>
+                <strong>Nom:</strong> {{ customDomain }}<br>
+                <strong>Valeur:</strong> cname.vercel-dns.com
+              </p>
+            </div>
+            
+            <p class="text-xs text-blue-600 mt-2">
+              La propagation DNS peut prendre 24-48h.
+            </p>
+          </div>
         </div>
       </div>
     </div>
@@ -417,6 +436,7 @@ const domainAvailable = ref(false)
 const domainCheckMessage = ref('')
 const successMessage = ref('')
 const errorMessage = ref('')
+const dnsConfig = ref<any>(null)
 
 // Récupérer la boutique actuelle
 const currentShop = computed(() => {
@@ -467,6 +487,10 @@ const updateDomain = async () => {
     
     if (response.success) {
       customDomain.value = customDomainInput.value
+      // Stocker la configuration DNS si disponible
+      if (response.dns_config) {
+        dnsConfig.value = response.dns_config
+      }
       successMessage.value = 'Domaine configuré avec succès'
       domainCheckMessage.value = ''
       domainAvailable.value = false
