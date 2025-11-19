@@ -170,27 +170,6 @@
             @click="updateDomain"
             :disabled="!customDomainInput || isUpdating || !domainAvailable"
             class="w-full px-4 py-2 bg-primary text-white text-sm font-medium rounded hover:bg-secondary disabled:opacity-50"
-          >
-            {{ isUpdating ? 'Mise à jour...' : (customDomain ? 'Changer le domaine' : 'Configurer le domaine') }}
-          </button>
-        </div>
-        
-        <!-- Instructions de configuration -->
-        <div class="mt-6 p-4 bg-yellow-50 border border-yellow-200 rounded-md">
-          <h4 class="text-sm font-medium text-yellow-900 mb-2">Instructions de configuration DNS</h4>
-          <div class="text-xs text-yellow-800 space-y-2">
-            <p>Pour utiliser votre domaine personnalisé, configurez les enregistrements DNS suivants chez votre registrar :</p>
-            <div class="mt-2 p-2 bg-white rounded border border-yellow-300">
-              <p class="font-mono">Type: A</p>
-              <p class="font-mono">Nom: @ (ou votre sous-domaine)</p>
-              <p class="font-mono">Valeur: [IP du serveur - fournie par support]</p>
-            </div>
-            <p class="mt-2">Contactez le support pour obtenir l'adresse IP du serveur.</p>
-          </div>
-        </div>
-      </div>
-    </div>
-
     <!-- Section Paiement -->
     <div v-if="activeTab === 'paiement'" class="bg-white p-6 border-t border-gray-200">
       <h2 class="text-lg font-medium text-gray-900 mb-4">Méthodes de paiement</h2>

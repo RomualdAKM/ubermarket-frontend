@@ -8,7 +8,7 @@ export const useSubdomainDetection = () => {
     if (process.server) return null
 
     const host = window.location.host
-    
+
     // Environnement local - pas de sous-domaine
     if (host.includes('localhost') || host.includes('127.0.0.1')) {
       return null
@@ -21,20 +21,22 @@ export const useSubdomainDetection = () => {
 
     // Extraire le sous-domaine de uber-market.com
     const match = host.match(/^([a-z0-9-]+)\.uber-market\.com$/i)
-    
+
     if (match && match[1]) {
       const subdomain = match[1].toLowerCase()
-      
+
       // Ignorer les sous-domaines réservés
       const reserved = ['www', 'api', 'admin', 'app', 'dashboard']
       if (reserved.includes(subdomain)) {
         return null
       }
-      
+
       return subdomain
     }
 
-    return null
+    // Si ce n'est pas un sous-domaine uber-market.com, c'est peut-être un domaine personnalisé
+    // On retourne le host complet comme identifiant
+    return host
   }
 
   /**
