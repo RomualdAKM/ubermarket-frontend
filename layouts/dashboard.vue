@@ -473,7 +473,6 @@ const toggleSidebar = () => {
   isSidebarOpen.value = !isSidebarOpen.value
 }
 
-// Fermer le menu lorsqu'on clique sur un lien (sur mobile)
 const closeSidebar = () => {
   if (!isLargeScreen.value) {
     isSidebarOpen.value = false
