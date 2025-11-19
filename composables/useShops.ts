@@ -14,6 +14,11 @@ export const useShops = () => {
       ...(options.headers as Record<string, string> || {})
     }
 
+    // Ajouter Content-Type: application/json si le corps est une chaîne (JSON)
+    if (typeof options.body === 'string') {
+      headers['Content-Type'] = 'application/json'
+    }
+
     if (token.value) {
       headers['Authorization'] = `Bearer ${token.value}`
     }
@@ -40,14 +45,14 @@ export const useShops = () => {
   const createShop = async (shopData: ShopData): Promise<ApiResponse<Shop>> => {
     try {
       const formData = new FormData()
-      
+
       // Ajouter les données texte
       Object.entries(shopData).forEach(([key, value]) => {
         if (key !== 'logo' && value !== undefined && value !== null) {
           formData.append(key, value.toString())
         }
       })
-      
+
       // Ajouter le logo s'il existe
       if (shopData.logo) {
         formData.append('logo', shopData.logo)
@@ -105,12 +110,12 @@ export const useShops = () => {
       if (shopId) {
         body.shop_id = shopId
       }
-      
+
       const response = await apiRequest<{ available: boolean; message: string }>('/shops/check-domain', {
         method: 'POST',
         body: JSON.stringify(body)
       })
-      
+
       return {
         available: response.data?.available || false,
         message: response.message || ''
@@ -138,7 +143,7 @@ export const useShops = () => {
         if (index !== -1) {
           shops.value[index] = response.data
         }
-        
+
         // Mettre à jour currentShop si c'est la même boutique
         if (currentShop.value?.id === shopId) {
           currentShop.value = response.data

@@ -176,7 +176,7 @@
         </div>
       </div>
     </div>
-      
+  
     <!-- Section Paiement -->
     <div v-if="activeTab === 'paiement'" class="bg-white p-6 border-t border-gray-200">
       <h2 class="text-lg font-medium text-gray-900 mb-4">Méthodes de paiement</h2>
