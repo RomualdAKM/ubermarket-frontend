@@ -170,6 +170,13 @@
             @click="updateDomain"
             :disabled="!customDomainInput || isUpdating || !domainAvailable"
             class="w-full px-4 py-2 bg-primary text-white text-sm font-medium rounded hover:bg-secondary disabled:opacity-50"
+          >
+            {{ isUpdating ? 'Mise à jour...' : (customDomain ? 'Changer le domaine' : 'Configurer le domaine') }}
+          </button>
+        </div>
+      </div>
+    </div>
+      
     <!-- Section Paiement -->
     <div v-if="activeTab === 'paiement'" class="bg-white p-6 border-t border-gray-200">
       <h2 class="text-lg font-medium text-gray-900 mb-4">Méthodes de paiement</h2>
