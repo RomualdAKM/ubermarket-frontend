@@ -170,7 +170,26 @@
                   <p class="text-xs text-gray-500 mt-4">Disponible sous 24h</p>
                 </div>
               </div>
-              
+              <!-- Méthode de paiement -->
+          <div v-if="selectedDeliveryOption !== 'payment_on_delivery'" class="mb-8">
+            <h3 class="text-base font-medium text-gray-900 mb-6">Méthode de paiement</h3>
+            
+            <div class="space-y-4">
+              <div v-for="method in paymentMethods" :key="method.id" class="flex items-center p-4 border border-gray-200 hover:border-gray-300 transition-colors">
+                <input 
+                  type="radio" 
+                  :id="method.id" 
+                  :value="method.id" 
+                  v-model="selectedPaymentMethod"
+                  class="w-4 h-4 text-gray-900 border-gray-300"
+                >
+                <label :for="method.id" class="ml-4 flex-1 cursor-pointer">
+                  <div class="font-medium text-gray-900">{{ method.label }}</div>
+                  <div class="text-xs text-gray-500 mt-1">{{ method.description }}</div>
+                </label>
+              </div>
+            </div>
+          </div>
               <!-- Calculs -->
               <div class="space-y-4 mb-8 pb-6 border-b border-gray-200">
                 <div class="flex justify-between text-gray-600">
@@ -264,6 +283,27 @@ const deliveryOptions = ref([
 
 // Sélection de l'option de livraison
 const selectedDeliveryOption = ref('delivery')
+
+// Méthodes de paiement
+const paymentMethods = ref([
+  {
+    id: 'mobile_money',
+    label: 'Mobile Money',
+    description: 'Paiement via Mobile Money (MTN, Moov, Orange...)'
+  },
+  {
+    id: 'card',
+    label: 'Carte bancaire',
+    description: 'Visa, Mastercard, American Express'
+  },
+  {
+    id: 'paypal',
+    label: 'PayPal',
+    description: 'Paiement sécurisé via PayPal'
+  }
+])
+
+const selectedPaymentMethod = ref('mobile_money')
 
 // Code promo
 const promoCode = ref('')

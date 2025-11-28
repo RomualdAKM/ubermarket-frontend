@@ -222,6 +222,31 @@
                 </div>
               </div>
               
+              <!-- Méthode de paiement -->
+              <div class="mb-6 pb-6 border-b border-gray-200">
+                <h3 class="text-sm font-medium text-gray-900 mb-3">Méthode de paiement</h3>
+                
+                <div class="space-y-2">
+                  <label 
+                    v-for="method in paymentMethods" 
+                    :key="method.id"
+                    class="flex items-center p-3 border border-gray-300 rounded-md cursor-pointer hover:bg-gray-50" 
+                    :class="selectedPaymentMethod === method.id ? 'border-primary bg-blue-50' : ''"
+                  >
+                    <input 
+                      type="radio" 
+                      v-model="selectedPaymentMethod" 
+                      :value="method.id"
+                      class="mr-2"
+                    >
+                    <div class="flex-1">
+                      <span class="text-sm font-medium text-gray-700">{{ method.label }}</span>
+                      <p class="text-xs text-gray-500 mt-0.5">{{ method.description }}</p>
+                    </div>
+                  </label>
+                </div>
+              </div>
+              
               <!-- Code promo -->
               <div class="mb-6 pb-6 border-b border-gray-200">
                 <h3 class="text-sm font-medium text-gray-900 mb-3">Code promo</h3>
@@ -318,6 +343,8 @@
 <script setup lang="ts">
 import FooterEpure from '@/components/theme_epure/FooterEpure.vue'
 import HeaderEpure from '@/components/theme_epure/HeaderEpure.vue'
+import { usePayment } from '~/composables/usePayment'
+
 definePageMeta({
   layout: false
 })
@@ -337,7 +364,9 @@ const router = useRouter()
 const { cartItems, subtotal, updateQuantity, removeItem, clearCart, fetchCart, getSessionId } = useCart()
 const { validatePromoCode } = usePromoCodes()
 const { createOrder } = useOrders()
+const { initializePayment } = usePayment()
 const { user } = useAuth()
+const config = useRuntimeConfig()
 
 // Données
 const shopSubdomain = computed(() => props.shop?.subdomain || '')
@@ -374,6 +403,32 @@ const orderForm = ref({
 })
 
 const isCreatingOrder = ref(false)
+
+// Méthodes de paiement
+const paymentMethods = ref([
+  {
+    id: 'mobile_money',
+    label: 'Mobile Money',
+    description: 'MTN, Moov, Orange Money'
+  },
+  {
+    id: 'card',
+    label: 'Carte bancaire',
+    description: 'Visa, Mastercard'
+  },
+  {
+    id: 'paypal',
+    label: 'PayPal',
+    description: 'Compte PayPal'
+  },
+  {
+    id: 'cash_on_delivery',
+    label: 'Paiement à la livraison',
+    description: 'Payer en espèces à la réception'
+  }
+])
+
+const selectedPaymentMethod = ref('cash_on_delivery')
 
 // Pré-remplir avec les infos de l'utilisateur connecté
 if (user.value) {
@@ -556,6 +611,7 @@ const handleCreateOrder = async () => {
       customer_email: orderForm.value.customer_email,
       customer_phone: orderForm.value.customer_phone,
       delivery_method: orderForm.value.delivery_method,
+      payment_method: selectedPaymentMethod.value,
       session_id: getSessionId()
     }
     
@@ -573,36 +629,57 @@ const handleCreateOrder = async () => {
     const order = await createOrder(shopSubdomain.value, orderData)
     
     if (order) {
-      successMessage.value = 'Commande créée avec succès !'
-      
-      // Attendre 2 secondes puis rediriger
-      setTimeout(() => {
-        // TODO: Rediriger vers la page de succès ou mes commandes
-        // Pour l'instant, on recharge le panier (qui sera vide)
-        fetchCart(shopSubdomain.value)
-        
-        // Réinitialiser le formulaire
-        if (!user.value) {
-          orderForm.value.customer_name = ''
-          orderForm.value.customer_email = ''
-          orderForm.value.customer_phone = ''
+      // Si paiement en ligne, initialiser le paiement
+      if (selectedPaymentMethod.value !== 'cash_on_delivery') {
+        try {
+          // Moneroo will add: ?status=X&paymentId=Y&paymentStatus=Z
+          // PayPal will add: ?token=ORDER_ID&PayerID=PAYER_ID
+          // We pass our local payment ID to identify which payment to verify
+          const returnUrl = `${window.location.origin}/boutique/${shopSubdomain.value}/payment-callback?local_payment_id=${order.id}`
+          
+          const paymentResult = await initializePayment(
+            order.id,
+            selectedPaymentMethod.value,
+            returnUrl
+          )
+          
+          if (paymentResult.success && paymentResult.checkout_url) {
+            // Rediriger vers la passerelle de paiement
+            window.location.href = paymentResult.checkout_url
+            return
+          } else {
+            errorMessage.value = 'Erreur lors de l\'initialisation du paiement'
+          }
+        } catch (paymentErr: any) {
+          errorMessage.value = paymentErr.message || 'Erreur lors de l\'initialisation du paiement'
         }
-        orderForm.value.delivery_method = 'pickup'
-        orderForm.value.shipping_address = {
-          address: '',
-          city: '',
-          postal_code: '',
-          country: ''
-        }
-        promoApplied.value = false
-        appliedPromoCode.value = null
+      } else {
+        // Paiement à la livraison - flux normal
+        successMessage.value = 'Commande créée avec succès !'
         
-        // Message de confirmation
-        alert(`Commande N°${order.order_number} créée avec succès !\n\nVous recevrez un email de confirmation à ${order.customer_email}`)
-        
-        // Rediriger vers la boutique
-        router.push(`/boutique/${shopSubdomain.value}`)
-      }, 1000)
+        setTimeout(() => {
+          fetchCart(shopSubdomain.value)
+          
+          if (!user.value) {
+            orderForm.value.customer_name = ''
+            orderForm.value.customer_email = ''
+            orderForm.value.customer_phone = ''
+          }
+          orderForm.value.delivery_method = 'pickup'
+          orderForm.value.shipping_address = {
+            address: '',
+            city: '',
+            postal_code: '',
+            country: ''
+          }
+          promoApplied.value = false
+          appliedPromoCode.value = null
+          
+          alert(`Commande N°${order.order_number} créée avec succès !\n\nVous recevrez un email de confirmation à ${order.customer_email}`)
+          
+          router.push(`/boutique/${shopSubdomain.value}`)
+        }, 1000)
+      }
     } else {
       errorMessage.value = 'Erreur lors de la création de la commande'
     }

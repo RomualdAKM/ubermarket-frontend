@@ -47,6 +47,7 @@ export interface CreateOrderData {
   customer_email: string
   customer_phone: string
   delivery_method: 'pickup' | 'delivery' | 'partner'
+  payment_method?: 'mobile_money' | 'paypal' | 'card' | 'cash_on_delivery'
   shipping_address?: any
   promo_code_id?: number
   discount_amount?: number
@@ -57,7 +58,7 @@ export interface CreateOrderData {
 export const useOrders = () => {
   const config = useRuntimeConfig()
   const { token, user } = useAuth()
-  
+
   const orders = useState<Order[]>('orders', () => [])
   const currentOrder = useState<Order | null>('currentOrder', () => null)
   const isLoading = ref(false)
@@ -191,12 +192,12 @@ export const useOrders = () => {
         if (index !== -1 && response.order) {
           orders.value[index] = response.order
         }
-        
+
         // Mettre à jour currentOrder si c'est la même
         if (currentOrder.value?.id === orderId && response.order) {
           currentOrder.value = response.order
         }
-        
+
         return true
       }
 
@@ -216,7 +217,7 @@ export const useOrders = () => {
     currentOrder,
     isLoading,
     error,
-    
+
     // Methods
     createOrder,
     fetchMyOrders,

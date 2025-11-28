@@ -197,67 +197,84 @@
     </div>
   
     <!-- Section Paiement -->
-    <div v-if="activeTab === 'paiement'" class="bg-white p-6 border-t border-gray-200">
-      <h2 class="text-lg font-medium text-gray-900 mb-4">Méthodes de paiement</h2>
-      
-      <div class="mb-6">
-        <h3 class="text-md font-medium text-gray-900 mb-3">Devise par défaut</h3>
-        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-          <div class="border border-gray-200 rounded p-4">
-            <div class="flex items-center">
-              <input id="euro" name="currency" type="radio" class="h-4 w-4 text-primary focus:ring-secondary" checked>
-              <label for="euro" class="ml-3 block text-sm font-medium text-gray-700">Euro (€)</label>
-            </div>
-          </div>
-          
-          <div class="border border-gray-200 rounded p-4">
-            <div class="flex items-center">
-              <input id="dollar" name="currency" type="radio" class="h-4 w-4 text-primary focus:ring-secondary">
-              <label for="dollar" class="ml-3 block text-sm font-medium text-gray-700">Dollar ($)</label>
-            </div>
-          </div>
-          
-          <div class="border border-gray-200 rounded p-4">
-            <div class="flex items-center">
-              <input id="xof" name="currency" type="radio" class="h-4 w-4 text-primary focus:ring-secondary">
-              <label for="xof" class="ml-3 block text-sm font-medium text-gray-700">Franc CFA (XOF)</label>
-            </div>
-          </div>
+<div v-if="activeTab === 'paiement'" class="bg-white p-6 border-t border-gray-200">
+  <h2 class="text-lg font-medium text-gray-900 mb-4">Configuration des paiements</h2>
+  
+  <!-- Moneroo -->
+  <div class="mb-6 p-4 border border-gray-200 rounded-lg">
+    <div class="flex items-center justify-between mb-4">
+      <div class="flex items-center">
+        <div class="bg-blue-100 p-2 rounded-lg">
+          <span class="text-xl">📱</span>
+        </div>
+        <div class="ml-3">
+          <h4 class="text-sm font-medium text-gray-900">Moneroo (Mobile Money & Cartes)</h4>
+          <p class="text-xs text-gray-500">MTN, Moov, Orange, Visa, Mastercard</p>
         </div>
       </div>
-      
-      <div class="border-t border-gray-200 rounded p-4 mb-6">
-        <h3 class="text-md font-medium text-gray-900 mb-3">Paiements activés</h3>
-        <div class="space-y-4">
-          <div class="flex items-center justify-between">
-            <div class="flex items-center">
-              <div class="bg-gray-200 border-2 border-dashed rounded-xl w-10 h-10" />
-              <div class="ml-3">
-                <p class="text-sm font-medium text-gray-900">PayPal</p>
-                <p class="text-sm text-gray-500">Connecté</p>
-              </div>
-            </div>
-            <button class="px-3 py-1 bg-red-100 text-red-700 text-sm font-medium rounded hover:bg-red-200 focus:outline-none focus:ring-2 focus:ring-red-500">
-              Déconnecter
-            </button>
-          </div>
-          
-          <div class="flex items-center justify-between">
-            <div class="flex items-center">
-              <div class="bg-gray-200 border-2 border-dashed rounded-xl w-10 h-10" />
-              <div class="ml-3">
-                <p class="text-sm font-medium text-gray-900">Mobile Money</p>
-                <p class="text-sm text-gray-500">Connecté via Fedapay</p>
-              </div>
-            </div>
-            <button class="px-3 py-1 bg-red-100 text-red-700 text-sm font-medium rounded hover:bg-red-200 focus:outline-none focus:ring-2 focus:ring-red-500">
-              Déconnecter
-            </button>
-          </div>
-        </div>
-      </div>
-      
+      <button @click="toggleMonerooConfig" class="text-sm text-primary hover:text-secondary font-medium">
+        {{ showMonerooConfig ? 'Masquer' : 'Configurer' }}
+      </button>
     </div>
+    
+    <div v-if="showMonerooConfig" class="mt-4 space-y-4 border-t border-gray-100 pt-4">
+      <div>
+        <label class="block text-sm font-medium text-gray-700">Clé Publique</label>
+        <input v-model="monerooConfig.public_key" type="text" class="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2" placeholder="pk_test_...">
+      </div>
+      <div>
+        <label class="block text-sm font-medium text-gray-700">Clé Secrète</label>
+        <input v-model="monerooConfig.secret_key" type="password" class="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2" placeholder="sk_test_...">
+      </div>
+      <div class="flex items-center">
+        <input v-model="monerooConfig.is_active" type="checkbox" class="h-4 w-4 text-primary border-gray-300 rounded">
+        <label class="ml-2 block text-sm text-gray-900">Activer</label>
+      </div>
+      <div class="flex justify-end">
+        <button @click="savePaymentConfig('mobile_money', monerooConfig)" class="bg-primary text-white px-4 py-2 rounded-md text-sm hover:bg-secondary">
+          Enregistrer
+        </button>
+      </div>
+    </div>
+  </div>
+  <!-- PayPal -->
+  <div class="p-4 border border-gray-200 rounded-lg">
+    <div class="flex items-center justify-between mb-4">
+      <div class="flex items-center">
+        <div class="bg-blue-100 p-2 rounded-lg">
+          <span class="text-xl">🅿️</span>
+        </div>
+        <div class="ml-3">
+          <h4 class="text-sm font-medium text-gray-900">PayPal</h4>
+          <p class="text-xs text-gray-500">Compte PayPal & Cartes</p>
+        </div>
+      </div>
+      <button @click="togglePaypalConfig" class="text-sm text-primary hover:text-secondary font-medium">
+        {{ showPaypalConfig ? 'Masquer' : 'Configurer' }}
+      </button>
+    </div>
+    
+    <div v-if="showPaypalConfig" class="mt-4 space-y-4 border-t border-gray-100 pt-4">
+      <div>
+        <label class="block text-sm font-medium text-gray-700">Client ID</label>
+        <input v-model="paypalConfig.client_id" type="text" class="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2" placeholder="AYSq3RDGsmBLJE-otTkBtM-jBRd1TCQwFf9RGfwddNXWz0uFU9ztymylOhRS">
+      </div>
+      <div>
+        <label class="block text-sm font-medium text-gray-700">Client Secret</label>
+        <input v-model="paypalConfig.client_secret" type="password" class="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2" placeholder="EGnHDxD_qRPdaLdZz8iCr8N7_MzF-YHPTkjs6NKYQvQSBngp4PTTVWkPZRbL">
+      </div>
+      <div class="flex items-center">
+        <input v-model="paypalConfig.is_active" type="checkbox" class="h-4 w-4 text-primary border-gray-300 rounded">
+        <label class="ml-2 block text-sm text-gray-900">Activer</label>
+      </div>
+      <div class="flex justify-end">
+        <button @click="savePaymentConfig('paypal', paypalConfig)" class="bg-primary text-white px-4 py-2 rounded-md text-sm hover:bg-secondary">
+          Enregistrer
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
 
     <!-- Section Notifications -->
     <div v-if="activeTab === 'notifications'" class="bg-white p-6 border-t border-gray-200">
@@ -437,7 +454,26 @@ const domainCheckMessage = ref('')
 const successMessage = ref('')
 const errorMessage = ref('')
 const dnsConfig = ref<any>(null)
-
+const showMonerooConfig = ref(false)
+const showPaypalConfig = ref(false)
+const monerooConfig = ref({ public_key: '', secret_key: '', is_active: false })
+const paypalConfig = ref({ client_id: '', client_secret: '', is_active: false })
+const toggleMonerooConfig = () => showMonerooConfig.value = !showMonerooConfig.value
+const togglePaypalConfig = () => showPaypalConfig.value = !showPaypalConfig.value
+const savePaymentConfig = async (method: string, credentials: any) => {
+  if (!currentShop.value) return
+  try {
+    const config = useRuntimeConfig()
+    await $fetch(`${config.public.apiBase}/shops/${currentShop.value.id}/payment-methods`, {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${useCookie('auth_token').value}` },
+      body: { method, credentials, is_active: credentials.is_active }
+    })
+    alert('Configuration enregistrée !')
+  } catch (e) {
+    alert('Erreur lors de l\'enregistrement')
+  }
+}
 // Récupérer la boutique actuelle
 const currentShop = computed(() => {
   const slug = route.params.slug as string
