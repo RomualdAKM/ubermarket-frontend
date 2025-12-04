@@ -637,10 +637,11 @@ const handleCreateOrder = async () => {
       // Si paiement en ligne, initialiser le paiement
       if (selectedPaymentMethod.value !== 'cash_on_delivery') {
         try {
-          // Moneroo will add: ?status=X&paymentId=Y&paymentStatus=Z
-          // PayPal will add: ?token=ORDER_ID&PayerID=PAYER_ID
-          // We pass our local payment ID to identify which payment to verify
-          const returnUrl = `${window.location.origin}/boutique/${shopSubdomain.value}/payment-callback?local_payment_id=${order.id}`
+          // Construire l'URL de retour de base
+          // Le backend ajoutera automatiquement le payment_id
+          // Moneroo ajoutera: ?status=X&paymentId=Y&paymentStatus=Z
+          // PayPal ajoutera: ?token=ORDER_ID&PayerID=PAYER_ID
+          const returnUrl = `${window.location.origin}/boutique/${shopSubdomain.value}/payment-callback`
           
           const paymentResult = await initializePayment(
             order.id,
