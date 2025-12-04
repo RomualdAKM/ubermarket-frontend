@@ -344,6 +344,11 @@
 import FooterEpure from '@/components/theme_epure/FooterEpure.vue'
 import HeaderEpure from '@/components/theme_epure/HeaderEpure.vue'
 import { usePayment } from '~/composables/usePayment'
+import { useCart } from '~/composables/useCart'
+import { usePromoCodes } from '~/composables/usePromoCodes'
+import { useOrders } from '~/composables/useOrders'
+import { useAuth } from '~/composables/useAuth'
+import { useRouter, useRuntimeConfig } from '#app'
 
 definePageMeta({
   layout: false

@@ -37,6 +37,10 @@
 
 <script setup lang="ts">
 import { usePayment } from '~/composables/usePayment'
+import { useAuth } from '~/composables/useAuth'
+import { useCart } from '~/composables/useCart'
+import { ref, computed, onMounted } from 'vue'
+import { useRoute } from 'vue-router'
 
 const route = useRoute()
 const subdomain = route.params.subdomain as string
