@@ -57,13 +57,12 @@
       </div>
 
       <!-- Catégories -->
-      <div class="py-12 sm:py-16" :style="{ backgroundColor: backgroundColor }">
+      <!-- <div class="py-12 sm:py-16" :style="{ backgroundColor: backgroundColor }">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div class="text-center mb-12 sm:mb-18">
             <h2 class="section-title">Nos catégories</h2>
           </div>
           
-          <!-- Version mobile avec défilement horizontal -->
           <div class="mt-8 sm:hidden overflow-x-auto whitespace-nowrap pb-4 -mx-4 px-4">
             <div class="inline-flex space-x-6">
               <a href="#" class="flex-shrink-0 text-center px-4 py-3 border-b-2 border-primary hover:text-primary transition-all">
@@ -84,7 +83,6 @@
             </div>
           </div>
           
-          <!-- Version desktop/tablette avec grille -->
           <div class="hidden sm:mt-12 sm:grid sm:grid-cols-2 md:grid-cols-4 gap-4 sm:gap-x-4 gap-y-6 sm:gap-y-8">
             <a href="#" class="text-center py-3 sm:py-4 border-r-2 sm:border-r-2 border-primary hover:text-primary transition-all">
               <h3 class="text-lg sm:text-xl font-medium">Mobilier</h3>
@@ -103,7 +101,7 @@
             </a>
           </div>
         </div>
-      </div>
+      </div> -->
 
       <!-- Produits vedettes -->
       <div class="py-16" :style="{ backgroundColor: backgroundColor }">
