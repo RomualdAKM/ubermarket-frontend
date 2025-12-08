@@ -2,7 +2,7 @@
   <div class="min-h-screen flex items-center justify-center  py-12 px-4 sm:px-6 lg:px-8">
     <div class="max-w-md w-full space-y-8">
       <div>
-        <h2 class="mt-6 text-center text-3xl font-extrabold text-gray-900">
+        <h2 class="mt-6 text-center text-2xl font-extrabold text-gray-900">
           Connexion vendeur
         </h2>
         <p class="mt-2 text-center text-sm text-gray-600">
@@ -25,7 +25,7 @@
               required 
               v-model="email" 
               :class="{'border-red-500': errors.email}" 
-              class="mt-1 block w-full px-3 py-2 border-0 border-b-2 border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-0 focus:border-primary" 
+              class="mt-1 block w-full px-3 py-2 border-0 border-b-2 border-gray-300 placeholder-gray-300 placeholder:italic text-gray-900 focus:outline-none focus:ring-0 focus:border-primary transition-colors duration-200"
               placeholder="Adresse e-mail"
             >
             <p v-if="errors.email" class="mt-1 text-sm text-red-600">{{ errors.email }}</p>
@@ -40,7 +40,7 @@
               required 
               v-model="password" 
               :class="{'border-red-500': errors.password}" 
-              class="mt-1 block w-full px-3 py-2 border-0 border-b-2 border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-0 focus:border-primary" 
+              class="mt-1 block w-full px-3 py-2 border-0 border-b-2 border-gray-300 placeholder-gray-300 placeholder:italic text-gray-900 focus:outline-none focus:ring-0 focus:border-primary transition-colors duration-200"
               placeholder="Mot de passe"
             >
             <p v-if="errors.password" class="mt-1 text-sm text-red-600">{{ errors.password }}</p>

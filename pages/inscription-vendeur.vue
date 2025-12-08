@@ -2,7 +2,7 @@
   <div class="min-h-screen flex items-center justify-center bg-white py-4 px-4 sm:px-6 lg:px-8">
     <div class="max-w-md w-full space-y-8">
       <div>
-        <h2 class="mt-6 text-center text-3xl font-extrabold text-gray-900">
+        <h2 class="mt-6 text-center text-2xl font-extrabold text-gray-900">
           Inscription vendeur
         </h2>
         <p class="mt-2 text-center text-sm text-gray-600">
@@ -23,8 +23,9 @@
               autocomplete="name" 
               required 
               v-model="name" 
+              @blur="validateField('name')" 
               :class="{'border-red-500': errors.name}" 
-              class="mt-1 block w-full px-3 py-2 border-0 border-b-2 border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-0 focus:border-primary" 
+              class="mt-1 block w-full px-3 py-2 border-0 border-b-2 border-gray-300 placeholder-gray-300 placeholder:italic text-gray-900 focus:outline-none focus:ring-0 focus:border-primary transition-colors duration-200" 
               placeholder="Prénom et nom (ex. : Jean Dupont)"
             >
             <p v-if="errors.name" class="mt-1 text-sm text-red-600">{{ errors.name }}</p>
@@ -36,11 +37,12 @@
               id="email-address" 
               name="email" 
               type="email" 
-              autocomplete="email" 
+              autocomplete="email"  
               required 
               v-model="email" 
+              @blur="validateField('email')" 
               :class="{'border-red-500': errors.email}" 
-              class="mt-1 block w-full px-3 py-2 border-0 border-b-2 border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-0 focus:border-primary" 
+              class="mt-1 block w-full px-3 py-2 border-0 border-b-2 border-gray-300 placeholder-gray-300 placeholder:italic text-gray-900 focus:outline-none focus:ring-0 focus:border-primary transition-colors duration-200" 
               placeholder="Adresse e-mail valide (ex. : jean@example.com)"
             >
             <p v-if="errors.email" class="mt-1 text-sm text-red-600">{{ errors.email }}</p>
@@ -55,8 +57,9 @@
               autocomplete="tel" 
               required 
               v-model="phone" 
+              @blur="validateField('phone')" 
               :class="{'border-red-500': errors.phone}" 
-              class="mt-1 block w-full px-3 py-2 border-0 border-b-2 border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-0 focus:border-primary" 
+              class="mt-1 block w-full px-3 py-2 border-0 border-b-2 border-gray-300 placeholder-gray-300 placeholder:italic text-gray-900 focus:outline-none focus:ring-0 focus:border-primary transition-colors duration-200" 
               placeholder="Format international (ex. : +33612345678)"
             >
             <p v-if="errors.phone" class="mt-1 text-sm text-red-600">{{ errors.phone }}</p>
@@ -69,8 +72,9 @@
               name="country" 
               required 
               v-model="country" 
+              @blur="validateField('country')" 
               :class="{'border-red-500': errors.country}" 
-              class="mt-1 block w-full px-3 py-2 border-0 border-b-2 border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-0 focus:border-primary bg-white"
+              class="mt-1 block w-full px-3 py-2 border-0 border-b-2 border-gray-300 text-gray-900 focus:outline-none focus:ring-0 focus:border-primary bg-white transition-colors duration-200"
             >
               <option value="">Sélectionnez un pays</option>
               <option v-for="countryOption in countries" :key="countryOption.code" :value="countryOption.code">
@@ -89,8 +93,9 @@
               autocomplete="new-password" 
               required 
               v-model="password" 
+              @blur="validateField('password')" 
               :class="{'border-red-500': errors.password}" 
-              class="mt-1 block w-full px-3 py-2 border-0 border-b-2 border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-0 focus:border-primary" 
+              class="mt-1 block w-full px-3 py-2 border-0 border-b-2 border-gray-300 placeholder-gray-300 placeholder:italic text-gray-900 focus:outline-none focus:ring-0 focus:border-primary transition-colors duration-200" 
               placeholder="Minimum 8 caractères, avec majuscule, minuscule et chiffre"
             >
             <p v-if="errors.password" class="mt-1 text-sm text-red-600">{{ errors.password }}</p>
@@ -105,12 +110,17 @@
               autocomplete="new-password" 
               required 
               v-model="passwordConfirm" 
+              @blur="validateField('passwordConfirm')" 
               :class="{'border-red-500': errors.passwordConfirm}" 
-              class="mt-1 block w-full px-3 py-2 border-0 border-b-2 border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-0 focus:border-primary" 
+              class="mt-1 block w-full px-3 py-2 border-0 border-b-2 border-gray-300 placeholder-gray-300 placeholder:italic text-gray-900 focus:outline-none focus:ring-0 focus:border-primary transition-colors duration-200" 
               placeholder="Confirmez votre mot de passe"
             >
             <p v-if="errors.passwordConfirm" class="mt-1 text-sm text-red-600">{{ errors.passwordConfirm }}</p>
           </div>
+        </div>
+
+        <div v-if="submitError" class="bg-red-50 border border-red-200 text-red-800 px-4 py-3 rounded relative" role="alert">
+          <span class="block sm:inline">{{ submitError }}</span>
         </div>
 
         <div class="flex items-start">
@@ -121,6 +131,7 @@
               type="checkbox" 
               required 
               v-model="acceptTerms" 
+              @change="validateField('acceptTerms')" 
               :class="{'border-red-500': errors.acceptTerms}" 
               class="h-4 w-4 text-primary focus:ring-primary border-gray-300 rounded"
             >
@@ -136,16 +147,22 @@
         <div>
           <button 
             type="submit" 
-            :disabled="!isFormValid" 
-            :class="{'opacity-50 cursor-not-allowed': !isFormValid, 'hover:bg-secondary': isFormValid}"
+            :disabled="!isFormValid || isSubmitting" 
+            :class="{'opacity-50 cursor-not-allowed': !isFormValid || isSubmitting, 'hover:bg-secondary': isFormValid && !isSubmitting}"
             class="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium text-white bg-primary focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary rounded-md"
           >
-            <span class="absolute left-0 inset-y-0 flex items-center pl-3">
+            <span v-if="!isSubmitting" class="absolute left-0 inset-y-0 flex items-center pl-3">
               <svg class="h-5 w-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"></path>
               </svg>
             </span>
-            S'inscrire
+            <span v-if="isSubmitting" class="absolute left-0 inset-y-0 flex items-center pl-3">
+              <svg class="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              </svg>
+            </span>
+            {{ isSubmitting ? 'Inscription en cours...' : "S'inscrire" }}
           </button>
         </div>
       </form>

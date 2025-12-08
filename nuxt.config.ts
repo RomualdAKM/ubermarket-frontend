@@ -12,8 +12,8 @@ export default defineNuxtConfig({
   },
   runtimeConfig: {
     public: {
-      apiBase: process.env.NUXT_PUBLIC_API_BASE || 'http://localhost:8000/api',
-      backendUrl: process.env.NUXT_PUBLIC_BACKEND_URL || 'http://localhost:8000'
+      apiBase: process.env.NUXT_PUBLIC_API_BASE || 'https://backend.uber-market.com/api',
+      backendUrl: process.env.NUXT_PUBLIC_BACKEND_URL || 'https://backend.uber-market.com'
     }
   },
   typescript: {
