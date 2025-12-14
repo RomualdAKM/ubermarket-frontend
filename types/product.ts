@@ -16,14 +16,14 @@ export interface ProductVariant {
 export interface ProductImage {
   id?: number
   product_id?: number
-  image_path: string // Nom réel du champ en DB
-  alt_text?: string // Nom réel du champ en DB
-  sort_order?: number // Nom réel du champ en DB
+  image_path: string
+  alt_text?: string
+  sort_order?: number
   created_at?: string
   updated_at?: string
-  // Pour le formulaire d'ajout
   file?: File
   preview?: string
+  is_primary?: boolean
 }
 
 export interface ProductData {

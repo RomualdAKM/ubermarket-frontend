@@ -2,10 +2,10 @@
   <div class="min-h-screen" :style="{ backgroundColor: backgroundColor }">
     <HeaderEpure :shop="shop" :primaryColor="primaryColor" />
     
-    <main class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-      <h1 class="text-4xl font-bold mb-8 text-center section-title">À propos</h1>
+    <main class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-4 py-16">
+      <h1 class="text-4xl font-bold max-w-4xl mx-auto px-4 sm:px-6 lg:px-4 py-2 text-center section-title">À propos</h1>
       
-      <div class="bg-white rounded-lg shadow-md p-8">
+      <div class="bg-white rounded-lg p-4">
         <div v-if="aboutImage" class="mb-8">
           <img :src="aboutImage" alt="À propos" class="w-full h-64 object-cover rounded-lg">
         </div>
@@ -41,7 +41,7 @@ interface Props {
 const props = defineProps<Props>()
 
 // Debug: afficher les props
-console.log('🔍 Props a-propos:', props)
+console.log('   Props a-propos:', props)
 console.log('  - shop:', props.shop)
 console.log('  - customizations:', props.customizations)
 console.log('  - customizations.about:', props.customizations?.about)
@@ -98,7 +98,7 @@ const footerSocialLinks = computed(() => {
   position: absolute;
   left: 50%;
   transform: translateX(-50%);
-  bottom: -12px;
+  bottom: -5px;
   width: 60px;
   height: 3px;
   background-color: v-bind(primaryColor);

@@ -3,7 +3,7 @@
     <div class="mb-8 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
       <div>
         <h1 class="text-2xl font-bold text-gray-900">Mes boutiques</h1>
-        <p class="text-gray-600 mt-1">Gérez vos boutiques en ligne</p>
+        <!-- <p class="text-gray-600 mt-1">Gérez vos boutiques en ligne</p> -->
       </div>
       <NuxtLink to="/creer-boutique" class="px-4 py-2 bg-primary text-white text-sm font-medium hover:bg-secondary focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary rounded-md transition-colors duration-200">
         + Créer une boutique
@@ -69,8 +69,9 @@
               Gérer
             </NuxtLink>
             <a 
-              :href="shop.full_domain" 
+              :href="getShopUrl(shop)" 
               target="_blank"
+              rel="noopener noreferrer"
               class="flex-1 px-3 py-2 bg-primary text-white text-sm font-medium rounded-md hover:bg-secondary focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition-colors duration-200 text-center"
             >
               Voir
@@ -161,6 +162,32 @@ const getStatusClass = (status: string) => {
     'draft': 'bg-yellow-100 text-yellow-800'
   }
   return classes[status as keyof typeof classes] || 'bg-gray-100 text-gray-800'
+}
+
+const getShopUrl = (shop: any) => {
+  // Si custom_domain est défini, l'utiliser
+  if (shop.custom_domain) {
+    // Vérifier si le domaine commence déjà par http:// ou https://
+    if (shop.custom_domain.startsWith('http://') || shop.custom_domain.startsWith('https://')) {
+      return shop.custom_domain
+    }
+    return `https://${shop.custom_domain}`
+  }
+  
+  // Sinon utiliser le sous-domaine
+  if (shop.subdomain) {
+    return `https://${shop.subdomain}.uber-market.com`
+  }
+  
+  // Fallback sur full_domain si disponible
+  if (shop.full_domain) {
+    if (shop.full_domain.startsWith('http://') || shop.full_domain.startsWith('https://')) {
+      return shop.full_domain
+    }
+    return `https://${shop.full_domain}`
+  }
+  
+  return '#'
 }
 
 // Chargement des données au montage

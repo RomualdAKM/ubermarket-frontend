@@ -1,8 +1,8 @@
 <template>
   <div class="min-h-screen flex items-center justify-center bg-white py-4 px-4 sm:px-6 lg:px-8">
-    <div class="max-w-md w-full space-y-8">
+    <div class="max-w-md w-full space-y-6">
       <div>
-        <h2 class="mt-6 text-center text-2xl font-extrabold text-gray-900">
+        <h2 class="mt-4 text-center text-2xl font-extrabold text-gray-900">
           Inscription vendeur
         </h2>
         <p class="mt-2 text-center text-sm text-gray-600">
@@ -12,7 +12,7 @@
           </NuxtLink>
         </p>
       </div>
-      <form class="mt-8 space-y-6" @submit.prevent="handleSignup">
+      <form class="mt-4 space-y-4" @submit.prevent="handleSignup">
         <div class="space-y-4">
           <div>
             <label for="name" class="block text-sm font-medium text-gray-700">Nom complet</label>

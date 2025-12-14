@@ -1,6 +1,4 @@
-import { ref } from 'vue'
-import type { Ref } from 'vue'
-import { useAuth } from '~/composables/useAuth'
+import type { ApiResponse } from '~/types/auth'
 
 export interface Review {
   id: number
@@ -12,39 +10,40 @@ export interface Review {
   is_verified_purchase: boolean
   created_at: string
   updated_at: string
-  user?: {
+  user: {
     id: number
     name: string
     email: string
   }
+  product: {
+    id: number
+    name: string
+    price: number
+  }
 }
 
-export interface CreateReviewData {
-  order_item_id: number
-  rating: number
-  comment?: string
+export interface ReviewStats {
+  total_reviews: number
+  average_rating: number
+  positive_percentage: number
+  average_response_time: string
 }
 
 export const useReviews = () => {
   const config = useRuntimeConfig()
   const { token } = useAuth()
-  
-  const reviews = useState<Review[]>('reviews', () => [])
-  const isLoading = ref(false)
-  const error: Ref<string | null> = ref(null)
+  const reviews = useState<Review[]>('reviews.list', () => [])
+  const stats = useState<ReviewStats | null>('reviews.stats', () => null)
+  const isLoading = useState<boolean>('reviews.loading', () => false)
+  const error = useState<string | null>('reviews.error', () => null)
 
-  /**
-   * Fonction utilitaire pour les requêtes API
-   */
-  const apiRequest = async <T>(endpoint: string, options: RequestInit = {}): Promise<any> => {
+  const apiRequest = async <T>(endpoint: string, options: RequestInit = {}): Promise<ApiResponse<T>> => {
+    const authToken = token.value
     const headers: Record<string, string> = {
       'Accept': 'application/json',
       'Content-Type': 'application/json',
+      ...(authToken && { 'Authorization': `Bearer ${authToken}` }),
       ...(options.headers as Record<string, string> || {})
-    }
-
-    if (token.value) {
-      headers['Authorization'] = `Bearer ${token.value}`
     }
 
     try {
@@ -66,53 +65,25 @@ export const useReviews = () => {
   }
 
   /**
-   * Créer un avis
+   * Récupérer tous les avis d'une boutique
    */
-  const createReview = async (reviewData: CreateReviewData): Promise<Review | null> => {
+  const fetchShopReviews = async (shopSlug: string): Promise<boolean> => {
     isLoading.value = true
     error.value = null
 
     try {
-      const response = await apiRequest<any>('/client/reviews', {
-        method: 'POST',
-        body: JSON.stringify(reviewData)
-      })
-
-      if (response.success && response.review) {
-        return response.review
-      }
-
-      return null
-    } catch (err: any) {
-      error.value = err.message
-      console.error('Erreur createReview:', err)
-      return null
-    } finally {
-      isLoading.value = false
-    }
-  }
-
-  /**
-   * Mettre à jour un avis
-   */
-  const updateReview = async (reviewId: number, reviewData: { rating: number, comment?: string }): Promise<boolean> => {
-    isLoading.value = true
-    error.value = null
-
-    try {
-      const response = await apiRequest<any>(`/client/reviews/${reviewId}`, {
-        method: 'PUT',
-        body: JSON.stringify(reviewData)
-      })
+      const response = await apiRequest<any>(`/shops/${shopSlug}/reviews`)
 
       if (response.success) {
+        reviews.value = response.data || []
+        stats.value = (response as any).stats || null
         return true
       }
 
       return false
     } catch (err: any) {
       error.value = err.message
-      console.error('Erreur updateReview:', err)
+      console.error('Erreur fetchShopReviews:', err)
       return false
     } finally {
       isLoading.value = false
@@ -120,70 +91,34 @@ export const useReviews = () => {
   }
 
   /**
-   * Supprimer un avis
+   * Récupérer les avis d'un produit spécifique (route publique)
    */
-  const deleteReview = async (reviewId: number): Promise<boolean> => {
-    isLoading.value = true
-    error.value = null
-
+  const fetchProductReviews = async (productId: number) => {
     try {
-      const response = await apiRequest<any>(`/client/reviews/${reviewId}`, {
-        method: 'DELETE'
-      })
+      const response = await fetch(`${config.public.apiBase}/products/${productId}/reviews`)
+      const data = await response.json()
 
-      if (response.success) {
-        return true
-      }
-
-      return false
-    } catch (err: any) {
-      error.value = err.message
-      console.error('Erreur deleteReview:', err)
-      return false
-    } finally {
-      isLoading.value = false
-    }
-  }
-
-  /**
-   * Récupérer les avis d'un produit
-   */
-  const fetchProductReviews = async (productId: number): Promise<{ reviews: Review[], average: number, total: number } | null> => {
-    isLoading.value = true
-    error.value = null
-
-    try {
-      const response = await apiRequest<any>(`/products/${productId}/reviews`)
-
-      if (response.success) {
-        reviews.value = response.reviews || []
+      if (data.success) {
         return {
-          reviews: response.reviews || [],
-          average: response.average_rating || 0,
-          total: response.total_reviews || 0
+          reviews: data.reviews || [],
+          average_rating: data.average_rating || 0,
+          total_reviews: data.total_reviews || 0
         }
       }
 
       return null
-    } catch (err: any) {
-      error.value = err.message
+    } catch (err) {
       console.error('Erreur fetchProductReviews:', err)
       return null
-    } finally {
-      isLoading.value = false
     }
   }
 
   return {
-    // State
     reviews,
+    stats,
     isLoading,
     error,
-    
-    // Methods
-    createReview,
-    updateReview,
-    deleteReview,
+    fetchShopReviews,
     fetchProductReviews
   }
 }

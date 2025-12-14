@@ -2,10 +2,10 @@
   <div class="min-h-screen" :style="{ backgroundColor: backgroundColor }">
     <HeaderEpure :shop="shop" :primaryColor="primaryColor" />
     
-    <main class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+    <main class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-4 py-16">
       <h1 class="text-4xl font-bold mb-8 text-center section-title">Conditions Générales d'Utilisation</h1>
       
-      <div class="bg-white rounded-lg shadow-md p-8">
+      <div class="bg-white rounded-lg p-4">
         <div class="prose max-w-none" :style="{ color: textColor }">
           <p class="text-lg leading-relaxed whitespace-pre-wrap">{{ termsText }}</p>
         </div>

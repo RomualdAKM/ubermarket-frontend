@@ -217,6 +217,90 @@ export const useProducts = () => {
     }
   }
 
+  // Mettre à jour un produit
+  const updateProduct = async (shopId: number, productId: number, productData: Partial<ProductData>): Promise<Product | null> => {
+    isLoading.value = true
+    error.value = null
+
+    try {
+      // Créer FormData pour gérer les fichiers si présents
+      const hasFiles = productData.images?.some(img => img.file) || productData.digital_file
+      
+      if (hasFiles) {
+        const formData = new FormData()
+        formData.append('_method', 'PUT')
+        
+        // Ajouter les données de base
+        if (productData.name) formData.append('name', productData.name)
+        if (productData.description) formData.append('description', productData.description)
+        if (productData.subcategory_id) formData.append('subcategory_id', productData.subcategory_id.toString())
+        if (productData.price !== undefined) formData.append('price', productData.price.toString())
+        if (productData.status) formData.append('status', productData.status)
+        if (productData.stock_quantity !== undefined) formData.append('stock_quantity', productData.stock_quantity.toString())
+        
+        // Ajouter les données optionnelles
+        if (productData.promotional_price) {
+          formData.append('promotional_price', productData.promotional_price.toString())
+        }
+        if (productData.promotion_start_date) {
+          formData.append('promotion_start_date', productData.promotion_start_date)
+        }
+        if (productData.promotion_end_date) {
+          formData.append('promotion_end_date', productData.promotion_end_date)
+        }
+
+        const response = await fetch(`${config.public.apiBase}/shops/${shopId}/products/${productId}`, {
+          method: 'POST',
+          headers: {
+            'Accept': 'application/json',
+            'Authorization': `Bearer ${token.value}`
+          },
+          body: formData
+        })
+
+        const data = await response.json()
+
+        if (!response.ok) {
+          throw new Error(data.message || 'Erreur lors de la mise à jour du produit')
+        }
+
+        if (data.success && data.data) {
+          // Mettre à jour le produit dans la liste
+          const index = products.value.findIndex(p => p.id === productId)
+          if (index !== -1) {
+            products.value[index] = data.data
+          }
+          return data.data
+        } else {
+          throw new Error(data.message || 'Erreur lors de la mise à jour du produit')
+        }
+      } else {
+        // Requête JSON standard sans fichiers
+        const response = await apiRequest<Product>(`/shops/${shopId}/products/${productId}`, {
+          method: 'PUT',
+          body: JSON.stringify(productData)
+        })
+        
+        if (response.success && response.data) {
+          // Mettre à jour le produit dans la liste
+          const index = products.value.findIndex(p => p.id === productId)
+          if (index !== -1) {
+            products.value[index] = response.data
+          }
+          return response.data
+        } else {
+          throw new Error(response.message || 'Erreur lors de la mise à jour du produit')
+        }
+      }
+    } catch (err: any) {
+      error.value = err.message
+      console.error('Erreur lors de la mise à jour du produit:', err)
+      return null
+    } finally {
+      isLoading.value = false
+    }
+  }
+
   // Réinitialiser les produits
   const resetProducts = (): void => {
     products.value = []
@@ -232,6 +316,7 @@ export const useProducts = () => {
     
     // Actions
     createProduct,
+    updateProduct,
     fetchShopProducts,
     fetchProductDetails,
     deleteProduct,

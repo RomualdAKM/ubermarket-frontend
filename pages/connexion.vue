@@ -95,9 +95,10 @@
 
 <script setup lang="ts">
 import { ref } from 'vue'
-import { useRouter } from 'vue-router'
+import { useRouter, useRoute } from 'vue-router'
 
 const router = useRouter()
+const route = useRoute()
 const { setToken, setUser } = useAuth()
 
 const email = ref('')
@@ -137,8 +138,11 @@ const handleLogin = async () => {
       // Stocker l'utilisateur
       setUser(data.user)
       
-      // Redirection vers le dashboard client
-      await router.push('/dashboard-client/profil')
+      // Récupérer l'URL de redirection depuis les query params
+      const redirectTo = route.query.redirect as string
+      
+      // Redirection vers l'URL demandée ou vers le dashboard client
+      await router.push(redirectTo || '/dashboard-client/profil')
     } else {
       errorMessage.value = data.message || 'Identifiants invalides'
     }

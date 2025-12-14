@@ -2,26 +2,37 @@
   <div class="flex h-screen bg-white">
     <!-- Sidebar -->
     <aside 
-      class="bg-white border-r border-gray-200 transition-all duration-300 ease-in-out"
+      class="bg-white border-r border-gray-200 transition-all duration-300 ease-in-out shadow-lg lg:shadow-none"
       :class="[
-        'fixed lg:relative z-30',
-        isSidebarOpen ? 'w-64' : 'w-20',
-        isSidebarOpen ? 'lg:w-64' : 'lg:w-20'
+        'fixed lg:relative z-30 h-full',
+        isSidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0',
+        isSidebarOpen ? 'w-64' : 'lg:w-20'
       ]"
     >
       <div class="flex items-center justify-between p-4 border-b border-gray-200">
-        <div class="flex items-center" v-show="isSidebarOpen || isLargeScreen">
-          <div class="bg-gray-200 border-2 border-dashed rounded-xl w-10 h-10" />
+        <div class="flex items-center" :class="isSidebarOpen ? 'opacity-100' : 'lg:opacity-100 opacity-0'">
+          <div v-if="currentShop?.logo" class="w-10 h-10 rounded-xl overflow-hidden flex-shrink-0">
+            <img 
+              :src="getLogoUrl(currentShop.logo)" 
+              :alt="`Logo ${currentShop.name}`"
+              class="w-full h-full object-cover"
+            />
+          </div>
+          <div v-else class="bg-gradient-to-br from-primary to-secondary rounded-xl w-10 h-10 flex items-center justify-center flex-shrink-0">
+            <span class="text-white font-bold text-lg">{{ getShopInitials(currentShop?.name) }}</span>
+          </div>
           <span 
-            class="ml-3 text-xl font-semibold text-primary transition-opacity duration-300"
-            :class="isSidebarOpen ? 'opacity-100' : 'opacity-0 lg:opacity-0'"
+            class="ml-3 text-xl font-bold text-gray-900 transition-opacity duration-300 truncate"
+            :class="isSidebarOpen ? 'opacity-100' : 'lg:opacity-0 opacity-100'"
+            :title="currentShop?.name || 'Ma boutique'"
           >
-            Uber Market
+            {{ currentShop?.name || 'Ma boutique' }}
           </span>
         </div>
         <button 
-          @click="toggleSidebar" 
-          class="lg:hidden text-gray-500 focus:outline-none"
+          @click="closeSidebar" 
+          class="lg:hidden text-gray-400 hover:text-gray-600 focus:outline-none p-1 rounded-lg hover:bg-gray-100 transition-colors"
+          aria-label="Fermer le menu"
         >
           <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
@@ -444,10 +455,27 @@ import { ref, onMounted, onUnmounted, computed } from 'vue'
 
 // Récupération de la boutique courante
 const { currentShop } = useShops()
+const config = useRuntimeConfig()
 
-// État du menu hamburger
-const isSidebarOpen = ref(true)
-const isLargeScreen = ref(false)
+// Fonction pour obtenir l'URL du logo
+const getLogoUrl = (logoPath: string) => {
+  if (!logoPath) return undefined
+  return `${config.public.apiBase.replace('/api', '')}/storage/${logoPath}`
+}
+
+// Fonction pour obtenir les initiales de la boutique
+const getShopInitials = (name?: string) => {
+  if (!name) return 'MB'
+  const words = name.trim().split(' ')
+  if (words.length >= 2) {
+    return (words[0][0] + words[1][0]).toUpperCase()
+  }
+  return name.substring(0, 2).toUpperCase()
+}
+
+// État du menu hamburger - Fermé par défaut sur mobile
+const isSidebarOpen = ref(false)
+const isLargeScreen = ref(true) // true par défaut pour éviter le flash
 
 // Fonction pour générer les liens dynamiques
 const getDashboardLink = (path: string = '') => {
@@ -482,11 +510,9 @@ const closeSidebar = () => {
 // Vérifier la taille de l'écran
 const checkScreenSize = () => {
   isLargeScreen.value = window.innerWidth >= 1024
-  if (!isLargeScreen.value) {
-    isSidebarOpen.value = false
-  } else {
-    isSidebarOpen.value = true
-  }
+  // Sur grand écran, ouvrir le sidebar par défaut
+  // Sur petit écran, le garder fermé
+  isSidebarOpen.value = isLargeScreen.value
 }
 
 // Gérer le redimensionnement de la fenêtre

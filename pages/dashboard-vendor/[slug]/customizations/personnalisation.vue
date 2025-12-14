@@ -166,7 +166,7 @@
       <div v-if="activeTab === 'accueil'">
         <div class="flex justify-between items-center mb-4">
           <h2 class="text-lg font-medium text-gray-900">Page d'accueil</h2>
-          <div class="flex items-center">
+          <!-- <div class="flex items-center">
             <span class="mr-2 text-sm text-gray-700">Afficher la section</span>
             <button
               @click="sectionVisibility.homepage = !sectionVisibility.homepage"
@@ -184,7 +184,7 @@
                 ]"
               />
             </button>
-          </div>
+          </div> -->
         </div>
         
         <!-- Bannière -->
@@ -194,7 +194,7 @@
           <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <!-- Carrousel d'images -->
             <div>
-              <label class="block text-sm font-medium text-gray-700 mb-2">Images (max 5, PNG/JPEG, max 5 Mo chacune)</label>
+              <label class="block text-sm font-medium text-gray-700 mb-2">Images</label>
               <div class="grid grid-cols-3 gap-2">
                 <div
                   v-for="(image, index) in homepageBanner.images"
@@ -248,14 +248,14 @@
             <div class="space-y-4">
               <div>
                 <label for="banner-title" class="block text-sm font-medium text-gray-700 mb-1">
-                  Texte principal (max 100 caractères)
+                  Texte principal 
                 </label>
                 <input
                   type="text"
                   id="banner-title"
                   v-model="homepageBanner.title"
                   maxlength="100"
-                  class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-secondary focus:border-secondary"
+                   class="mt-1 block w-full px-3 py-2 border-0 border-b-2 border-gray-300 placeholder-gray-300 placeholder:italic text-gray-900 focus:outline-none focus:ring-0 focus:border-primary transition-colors duration-200"
                 />
                 <div class="text-right text-sm text-gray-500 mt-1">
                   {{ homepageBanner.title.length }}/100
@@ -264,14 +264,14 @@
               
               <div>
                 <label for="banner-subtitle" class="block text-sm font-medium text-gray-700 mb-1">
-                  Texte secondaire (max 200 caractères)
+                  Texte secondaire 
                 </label>
                 <textarea
                   id="banner-subtitle"
                   v-model="homepageBanner.subtitle"
                   rows="2"
                   maxlength="200"
-                  class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-secondary focus:border-secondary"
+                   class="mt-1 block w-full px-3 py-2 border-0 border-b-2 border-gray-300 placeholder-gray-300 placeholder:italic text-gray-900 focus:outline-none focus:ring-0 focus:border-primary transition-colors duration-200"
                 ></textarea>
                 <div class="text-right text-sm text-gray-500 mt-1">
                   {{ homepageBanner.subtitle.length }}/200
@@ -296,7 +296,7 @@
               <select
                 id="products-per-page"
                 v-model="homepageProducts.perPage"
-                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-secondary focus:border-secondary"
+                 class="mt-1 block w-full px-3 py-2 border-0 border-b-2 border-gray-300 placeholder-gray-300 placeholder:italic text-gray-900 focus:outline-none focus:ring-0 focus:border-primary transition-colors duration-200"
               >
                 <option value="6">6</option>
                 <option value="12">12</option>
@@ -312,7 +312,7 @@
       <div v-if="activeTab === 'apropos'">
         <div class="flex justify-between items-center mb-4">
           <h2 class="text-lg font-medium text-gray-900">Page À propos</h2>
-          <div class="flex items-center">
+          <!-- <div class="flex items-center">
             <span class="mr-2 text-sm text-gray-700">Afficher la section</span>
             <button
               @click="sectionVisibility.about = !sectionVisibility.about"
@@ -330,20 +330,20 @@
                 ]"
               />
             </button>
-          </div>
+          </div> -->
         </div>
         
         <div class="space-y-6">
           <div>
             <label for="about-text" class="block text-sm font-medium text-gray-700 mb-1">
-              Texte (max 1000 caractères)
+              Texte 
             </label>
             <textarea
               id="about-text"
               v-model="aboutPage.text"
               rows="5"
               maxlength="1000"
-              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-secondary focus:border-secondary"
+               class="mt-1 block w-full px-3 py-2 border-0 border-b-2 border-gray-300 placeholder-gray-300 placeholder:italic text-gray-900 focus:outline-none focus:ring-0 focus:border-primary transition-colors duration-200"
               placeholder="Décrivez votre entreprise, votre mission, vos valeurs..."
             ></textarea>
             <div class="text-right text-sm text-gray-500 mt-1">
@@ -386,7 +386,7 @@
           </div>
           
           
-          <div>
+          <!-- <div>
             <button
               @click="duplicateAboutSection"
               class="inline-flex items-center px-3 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50"
@@ -396,7 +396,7 @@
               </svg>
               Dupliquer la section
             </button>
-          </div>
+          </div> -->
         </div>
       </div>
 
@@ -405,7 +405,7 @@
       <div v-if="activeTab === 'cgu'">
         <div class="flex justify-between items-center mb-4">
           <h2 class="text-lg font-medium text-gray-900">Page CGU</h2>
-          <div class="flex items-center">
+          <!-- <div class="flex items-center">
             <span class="mr-2 text-sm text-gray-700">Afficher la section</span>
             <button
               @click="sectionVisibility.terms = !sectionVisibility.terms"
@@ -423,19 +423,19 @@
                 ]"
               />
             </button>
-          </div>
+          </div> -->
         </div>
         
         <div>
           <label for="terms-text" class="block text-sm font-medium text-gray-700 mb-1">
-            Texte des conditions générales d'utilisation (max 5000 caractères)
+            Texte des conditions générales d'utilisation
           </label>
           <textarea
             id="terms-text"
             v-model="termsPage.text"
             rows="15"
             maxlength="5000"
-            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-secondary focus:border-secondary"
+             class="mt-1 block w-full px-3 py-2 border-0 border-b-2 border-gray-300 placeholder-gray-300 placeholder:italic text-gray-900 focus:outline-none focus:ring-0 focus:border-primary transition-colors duration-200"
             placeholder="Saisissez ici les conditions générales d'utilisation de votre boutique..."
           ></textarea>
           <div class="text-right text-sm text-gray-500 mt-1">
@@ -448,7 +448,7 @@
       <div v-if="activeTab === 'pied'">
         <div class="flex justify-between items-center mb-4">
           <h2 class="text-lg font-medium text-gray-900">Pied de page</h2>
-          <div class="flex items-center">
+          <!-- <div class="flex items-center">
             <span class="mr-2 text-sm text-gray-700">Afficher la section</span>
             <button
               @click="sectionVisibility.footer = !sectionVisibility.footer"
@@ -466,20 +466,20 @@
                 ]"
               />
             </button>
-          </div>
+          </div> -->
         </div>
         
         <div class="space-y-6">
           <div>
             <label for="footer-text" class="block text-sm font-medium text-gray-700 mb-1">
-              Texte (max 500 caractères)
+              Texte 
             </label>
             <textarea
               id="footer-text"
               v-model="footer.text"
               rows="3"
               maxlength="500"
-              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-secondary focus:border-secondary"
+               class="mt-1 block w-full px-3 py-2 border-0 border-b-2 border-gray-300 placeholder-gray-300 placeholder:italic text-gray-900 focus:outline-none focus:ring-0 focus:border-primary transition-colors duration-200"
               placeholder="Texte à afficher dans le pied de page..."
             ></textarea>
             <div class="text-right text-sm text-gray-500 mt-1">
@@ -499,7 +499,7 @@
                   type="text"
                   id="social-facebook"
                   v-model="footer.socialLinks.facebook"
-                  class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-secondary focus:border-secondary"
+                   class="mt-1 block w-full px-3 py-2 border-0 border-b-2 border-gray-300 placeholder-gray-300 placeholder:italic text-gray-900 focus:outline-none focus:ring-0 focus:border-primary transition-colors duration-200"
                   placeholder="https://facebook.com/votre-page"
                 />
               </div>
@@ -512,7 +512,7 @@
                   type="text"
                   id="social-instagram"
                   v-model="footer.socialLinks.instagram"
-                  class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-secondary focus:border-secondary"
+                   class="mt-1 block w-full px-3 py-2 border-0 border-b-2 border-gray-300 placeholder-gray-300 placeholder:italic text-gray-900 focus:outline-none focus:ring-0 focus:border-primary transition-colors duration-200"
                   placeholder="https://instagram.com/votre-compte"
                 />
               </div>
@@ -525,7 +525,7 @@
                   type="text"
                   id="social-twitter"
                   v-model="footer.socialLinks.twitter"
-                  class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-secondary focus:border-secondary"
+                   class="mt-1 block w-full px-3 py-2 border-0 border-b-2 border-gray-300 placeholder-gray-300 placeholder:italic text-gray-900 focus:outline-none focus:ring-0 focus:border-primary transition-colors duration-200"
                   placeholder="https://twitter.com/votre-compte"
                 />
               </div>
@@ -538,7 +538,7 @@
                   type="text"
                   id="social-linkedin"
                   v-model="footer.socialLinks.linkedin"
-                  class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-secondary focus:border-secondary"
+                   class="mt-1 block w-full px-3 py-2 border-0 border-b-2 border-gray-300 placeholder-gray-300 placeholder:italic text-gray-900 focus:outline-none focus:ring-0 focus:border-primary transition-colors duration-200"
                   placeholder="https://linkedin.com/company/votre-entreprise"
                 />
               </div>
@@ -654,7 +654,7 @@
             <select
               id="font-family"
               v-model="customFonts.family"
-              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              class="mt-1 block w-full px-3 py-2 border-0 border-b-2 border-gray-300 placeholder-gray-300 placeholder:italic text-gray-900 focus:outline-none focus:ring-0 focus:border-primary transition-colors duration-200"
             >
               <option value="sans-serif">Sans Serif (par défaut)</option>
               <option value="serif">Serif</option>
@@ -1119,13 +1119,13 @@ const saveCustomization = async () => {
     )
 
     if (success) {
-      alert('✅ Personnalisation enregistrée avec succès !')
+      alert('Personnalisation enregistrée avec succès !')
     } else {
-      alert('❌ Erreur lors de l\'enregistrement')
+      alert('Erreur lors de l\'enregistrement')
     }
   } catch (error: any) {
     console.error('Erreur lors de l\'enregistrement:', error)
-    alert(`❌ Erreur: ${error.message || 'Une erreur est survenue'}`)
+    alert(`Erreur: ${error.message || 'Une erreur est survenue'}`)
   }
 }
 

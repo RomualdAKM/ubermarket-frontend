@@ -1,6 +1,6 @@
 <template>
   <div class="container max-w-4xl mx-auto p-6">
-    <div class="mb-8">
+    <div class="mb-4">
       <NuxtLink to="/mes-boutiques" class="inline-flex items-center text-primary hover:text-secondary mb-4">
         <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
@@ -12,8 +12,33 @@
     </div>
 
     <div class="bg-white">
-      <form @submit.prevent="createBoutique" class="space-y-4">
+      <form @submit.prevent="createBoutique" class="space-y-2">
         <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
+               <div>
+            <label for="logo" class="block text-sm font-medium text-gray-700 mb-1">Logo de la boutique</label>
+            <div class="mt-2 flex items-center gap-4">
+              <div class="relative">
+                <div v-if="boutiqueForm.logoPreview" class="w-20 h-20 rounded-lg border-2 border-gray-200 overflow-hidden shadow-sm">
+                  <img :src="boutiqueForm.logoPreview" alt="Logo" class="w-full h-full object-cover">
+                </div>
+                <div v-else class="w-20 h-20 rounded-lg border-2 border-dashed border-gray-300 flex items-center justify-center bg-gray-50">
+                  <svg class="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                  </svg>
+                </div>
+              </div>
+              <div class="flex-1">
+                <label for="logo-upload" class="inline-flex items-center gap-2 px-4 py-2 bg-white border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 hover:border-gray-400 transition-colors cursor-pointer">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
+                  </svg>
+                  {{ boutiqueForm.logoPreview ? 'Modifier' : 'Télécharger' }}
+                </label>
+                <input id="logo-upload" name="logo-upload" type="file" accept="image/png, image/jpeg" @change="handleLogoUpload" class="sr-only">
+                <p class="mt-1.5 text-xs text-gray-500">PNG ou JPEG, max 2 Mo</p>
+              </div>
+            </div>
+          </div>
           <div>
             <label for="name" class="block text-sm font-medium text-gray-700 mb-1">Nom de la boutique <span class="text-red-500">*</span></label>
             <input 
@@ -51,7 +76,7 @@
               <option value="website">Site web</option>
             </select>
             <transition name="fade">
-              <p v-if="showTypeInfo" class="mt-2 text-xs text-gray-600 bg-blue-50 border-l-4 border-blue-400 p-2 rounded">
+              <p v-if="showTypeInfo" class="mt-2 text-xs text-gray-600 bg-gray-50  p-2 rounded">
                 <span v-if="boutiqueForm.type === 'e-commerce'" class="block">
                   <strong class="text-blue-700">E-commerce :</strong> Vos clients pourront passer commande et acheter en ligne ou payer à la livraison.
                 </span>
@@ -86,7 +111,7 @@
               <option value="digital">Produits numériques</option>
             </select>
             <transition name="fade">
-              <p v-if="showProductTypeInfo" class="mt-2 text-xs text-gray-600 bg-blue-50 border-l-4 border-blue-400 p-2 rounded">
+              <p v-if="showProductTypeInfo" class="mt-2 text-xs text-gray-600 bg-gray-50  p-2 rounded">
                 <span v-if="boutiqueForm.productType === 'physical'" class="block">
                   <strong class="text-blue-700">Produits physiques :</strong> Articles nécessitant une livraison (vêtements, électronique, etc.).
                 </span>
@@ -118,31 +143,7 @@
             </select>
           </div>
           
-          <div>
-            <label for="logo" class="block text-sm font-medium text-gray-700 mb-1">Logo de la boutique</label>
-            <div class="mt-2 flex items-center gap-4">
-              <div class="relative">
-                <div v-if="boutiqueForm.logoPreview" class="w-20 h-20 rounded-lg border-2 border-gray-200 overflow-hidden shadow-sm">
-                  <img :src="boutiqueForm.logoPreview" alt="Logo" class="w-full h-full object-cover">
-                </div>
-                <div v-else class="w-20 h-20 rounded-lg border-2 border-dashed border-gray-300 flex items-center justify-center bg-gray-50">
-                  <svg class="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
-                  </svg>
-                </div>
-              </div>
-              <div class="flex-1">
-                <label for="logo-upload" class="inline-flex items-center gap-2 px-4 py-2 bg-white border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 hover:border-gray-400 transition-colors cursor-pointer">
-                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
-                  </svg>
-                  {{ boutiqueForm.logoPreview ? 'Modifier' : 'Télécharger' }}
-                </label>
-                <input id="logo-upload" name="logo-upload" type="file" accept="image/png, image/jpeg" @change="handleLogoUpload" class="sr-only">
-                <p class="mt-1.5 text-xs text-gray-500">PNG ou JPEG, max 2 Mo</p>
-              </div>
-            </div>
-          </div>
+     
           
           <!-- <div>
             <label for="color" class="block text-sm font-medium text-gray-700 mb-1">Couleur principale</label>

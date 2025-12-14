@@ -1,44 +1,60 @@
 <template>
   <div class="max-w-7xl mx-auto">
     <!-- En-tête -->
-    <div class="mb-6">
-      <NuxtLink to="/dashboard/produits" class="inline-flex items-center text-blue-600 hover:text-blue-800 mb-4">
+    <div class="mb-4">
+      <!-- <NuxtLink to="/dashboard/produits" class="inline-flex items-center text-blue-600 hover:text-blue-800 mb-4">
         <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
         </svg>
         Retour aux produits
-      </NuxtLink>
-      <h1 class="text-2xl font-bold text-gray-900">Ajouter un produit</h1>
-      <p class="text-gray-600">Remplissez le formulaire ci-dessous pour ajouter un nouveau produit à votre boutique</p>
+      </NuxtLink> -->
+      <div class="flex items-center gap-3">
+        <h1 class="text-xl font-bold text-gray-900">Ajouter un produit</h1>
+        <button 
+          type="button"
+          @click="showShopInfo = !showShopInfo"
+          class="inline-flex items-center justify-center w-6 h-6 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-600 hover:text-gray-800 transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-400"
+          :title="showShopInfo ? 'Masquer les informations' : 'Voir les informations de la boutique'"
+        >
+          <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+            <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path>
+          </svg>
+        </button>
+      </div>
     </div>
+
+    <!-- Informations boutique (repliable) -->
+    <transition name="slide-fade">
+      <div v-if="showShopInfo && currentShop" class="mb-4 bg-white border border-gray-200 rounded-lg overflow-hidden">
+        <div class="px-4 py-3 bg-gray-50 border-b border-gray-200">
+          <h3 class="text-sm font-medium text-gray-700">Informations de la boutique</h3>
+        </div>
+        <div class="p-4">
+          <dl class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div>
+              <dt class="text-xs font-medium text-gray-500 uppercase tracking-wide">Boutique</dt>
+              <dd class="mt-1 text-sm text-gray-900 font-medium">{{ currentShop.name }}</dd>
+            </div>
+            <div>
+              <dt class="text-xs font-medium text-gray-500 uppercase tracking-wide">Type de produits</dt>
+              <dd class="mt-1 text-sm text-gray-900">{{ isPhysicalShop ? 'Produits physiques' : 'Produits numériques' }}</dd>
+            </div>
+            <div>
+              <dt class="text-xs font-medium text-gray-500 uppercase tracking-wide">Catégorie</dt>
+              <dd class="mt-1 text-sm text-gray-900">{{ shopCategory?.name || 'Non définie' }}</dd>
+            </div>
+          </dl>
+        </div>
+      </div>
+    </transition>
 
     <!-- Formulaire d'ajout de produit -->
     <div class="bg-white overflow-hidden">
-      <div class="p-6">
-        <!-- Informations sur la boutique -->
-        <div class="mb-8 p-4 bg-blue-50 border border-blue-200 rounded-lg" v-if="currentShop">
-          <h2 class="text-lg font-semibold text-blue-900 mb-2">Informations de la boutique</h2>
-          <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
-            <div>
-              <span class="font-medium text-blue-800">Nom :</span>
-              <span class="text-blue-700">{{ currentShop.name }}</span>
-            </div>
-            <div>
-              <span class="font-medium text-blue-800">Type :</span>
-              <span class="text-blue-700 capitalize">{{ isPhysicalShop ? 'Produits physiques' : 'Produits numériques' }}</span>
-            </div>
-            <div>
-              <span class="font-medium text-blue-800">Catégorie :</span>
-              <span class="text-blue-700">{{ shopCategory?.name || 'Non définie' }}</span>
-            </div>
-          </div>
-        </div>
-
-        <!-- Formulaire selon le type de boutique -->
+      <div>
         <form @submit.prevent="submitForm">
           <!-- Informations de base -->
           <div class="border-b border-gray-200 pb-6 mb-6">
-            <h2 class="text-lg font-semibold text-gray-900 mb-4">Informations de base</h2>
+            <!-- <h2 class="text-lg font-semibold text-gray-900 mb-4">Informations de base</h2> -->
             
             <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
               <div class="sm:col-span-2">
@@ -50,7 +66,7 @@
                   id="nom-produit"
                   v-model="productForm.name"
                   required
-                  class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  class="mt-1 block w-full px-3 py-2 border-0 border-b-2 border-gray-300 placeholder-gray-300 placeholder:italic text-gray-900 focus:outline-none focus:ring-0 focus:border-primary transition-colors duration-200"
                   placeholder="Ex. : T-shirt bleu"
                 />
               </div>
@@ -58,7 +74,7 @@
               <div class="sm:col-span-2">
                 <label for="description" class="block text-sm font-medium text-gray-700 mb-1">
                   Description<span class="text-red-500">*</span>
-                  <span class="text-gray-500 font-normal"> (max 1000 caractères)</span>
+                  <!-- <span class="text-gray-500 font-normal"> (max 1000 caractères)</span> -->
                 </label>
                 <textarea
                   id="description"
@@ -66,7 +82,7 @@
                   rows="4"
                   maxlength="1000"
                   required
-                  class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  class="mt-1 block w-full px-3 py-2 border-0 border-b-2 border-gray-300 placeholder-gray-300 placeholder:italic text-gray-900 focus:outline-none focus:ring-0 focus:border-primary transition-colors duration-200"
                   placeholder="Décrivez votre produit en détail..."
                 ></textarea>
                 <div class="text-right text-sm text-gray-500 mt-1">
@@ -82,7 +98,7 @@
                   id="sous-categorie"
                   v-model="productForm.subcategory_id"
                   required
-                  class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  class="mt-1 block w-full px-3 py-2 border-0 border-b-2 border-gray-300 placeholder-gray-300 placeholder:italic text-gray-900 focus:outline-none focus:ring-0 focus:border-primary transition-colors duration-200"
                   :disabled="subcategories.length === 0"
                 >
                   <option value="0">Sélectionnez une sous-catégorie</option>
@@ -118,7 +134,7 @@
                   step="0.01"
                   min="0"
                   required
-                  class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  class="mt-1 block w-full px-3 py-2 border-0 border-b-2 border-gray-300 placeholder-gray-300 placeholder:italic text-gray-900 focus:outline-none focus:ring-0 focus:border-primary transition-colors duration-200"
                   placeholder="Ex. : 29.99"
                 />
               </div>
@@ -133,7 +149,7 @@
                   v-model.number="productForm.promotional_price"
                   step="0.01"
                   min="0"
-                  class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  class="mt-1 block w-full px-3 py-2 border-0 border-b-2 border-gray-300 placeholder-gray-300 placeholder:italic text-gray-900 focus:outline-none focus:ring-0 focus:border-primary transition-colors duration-200"
                   placeholder="Ex. : 19.99"
                 />
               </div>
@@ -148,7 +164,7 @@
                     type="date"
                     id="date-debut-promo"
                     v-model="productForm.promotion_start_date"
-                    class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    class="mt-1 block w-full px-3 py-2 border-0 border-b-2 border-gray-300 placeholder-gray-300 placeholder:italic text-gray-900 focus:outline-none focus:ring-0 focus:border-primary transition-colors duration-200"
                   />
                 </div>
                 
@@ -160,7 +176,7 @@
                     type="date"
                     id="date-fin-promo"
                     v-model="productForm.promotion_end_date"
-                    class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    class="mt-1 block w-full px-3 py-2 border-0 border-b-2 border-gray-300 placeholder-gray-300 placeholder:italic text-gray-900 focus:outline-none focus:ring-0 focus:border-primary transition-colors duration-200"
                   />
                 </div>
               </div>
@@ -177,7 +193,7 @@
                     v-model.number="productForm.stock_quantity"
                     min="0"
                     required
-                    class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    class="mt-1 block w-full px-3 py-2 border-0 border-b-2 border-gray-300 placeholder-gray-300 placeholder:italic text-gray-900 focus:outline-none focus:ring-0 focus:border-primary transition-colors duration-200"
                     placeholder="Ex. : 50"
                   />
                 </div>
@@ -332,10 +348,10 @@
 
           <!-- Images du produit -->
           <div class="border-b border-gray-200 pb-6 mb-6">
-            <h2 class="text-lg font-semibold text-gray-900 mb-4">
+            <h3 class="text-xl font-semibold text-gray-900 mb-2">
               Images du produit<span class="text-red-500">*</span>
               <span class="text-gray-500 font-normal text-base"> (jusqu'à 5 images, PNG/JPEG, max 5 Mo chacune)</span>
-            </h2>
+            </h3>
             
             <div class="mb-3 text-sm text-gray-600">
               <span class="font-medium">💡 Astuce :</span> Cliquez sur une image pour la définir comme image principale
@@ -416,61 +432,37 @@
           <div class="pb-6">
             <h2 class="text-lg font-semibold text-gray-900 mb-4">Statut du produit</h2>
             
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div 
+            <div class="inline-flex rounded-lg border border-gray-200 p-1 bg-gray-50">
+              <button
+                type="button"
                 @click="productForm.status = 'active'"
                 :class="[
-                  'border-2 p-4 cursor-pointer',
-                  productForm.status === 'active' ? 'border-green-500 bg-green-50' : 'border-gray-200 hover:border-gray-300'
+                  'px-4 py-2 text-sm font-medium rounded-md transition-all',
+                  productForm.status === 'active' 
+                    ? 'bg-white text-gray-900 shadow-sm' 
+                    : 'text-gray-600 hover:text-gray-900'
                 ]"
               >
-                <div class="flex items-center">
-                  <div class="flex items-center h-5">
-                    <input
-                      id="status-active"
-                      name="status"
-                      type="radio"
-                      class="h-4 w-4 text-green-600 focus:ring-green-500"
-                      :checked="productForm.status === 'active'"
-                      @change="productForm.status = 'active'"
-                    />
-                  </div>
-                  <label for="status-active" class="ml-3 block text-sm font-medium text-gray-700">
-                    Actif
-                  </label>
-                </div>
-                <p class="mt-2 text-sm text-gray-500">
-                  Le produit sera visible par les acheteurs
-                </p>
-              </div>
-              
-              <div 
+                Actif
+              </button>
+              <button
+                type="button"
                 @click="productForm.status = 'inactive'"
                 :class="[
-                  'border-2 p-4 cursor-pointer',
-                  productForm.status === 'inactive' ? 'border-gray-500 bg-gray-50' : 'border-gray-200 hover:border-gray-300'
+                  'px-4 py-2 text-sm font-medium rounded-md transition-all',
+                  productForm.status === 'inactive' 
+                    ? 'bg-white text-gray-900 shadow-sm' 
+                    : 'text-gray-600 hover:text-gray-900'
                 ]"
               >
-                <div class="flex items-center">
-                  <div class="flex items-center h-5">
-                    <input
-                      id="status-inactive"
-                      name="status"
-                      type="radio"
-                      class="h-4 w-4 text-gray-600 focus:ring-gray-500"
-                      :checked="productForm.status === 'inactive'"
-                      @change="productForm.status = 'inactive'"
-                    />
-                  </div>
-                  <label for="status-inactive" class="ml-3 block text-sm font-medium text-gray-700">
-                    Inactif
-                  </label>
-                </div>
-                <p class="mt-2 text-sm text-gray-500">
-                  Le produit ne sera pas visible par les acheteurs
-                </p>
-              </div>
+                Inactif
+              </button>
             </div>
+            <p class="mt-2 text-sm text-gray-500">
+              {{ productForm.status === 'active' 
+                ? 'Le produit sera visible et disponible à l\'achat' 
+                : 'Le produit sera masqué pour les acheteurs' }}
+            </p>
           </div>
 
           <!-- Message d'erreur -->
@@ -548,6 +540,7 @@ const { createProduct, isLoading: isCreatingProduct, error: productError } = use
 const isLoading = ref(false)
 const error = ref<string | null>(null)
 const subcategories = ref<Subcategory[]>([])
+const showShopInfo = ref(false)
 
 // Formulaire du produit
 const productForm = reactive<ProductData>({
@@ -794,7 +787,7 @@ const submitForm = async () => {
     if (newProduct) {
       // Redirection vers la liste des produits avec un message de succès
       alert('Produit ajouté avec succès !')
-      router.push(`/dashboard-vendor/${currentShop.value.slug}/products`)
+      router.push(`/dashboard-vendor/${currentShop.value.slug}/products/produits`)
     } else {
       throw new Error('Erreur lors de la création du produit')
     }
@@ -806,3 +799,23 @@ const submitForm = async () => {
   }
 }
 </script>
+
+<style scoped>
+.slide-fade-enter-active {
+  transition: all 0.3s ease-out;
+}
+
+.slide-fade-leave-active {
+  transition: all 0.2s ease-in;
+}
+
+.slide-fade-enter-from {
+  transform: translateY(-10px);
+  opacity: 0;
+}
+
+.slide-fade-leave-to {
+  transform: translateY(-10px);
+  opacity: 0;
+}
+</style>

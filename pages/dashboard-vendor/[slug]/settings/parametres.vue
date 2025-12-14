@@ -18,12 +18,12 @@
           <button @click="activeTab = 'paiement'" :class="[activeTab === 'paiement' ? 'border-secondary text-primary' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300', 'whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm']">
             Paiement
           </button>
-          <button @click="activeTab = 'notifications'" :class="[activeTab === 'notifications' ? 'border-secondary text-primary' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300', 'whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm']">
+          <!-- <button @click="activeTab = 'notifications'" :class="[activeTab === 'notifications' ? 'border-secondary text-primary' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300', 'whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm']">
             Notifications
           </button>
           <button @click="activeTab = 'collaborateurs'" :class="[activeTab === 'collaborateurs' ? 'border-secondary text-primary' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300', 'whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm']">
             Collaborateurs
-          </button>
+          </button> -->
         </nav>
       </div>
     </div>
@@ -32,41 +32,94 @@
     <div v-if="activeTab === 'general'" class="bg-white p-6 border-t border-gray-200">
       <h2 class="text-lg font-medium text-gray-900 mb-4">Paramètres généraux</h2>
       
-      <form class="space-y-6">
+      <!-- Messages -->
+      <div v-if="generalSuccessMessage" class="mb-4 p-3 bg-green-50 border border-green-200 rounded-md">
+        <p class="text-sm text-green-800">{{ generalSuccessMessage }}</p>
+      </div>
+      
+      <div v-if="generalErrorMessage" class="mb-4 p-3 bg-red-50 border border-red-200 rounded-md">
+        <p class="text-sm text-red-800">{{ generalErrorMessage }}</p>
+      </div>
+      
+      <form @submit.prevent="updateGeneralSettings" class="space-y-6">
         <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
           <div>
             <label for="name" class="block text-sm font-medium text-gray-700">Nom complet</label>
-            <input type="text" name="name" id="name" class="mt-1 block w-full border border-gray-300 rounded-md rounded px-3 py-2 focus:outline-none focus:ring-secondary focus:border-secondary" value="Jean Dupont">
+            <input 
+              type="text" 
+              name="name" 
+              id="name" 
+              v-model="profileForm.name"
+              required
+              class="mt-1 block w-full px-3 py-2 border-0 border-b-2 border-gray-300 placeholder-gray-300 placeholder:italic text-gray-900 focus:outline-none focus:ring-0 focus:border-primary transition-colors duration-200" 
+            >
           </div>
           
           <div>
             <label for="email" class="block text-sm font-medium text-gray-700">Email</label>
-            <input type="email" name="email" id="email" class="mt-1 block w-full border border-gray-300 rounded-md rounded px-3 py-2 focus:outline-none focus:ring-secondary focus:border-secondary" value="jean.dupont@email.com">
+            <input 
+              type="email" 
+              name="email" 
+              id="email" 
+              v-model="profileForm.email"
+              required
+              class="mt-1 block w-full px-3 py-2 border-0 border-b-2 border-gray-300 placeholder-gray-300 placeholder:italic text-gray-900 focus:outline-none focus:ring-0 focus:border-primary transition-colors duration-200" 
+            >
           </div>
           
           <div>
             <label for="phone" class="block text-sm font-medium text-gray-700">Téléphone</label>
-            <input type="text" name="phone" id="phone" class="mt-1 block w-full border border-gray-300 rounded-md rounded px-3 py-2 focus:outline-none focus:ring-secondary focus:border-secondary" value="+33 6 12 34 56 78">
+            <input 
+              type="text" 
+              name="phone" 
+              id="phone" 
+              v-model="profileForm.phone"
+              required
+              placeholder="+33612345678"
+              class="mt-1 block w-full px-3 py-2 border-0 border-b-2 border-gray-300 placeholder-gray-300 placeholder:italic text-gray-900 focus:outline-none focus:ring-0 focus:border-primary transition-colors duration-200" 
+            >
           </div>
           
           <div>
             <label for="country" class="block text-sm font-medium text-gray-700">Pays</label>
-            <select id="country" name="country" class="mt-1 block w-full border border-gray-300 rounded-md rounded px-3 py-2 focus:outline-none focus:ring-secondary focus:border-secondary">
-              <option>France</option>
-              <option>Belgique</option>
-              <option>Suisse</option>
+            <select 
+              id="country" 
+              name="country" 
+              v-model="profileForm.country"
+              required
+              class="mt-1 block w-full px-3 py-2 border-0 border-b-2 border-gray-300 placeholder-gray-300 placeholder:italic text-gray-900 focus:outline-none focus:ring-0 focus:border-primary transition-colors duration-200"
+            >
+              <option value="FR">France</option>
+              <option value="BE">Belgique</option>
+              <option value="CH">Suisse</option>
+              <option value="CA">Canada</option>
+              <option value="MA">Maroc</option>
+              <option value="TN">Tunisie</option>
+              <option value="DZ">Algérie</option>
+              <option value="US">États-Unis</option>
+              <option value="GB">Royaume-Uni</option>
+              <option value="DE">Allemagne</option>
             </select>
           </div>
         </div>
         
-        <div>
-          <label for="about" class="block text-sm font-medium text-gray-700">À propos</label>
-          <textarea id="about" name="about" rows="3" class="mt-1 block w-full border border-gray-300 rounded-md rounded px-3 py-2 focus:outline-none focus:ring-secondary focus:border-secondary"></textarea>
-        </div>
-        
         <div class="flex justify-end">
-          <button type="submit" class="px-4 py-2 bg-primary text-white text-sm font-medium rounded hover:bg-secondary focus:outline-none focus:ring-2 focus:ring-secondary focus:ring-offset-2">
-            Sauvegarder
+          <button 
+            type="submit" 
+            :disabled="isUpdatingGeneral"
+            :class="[
+              'px-4 py-2 text-white text-sm font-medium rounded focus:outline-none focus:ring-2 focus:ring-offset-2',
+              isUpdatingGeneral ? 'bg-gray-300 cursor-not-allowed' : 'bg-primary hover:bg-secondary focus:ring-secondary'
+            ]"
+          >
+            <span v-if="isUpdatingGeneral" class="flex items-center">
+              <svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              </svg>
+              Mise à jour...
+            </span>
+            <span v-else>Sauvegarder</span>
           </button>
         </div>
       </form>
@@ -74,72 +127,58 @@
 
     <!-- Section Domaine -->
     <div v-if="activeTab === 'domaine'" class="bg-white p-6 border-t border-gray-200">
-      <h2 class="text-lg font-medium text-gray-900 mb-4">Configuration du domaine</h2>
+      <h2 class="text-lg font-medium text-gray-900 mb-6">Configuration du domaine</h2>
       
       <!-- Messages -->
-      <div v-if="successMessage" class="mb-4 p-3 bg-green-50 border border-green-200 rounded-md">
-        <p class="text-sm text-green-800">{{ successMessage }}</p>
+      <div v-if="successMessage" class="mb-4 p-3 bg-green-50 border-l-4 border-green-500 text-green-700">
+        {{ successMessage }}
       </div>
       
-      <div v-if="errorMessage" class="mb-4 p-3 bg-red-50 border border-red-200 rounded-md">
-        <p class="text-sm text-red-800">{{ errorMessage }}</p>
+      <div v-if="errorMessage" class="mb-4 p-3 bg-red-50 border-l-4 border-red-500 text-red-700">
+        {{ errorMessage }}
       </div>
       
       <!-- Sous-domaine -->
       <div class="mb-8">
-        <h3 class="text-md font-medium text-gray-900 mb-3">Sous-domaine</h3>
-        <p class="text-sm text-gray-600 mb-4">
-          Votre boutique est accessible via le sous-domaine suivant :
-        </p>
-        
-        <div class="flex items-center space-x-2 p-4 bg-gray-50 border border-gray-200 rounded-md">
-          <div class="flex-1">
-            <p class="text-sm font-mono text-gray-900">{{ currentShopSubdomain }}.uber-market.com</p>
-          </div>
+        <h3 class="text-sm font-medium text-gray-900 mb-2">Sous-domaine actuel</h3>
+        <div class="flex items-center justify-between p-3 bg-gray-50 border border-gray-200 rounded">
+          <code class="text-sm text-gray-700">{{ currentShopSubdomain }}.uber-market.com</code>
           <button 
             @click="copyToClipboard(currentShopSubdomain + '.uber-market.com')"
-            class="px-3 py-1 text-sm bg-gray-100 text-gray-700 rounded hover:bg-gray-200"
+            class="text-sm text-gray-600 hover:text-gray-900 underline"
           >
             Copier
           </button>
         </div>
-        
-        <p class="text-xs text-gray-500 mt-2">
-          Le sous-domaine est généré automatiquement à partir du nom de votre boutique.
-        </p>
       </div>
       
       <!-- Domaine personnalisé -->
-      <div class="border-t border-gray-200 pt-6">
-        <h3 class="text-md font-medium text-gray-900 mb-3">Domaine personnalisé</h3>
-        <p class="text-sm text-gray-600 mb-4">
-          Utilisez votre propre nom de domaine pour votre boutique (ex: www.maboutique.com)
-        </p>
+      <div class="border-t border-gray-200 pt-8">
+        <h3 class="text-sm font-medium text-gray-900 mb-2">Domaine personnalisé</h3>
+        <p class="text-sm text-gray-600 mb-4">Connectez votre propre nom de domaine</p>
         
-        <!-- Domaine actuel -->
-        <div v-if="customDomain" class="mb-4 p-4 bg-blue-50 border border-blue-200 rounded-md">
-          <div class="flex items-center justify-between">
-            <div>
-              <p class="text-sm font-medium text-blue-900">Domaine actif</p>
-              <p class="text-sm font-mono text-blue-700 mt-1">{{ customDomain }}</p>
-            </div>
+        <!-- Domaine actif -->
+        <div v-if="customDomain" class="mb-6 p-4 bg-white border border-gray-300 rounded">
+          <div class="flex items-center justify-between mb-2">
+            <span class="text-xs font-medium text-gray-500 uppercase tracking-wide">Domaine actif</span>
             <button 
               @click="removeDomain"
               :disabled="isUpdating"
-              class="px-3 py-1 text-sm bg-red-100 text-red-700 rounded hover:bg-red-200 disabled:opacity-50"
+              class="text-sm text-red-600 hover:text-red-800 disabled:opacity-50"
             >
               Retirer
             </button>
           </div>
+          <code class="text-sm font-mono text-gray-900">{{ customDomain }}</code>
         </div>
         
-        <!-- Formulaire d'ajout -->
+        <!-- Formulaire -->
         <div class="space-y-4">
           <div>
-            <label for="custom_domain" class="block text-sm font-medium text-gray-700 mb-1">
-              Nom de domaine
+            <label for="custom_domain" class="block text-sm font-medium text-gray-700 mb-2">
+              Nouveau domaine
             </label>
-            <div class="flex space-x-2">
+            <div class="flex gap-2">
               <input 
                 type="text" 
                 id="custom_domain" 
@@ -147,19 +186,19 @@
                 @input="domainCheckMessage = ''"
                 :disabled="isUpdating"
                 placeholder="www.maboutique.com"
-                class="flex-1 border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-secondary focus:border-secondary disabled:bg-gray-100"
+                class="mt-1 block w-full px-2 py-1 border-0 border-b-2 border-gray-300 placeholder-gray-300 placeholder:italic text-gray-900 focus:outline-none focus:ring-0 focus:border-primary transition-colors duration-200"
               >
               <button 
                 @click="checkDomain"
                 :disabled="!customDomainInput || isChecking"
-                class="px-4 py-2 bg-gray-100 text-gray-700 text-sm font-medium rounded hover:bg-gray-200 disabled:opacity-50"
+                class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {{ isChecking ? 'Vérification...' : 'Vérifier' }}
               </button>
             </div>
             
             <p v-if="domainCheckMessage" :class="[
-              'text-xs mt-2',
+              'text-sm mt-2',
               domainAvailable ? 'text-green-600' : 'text-red-600'
             ]">
               {{ domainCheckMessage }}
@@ -169,27 +208,28 @@
           <button 
             @click="updateDomain"
             :disabled="!customDomainInput || isUpdating || !domainAvailable"
-            class="w-full px-4 py-2 bg-primary text-white text-sm font-medium rounded hover:bg-secondary disabled:opacity-50"
+            class="w-full px-4 py-2 text-sm font-medium text-white bg-gray-900 rounded hover:bg-gray-800 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors"
           >
             {{ isUpdating ? 'Mise à jour...' : (customDomain ? 'Changer le domaine' : 'Configurer le domaine') }}
           </button>
+          
           <!-- Instructions DNS -->
-          <div v-if="dnsConfig" class="mt-4 p-4 bg-blue-50 border border-blue-200 rounded-md">
-            <h4 class="text-sm font-medium text-blue-900 mb-2">Configuration DNS requise</h4>
-            <p class="text-xs text-blue-700 mb-3">
-              Ajoutez cet enregistrement chez votre registrar (GoDaddy, Namecheap, OVH...) :
+          <div v-if="dnsConfig" class="mt-6 p-4 bg-gray-50 border border-gray-200 rounded">
+            <h4 class="text-sm font-medium text-gray-900 mb-3">Configuration DNS requise</h4>
+            <p class="text-sm text-gray-600 mb-3">
+              Ajoutez cet enregistrement chez votre registrar :
             </p>
             
-            <div class="p-3 bg-white border border-blue-300 rounded">
-              <p class="text-xs font-mono text-gray-700">
-                <strong>Type:</strong> CNAME<br>
-                <strong>Nom:</strong> {{ customDomain }}<br>
-                <strong>Valeur:</strong> cname.vercel-dns.com
-              </p>
+            <div class="p-3 bg-white border border-gray-300 rounded font-mono text-xs text-gray-700">
+              <div class="grid grid-cols-2 gap-2">
+                <div><span class="font-semibold">Type:</span> CNAME</div>
+                <div><span class="font-semibold">Nom:</span> {{ customDomain }}</div>
+                <div class="col-span-2"><span class="font-semibold">Valeur:</span> cname.vercel-dns.com</div>
+              </div>
             </div>
             
-            <p class="text-xs text-blue-600 mt-2">
-              La propagation DNS peut prendre 24-48h.
+            <p class="text-xs text-gray-500 mt-3">
+              La propagation DNS peut prendre jusqu'à 48h.
             </p>
           </div>
         </div>
@@ -198,79 +238,81 @@
   
     <!-- Section Paiement -->
 <div v-if="activeTab === 'paiement'" class="bg-white p-6 border-t border-gray-200">
-  <h2 class="text-lg font-medium text-gray-900 mb-4">Configuration des paiements</h2>
+  <h2 class="text-lg font-medium text-gray-900 mb-6">Configuration des paiements</h2>
   
   <!-- Moneroo -->
-  <div class="mb-6 p-4 border border-gray-200 rounded-lg">
-    <div class="flex items-center justify-between mb-4">
-      <div class="flex items-center">
-        <div class="bg-blue-100 p-2 rounded-lg">
-          <span class="text-xl">📱</span>
+  <div class="mb-6 border border-gray-200 rounded overflow-hidden">
+    <div class="flex items-center justify-between p-4 bg-gray-50">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded bg-white border border-gray-200 flex items-center justify-center">
+          <span class="text-sm font-semibold text-gray-700">M</span>
         </div>
-        <div class="ml-3">
-          <h4 class="text-sm font-medium text-gray-900">Moneroo (Mobile Money & Cartes)</h4>
-          <p class="text-xs text-gray-500">MTN, Moov, Orange, Visa, Mastercard</p>
+        <div>
+          <h4 class="text-sm font-medium text-gray-900">Moneroo</h4>
+          <p class="text-xs text-gray-500">Mobile Money & Cartes bancaires</p>
         </div>
       </div>
-      <button @click="toggleMonerooConfig" class="text-sm text-primary hover:text-secondary font-medium">
+      <button @click="toggleMonerooConfig" class="text-sm font-medium text-gray-700 hover:text-gray-900">
         {{ showMonerooConfig ? 'Masquer' : 'Configurer' }}
       </button>
     </div>
     
-    <div v-if="showMonerooConfig" class="mt-4 space-y-4 border-t border-gray-100 pt-4">
-      <div>
-        <label class="block text-sm font-medium text-gray-700">Clé Publique</label>
-        <input v-model="monerooConfig.public_key" type="text" class="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2" placeholder="pk_test_...">
-      </div>
-      <div>
-        <label class="block text-sm font-medium text-gray-700">Clé Secrète</label>
-        <input v-model="monerooConfig.secret_key" type="password" class="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2" placeholder="sk_test_...">
-      </div>
-      <div class="flex items-center">
-        <input v-model="monerooConfig.is_active" type="checkbox" class="h-4 w-4 text-primary border-gray-300 rounded">
-        <label class="ml-2 block text-sm text-gray-900">Activer</label>
-      </div>
-      <div class="flex justify-end">
-        <button @click="savePaymentConfig('mobile_money', monerooConfig)" class="bg-primary text-white px-4 py-2 rounded-md text-sm hover:bg-secondary">
-          Enregistrer
-        </button>
+    <div v-if="showMonerooConfig" class="p-4 bg-white border-t border-gray-200">
+      <div class="space-y-4">
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2">Clé API (Secret Key)</label>
+          <input v-model="monerooConfig.api_key" type="password" class="mt-1 block w-full px-2 py-1 border-0 border-b-2 border-gray-300 placeholder-gray-300 placeholder:italic text-gray-900 focus:outline-none focus:ring-0 focus:border-primary transition-colors duration-200" placeholder="sk_test_...">
+          <p class="mt-1 text-xs text-gray-500">La clé secrète disponible dans votre tableau de bord Moneroo</p>
+        </div>
+        <div class="flex items-center">
+          <input v-model="monerooConfig.is_active" type="checkbox" class="h-4 w-4 text-gray-900 border-gray-300 rounded">
+          <label class="ml-2 text-sm text-gray-700">Activer ce mode de paiement</label>
+        </div>
+        <div class="flex justify-end pt-2">
+          <button @click="savePaymentConfig('mobile_money', monerooConfig)" class="px-4 py-2 text-sm font-medium text-white bg-gray-900 rounded hover:bg-gray-800 transition-colors">
+            Enregistrer
+          </button>
+        </div>
       </div>
     </div>
   </div>
+  
   <!-- PayPal -->
-  <div class="p-4 border border-gray-200 rounded-lg">
-    <div class="flex items-center justify-between mb-4">
-      <div class="flex items-center">
-        <div class="bg-blue-100 p-2 rounded-lg">
-          <span class="text-xl">🅿️</span>
+  <div class="border border-gray-200 rounded overflow-hidden">
+    <div class="flex items-center justify-between p-4 bg-gray-50">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded bg-white border border-gray-200 flex items-center justify-center">
+          <span class="text-sm font-semibold text-gray-700">PP</span>
         </div>
-        <div class="ml-3">
+        <div>
           <h4 class="text-sm font-medium text-gray-900">PayPal</h4>
-          <p class="text-xs text-gray-500">Compte PayPal & Cartes</p>
+          <p class="text-xs text-gray-500">Compte PayPal & Cartes bancaires</p>
         </div>
       </div>
-      <button @click="togglePaypalConfig" class="text-sm text-primary hover:text-secondary font-medium">
+      <button @click="togglePaypalConfig" class="text-sm font-medium text-gray-700 hover:text-gray-900">
         {{ showPaypalConfig ? 'Masquer' : 'Configurer' }}
       </button>
     </div>
     
-    <div v-if="showPaypalConfig" class="mt-4 space-y-4 border-t border-gray-100 pt-4">
-      <div>
-        <label class="block text-sm font-medium text-gray-700">Client ID</label>
-        <input v-model="paypalConfig.client_id" type="text" class="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2" placeholder="AYSq3RDGsmBLJE-otTkBtM-jBRd1TCQwFf9RGfwddNXWz0uFU9ztymylOhRS">
-      </div>
-      <div>
-        <label class="block text-sm font-medium text-gray-700">Client Secret</label>
-        <input v-model="paypalConfig.client_secret" type="password" class="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2" placeholder="EGnHDxD_qRPdaLdZz8iCr8N7_MzF-YHPTkjs6NKYQvQSBngp4PTTVWkPZRbL">
-      </div>
-      <div class="flex items-center">
-        <input v-model="paypalConfig.is_active" type="checkbox" class="h-4 w-4 text-primary border-gray-300 rounded">
-        <label class="ml-2 block text-sm text-gray-900">Activer</label>
-      </div>
-      <div class="flex justify-end">
-        <button @click="savePaymentConfig('paypal', paypalConfig)" class="bg-primary text-white px-4 py-2 rounded-md text-sm hover:bg-secondary">
-          Enregistrer
-        </button>
+    <div v-if="showPaypalConfig" class="p-4 bg-white border-t border-gray-200">
+      <div class="space-y-4">
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2">Client ID</label>
+          <input v-model="paypalConfig.client_id" type="text" class="mt-1 block w-full px-2 py-1 border-0 border-b-2 border-gray-300 placeholder-gray-300 placeholder:italic text-gray-900 focus:outline-none focus:ring-0 focus:border-primary transition-colors duration-200" placeholder="AYSq3RDGsmBLJE-otTkBtM-jBRd1TCQwFf9RGfwddNXWz0uFU9ztymylOhRS">
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2">Client Secret</label>
+          <input v-model="paypalConfig.client_secret" type="password" class="mt-1 block w-full px-2 py-1 border-0 border-b-2 border-gray-300 placeholder-gray-300 placeholder:italic text-gray-900 focus:outline-none focus:ring-0 focus:border-primary transition-colors duration-200" placeholder="EGnHDxD_qRPdaLdZz8iCr8N7_MzF-YHPTkjs6NKYQvQSBngp4PTTVWkPZRbL">
+        </div>
+        <div class="flex items-center">
+          <input v-model="paypalConfig.is_active" type="checkbox" class="h-4 w-4 text-gray-900 border-gray-300 rounded">
+          <label class="ml-2 text-sm text-gray-700">Activer ce mode de paiement</label>
+        </div>
+        <div class="flex justify-end pt-2">
+          <button @click="savePaymentConfig('paypal', paypalConfig)" class="px-4 py-2 text-sm font-medium text-white bg-gray-900 rounded hover:bg-gray-800 transition-colors">
+            Enregistrer
+          </button>
+        </div>
       </div>
     </div>
   </div>
@@ -399,17 +441,17 @@
           <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <div>
               <label for="collab-name" class="block text-sm font-medium text-gray-700">Nom complet</label>
-              <input type="text" name="collab-name" id="collab-name" class="mt-1 block w-full border border-gray-300 rounded-md rounded px-3 py-2 focus:outline-none focus:ring-secondary focus:border-secondary">
+              <input type="text" name="collab-name" id="collab-name"  class="mt-1 block w-full px-3 py-2 border-0 border-b-2 border-gray-300 placeholder-gray-300 placeholder:italic text-gray-900 focus:outline-none focus:ring-0 focus:border-primary transition-colors duration-200">
             </div>
             
             <div>
               <label for="collab-email" class="block text-sm font-medium text-gray-700">Email</label>
-              <input type="email" name="collab-email" id="collab-email" class="mt-1 block w-full border border-gray-300 rounded-md rounded px-3 py-2 focus:outline-none focus:ring-secondary focus:border-secondary">
+              <input type="email" name="collab-email" id="collab-email"  class="mt-1 block w-full px-3 py-2 border-0 border-b-2 border-gray-300 placeholder-gray-300 placeholder:italic text-gray-900 focus:outline-none focus:ring-0 focus:border-primary transition-colors duration-200">
             </div>
             
             <div>
               <label for="collab-role" class="block text-sm font-medium text-gray-700">Rôle</label>
-              <select id="collab-role" name="collab-role" class="mt-1 block w-full border border-gray-300 rounded-md rounded px-3 py-2 focus:outline-none focus:ring-secondary focus:border-secondary">
+              <select id="collab-role" name="collab-role"  class="mt-1 block w-full px-3 py-2 border-0 border-b-2 border-gray-300 placeholder-gray-300 placeholder:italic text-gray-900 focus:outline-none focus:ring-0 focus:border-primary transition-colors duration-200">
                 <option>Gestion des produits</option>
                 <option>Gestion des commandes</option>
                 <option>Gestion des clients</option>
@@ -434,6 +476,7 @@
 
 <script setup lang="ts">
 import type { Shop } from '~/types/auth'
+import type { User } from '~/types/auth'
 
 definePageMeta({
   layout: 'dashboard',
@@ -442,6 +485,7 @@ definePageMeta({
 
 const route = useRoute()
 const { shops, checkCustomDomainAvailability, updateShop } = useShops()
+const { user, updateProfile } = useAuth()
 
 const activeTab = ref('general')
 const customDomainInput = ref('')
@@ -456,8 +500,63 @@ const errorMessage = ref('')
 const dnsConfig = ref<any>(null)
 const showMonerooConfig = ref(false)
 const showPaypalConfig = ref(false)
-const monerooConfig = ref({ public_key: '', secret_key: '', is_active: false })
+const monerooConfig = ref({ api_key: '', is_active: false })
 const paypalConfig = ref({ client_id: '', client_secret: '', is_active: false })
+
+// Section Général
+const isUpdatingGeneral = ref(false)
+const generalSuccessMessage = ref('')
+const generalErrorMessage = ref('')
+const profileForm = reactive({
+  name: '',
+  email: '',
+  phone: '',
+  country: 'FR'
+})
+
+// Initialiser le formulaire avec les données utilisateur
+onMounted(() => {
+  if (user.value) {
+    profileForm.name = user.value.name || ''
+    profileForm.email = user.value.email || ''
+    profileForm.phone = user.value.phone || ''
+    profileForm.country = user.value.country || 'FR'
+  }
+  
+  if (currentShop.value) {
+    currentShopSubdomain.value = currentShop.value.subdomain || ''
+    customDomain.value = currentShop.value.custom_domain || null
+    customDomainInput.value = customDomain.value || ''
+  }
+})
+
+// Mettre à jour les paramètres généraux
+const updateGeneralSettings = async () => {
+  isUpdatingGeneral.value = true
+  generalErrorMessage.value = ''
+  generalSuccessMessage.value = ''
+  
+  try {
+    const response = await updateProfile({
+      name: profileForm.name,
+      email: profileForm.email,
+      phone: profileForm.phone,
+      country: profileForm.country
+    })
+    
+    if (response.success) {
+      generalSuccessMessage.value = 'Profil mis à jour avec succès'
+      setTimeout(() => generalSuccessMessage.value = '', 3000)
+    } else {
+      generalErrorMessage.value = response.message || 'Erreur lors de la mise à jour'
+    }
+  } catch (error: any) {
+    generalErrorMessage.value = error.message || 'Erreur lors de la mise à jour du profil'
+  } finally {
+    isUpdatingGeneral.value = false
+  }
+}
+
 const toggleMonerooConfig = () => showMonerooConfig.value = !showMonerooConfig.value
 const togglePaypalConfig = () => showPaypalConfig.value = !showPaypalConfig.value
 const savePaymentConfig = async (method: string, credentials: any) => {

@@ -551,13 +551,17 @@ const handleAddToCart = async () => {
     return
   }
   
-  // Pour les produits physiques avec variantes, vérifier qu'au moins une variante est sélectionnée si nécessaire
-  let variantId = null
+  // Pour les produits physiques avec variantes, récupérer TOUTES les variantes sélectionnées
+  let variantIds: number[] | null = null
   if (!isDigitalProduct.value && Object.keys(groupedVariants.value).length > 0) {
-    // Récupérer l'ID de la première variante sélectionnée
-    const firstVariant = Object.values(selectedVariants.value)[0] as any
-    if (firstVariant) {
-      variantId = firstVariant.id
+    // Extraire les IDs de TOUTES les variantes sélectionnées
+    const selectedVariantIds = Object.values(selectedVariants.value)
+      .map((variant: any) => variant?.id)
+      .filter((id): id is number => id !== null && id !== undefined)
+    
+    // Si des variantes sont sélectionnées, les envoyer
+    if (selectedVariantIds.length > 0) {
+      variantIds = selectedVariantIds
     }
   }
   
@@ -570,7 +574,7 @@ const handleAddToCart = async () => {
       shopSubdomain.value,
       props.product.id,
       quantity.value,
-      variantId
+      variantIds
     )
     
     if (success) {

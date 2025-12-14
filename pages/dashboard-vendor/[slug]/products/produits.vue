@@ -2,8 +2,8 @@
   <div>
     <div class="mb-6 flex justify-between items-center">
       <div>
-        <h1 class="text-2xl font-semibold text-gray-800">Produits</h1>
-        <p class="text-gray-600">Gérez vos produits ({{ filteredProducts.length }} produit{{ filteredProducts.length > 1 ? 's' : '' }})</p>
+        <h1 class="text-xl font-semibold text-gray-800">Produits</h1>
+        <!-- <p class="text-gray-600">Gérez vos produits ({{ filteredProducts.length }} produit{{ filteredProducts.length > 1 ? 's' : '' }})</p> -->
       </div>
       <NuxtLink :to="getDashboardLink('products/ajouter-produit')" class="px-4 py-2 bg-primary text-white text-sm font-medium hover:bg-secondary focus:outline-none focus:ring-2 focus:ring-secondary focus:ring-offset-2">
         Ajouter un produit

@@ -26,6 +26,7 @@ const route = useRoute()
 const subdomain = route.params.subdomain as string
 const productId = parseInt(route.params.id as string)
 const { fetchCustomizations } = useCustomization()
+const { trackViewContent } = useMarketingTracking()
 
 const shop = ref<any>(null)
 const product = ref<any>(null)
@@ -60,6 +61,9 @@ const loadProductData = async () => {
     }
 
     product.value = productData.data
+    
+    // Tracker la vue du produit pour le marketing
+    trackViewContent(product.value)
     
     // Charger les customizations de la boutique
     await fetchCustomizations(subdomain)

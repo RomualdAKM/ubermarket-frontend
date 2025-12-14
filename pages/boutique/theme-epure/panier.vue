@@ -63,9 +63,15 @@
                   <div class="flex justify-between">
                     <div>
                       <h3 class="text-lg font-medium text-gray-900">{{ item.product.name }}</h3>
-                      <p v-if="item.variant" class="mt-1 text-gray-600">
-                        {{ item.variant.name }}: {{ item.variant.value }}
-                      </p>
+                      <!-- Afficher TOUTES les variantes sélectionnées -->
+                      <div v-if="item.variants && item.variants.length > 0" class="mt-1 space-y-1">
+                        <p v-for="variant in item.variants" :key="variant.id" class="text-sm text-gray-600">
+                          {{ variant.name }}: <span class="font-medium">{{ variant.value }}</span>
+                          <span v-if="variant.price_modifier && parseFloat(variant.price_modifier) !== 0" class="text-xs text-gray-500">
+                            ({{ parseFloat(variant.price_modifier) > 0 ? '+' : '' }}{{ parseFloat(variant.price_modifier).toLocaleString('fr-FR') }} {{ shop?.currency }})
+                          </span>
+                        </p>
+                      </div>
                       <p class="mt-1 text-sm text-gray-600">
                         {{ formatPrice(item.price) }} l'unité
                       </p>
@@ -130,42 +136,97 @@
             <div class="border border-gray-200 rounded-lg p-6 sticky top-4">
               <h2 class="text-lg font-medium text-gray-900 mb-6">Résumé de la commande</h2>
               
-              <!-- Formulaire informations client -->
-              <div class="mb-6 pb-6 border-b border-gray-200">
-                <h3 class="text-sm font-medium text-gray-900 mb-3">Vos informations</h3>
-                
-                <div class="space-y-3">
-                  <div>
-                    <input 
-                      type="text" 
-                      v-model="orderForm.customer_name"
-                      placeholder="Nom complet *"
-                      class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary"
-                      required
-                    >
-                  </div>
-                  
-                  <div>
-                    <input 
-                      type="email" 
-                      v-model="orderForm.customer_email"
-                      placeholder="Email *"
-                      class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary"
-                      required
-                    >
-                  </div>
-                  
-                  <div>
-                    <input 
-                      type="tel" 
-                      v-model="orderForm.customer_phone"
-                      placeholder="Téléphone *"
-                      class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary"
-                      required
-                    >
+              <!-- Message : Connexion requise -->
+              <div v-if="!user" class="mb-6">
+                <div class="bg-blue-50 border border-blue-200 rounded-md p-4 mb-4">
+                  <div class="flex">
+                    <svg class="h-5 w-5 text-blue-400 mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                    <div>
+                      <h3 class="text-sm font-medium text-blue-800 mb-1">Connexion requise</h3>
+                      <p class="text-xs text-blue-700">Vous devez être connecté pour passer commande et suivre vos achats.</p>
+                    </div>
                   </div>
                 </div>
+                
+                <div class="space-y-2">
+                  <NuxtLink 
+                    :to="`/connexion?redirect=/boutique/${shopSubdomain}/panier`"
+                    class="block w-full px-6 py-3 bg-primary text-white font-medium hover:bg-secondary rounded-md transition-colors text-center"
+                  >
+                    Se connecter
+                  </NuxtLink>
+                  
+                  <NuxtLink 
+                    :to="`/inscription?redirect=/boutique/${shopSubdomain}/panier`"
+                    class="block w-full px-6 py-3 border border-gray-300 text-gray-700 font-medium hover:bg-gray-50 rounded-md transition-colors text-center"
+                  >
+                    Créer un compte
+                  </NuxtLink>
+                </div>
+                
+                <p class="mt-4 text-xs text-gray-500 text-center">
+                  Pas encore inscrit ? Créez votre compte en 30 secondes pour profiter du suivi de commande.
+                </p>
               </div>
+              
+              <!-- Formulaire commande (si connecté) -->
+              <div v-else>
+                <!-- Totaux (affichés en haut quand connecté) -->
+                <div class="space-y-3 mb-6 pb-6 border-b border-gray-200">
+                  <div class="flex justify-between text-gray-600">
+                    <span>Sous-total</span>
+                    <span class="text-gray-900">{{ formatPrice(subtotal) }}</span>
+                  </div>
+                  
+                  <div v-if="promoApplied && appliedPromoCode" class="flex justify-between text-green-600">
+                    <span>Réduction</span>
+                    <span>-{{ formatPrice(appliedPromoCode.discount_amount) }}</span>
+                  </div>
+
+                  <div class="border-t border-gray-200 pt-3 flex justify-between">
+                    <span class="text-lg font-medium text-gray-900">Total</span>
+                    <span class="text-lg font-medium text-gray-900">{{ formatPrice(finalTotal) }}</span>
+                  </div>
+                </div>
+
+                <!-- Formulaire informations client -->
+                <div class="mb-6 pb-6 border-b border-gray-200">
+                  <h3 class="text-sm font-medium text-gray-900 mb-3">Vos informations</h3>
+                  
+                  <div class="space-y-3">
+                    <div>
+                      <input 
+                        type="text" 
+                        v-model="orderForm.customer_name"
+                        placeholder="Nom complet *"
+                        class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary"
+                        required
+                      >
+                    </div>
+                    
+                    <div>
+                      <input 
+                        type="email" 
+                        v-model="orderForm.customer_email"
+                        placeholder="Email *"
+                        class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary"
+                        required
+                      >
+                    </div>
+                    
+                    <div>
+                      <input 
+                        type="tel" 
+                        v-model="orderForm.customer_phone"
+                        placeholder="Téléphone *"
+                        class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary"
+                        required
+                      >
+                    </div>
+                  </div>
+                </div>
               
               <!-- Mode de livraison -->
               <div class="mb-6 pb-6 border-b border-gray-200">
@@ -290,24 +351,6 @@
                 <p v-if="promoError" class="mt-2 text-xs text-red-600">{{ promoError }}</p>
               </div>
               
-              <!-- Totaux -->
-              <div class="space-y-3 mb-6">
-                <div class="flex justify-between text-gray-600">
-                  <span>Sous-total</span>
-                  <span class="text-gray-900">{{ formatPrice(subtotal) }}</span>
-                </div>
-                
-                <div v-if="promoApplied && appliedPromoCode" class="flex justify-between text-green-600">
-                  <span>Réduction</span>
-                  <span>-{{ formatPrice(appliedPromoCode.discount_amount) }}</span>
-                </div>
-
-                <div class="border-t border-gray-200 pt-3 flex justify-between">
-                  <span class="text-lg font-medium text-gray-900">Total</span>
-                  <span class="text-lg font-medium text-gray-900">{{ formatPrice(finalTotal) }}</span>
-                </div>
-              </div>
-
               <!-- Bouton commander -->
               <div>
                 <button 
@@ -326,6 +369,8 @@
                 </p>
               </div>
             </div>
+            </div>
+            <!-- Fin div v-else (formulaire connecté) -->
           </div>
         </div>
       </div>
@@ -354,7 +399,7 @@ definePageMeta({
   layout: false
 })
 
-import { ref, computed } from 'vue'
+import { ref, computed, watch } from 'vue'
 
 // Props
 interface Props {
@@ -435,12 +480,14 @@ const paymentMethods = ref([
 
 const selectedPaymentMethod = ref('cash_on_delivery')
 
-// Pré-remplir avec les infos de l'utilisateur connecté
-if (user.value) {
-  orderForm.value.customer_name = user.value.name || ''
-  orderForm.value.customer_email = user.value.email || ''
-  orderForm.value.customer_phone = user.value.phone || ''
-}
+// Pré-remplir le formulaire avec les infos de l'utilisateur connecté
+watch(user, (newUser) => {
+  if (newUser) {
+    orderForm.value.customer_name = newUser.name || ''
+    orderForm.value.customer_email = newUser.email || ''
+    orderForm.value.customer_phone = newUser.phone || ''
+  }
+}, { immediate: true })
 
 // Validation du formulaire
 const isFormValid = computed(() => {

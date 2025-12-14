@@ -169,6 +169,27 @@ export const useAuth = () => {
     }
   }
 
+  // Mettre à jour le profil utilisateur
+  const updateProfile = async (profileData: Partial<User>): Promise<ApiResponse<User>> => {
+    try {
+      const storedRole = process.client ? localStorage.getItem('user_role') : null
+      const endpoint = storedRole === 'client' ? '/client/user' : '/vendor/user'
+      
+      const response = await apiRequest<User>(endpoint, {
+        method: 'PUT',
+        body: JSON.stringify(profileData)
+      })
+
+      if (response.success && response.user) {
+        user.value = response.user
+      }
+
+      return response
+    } catch (error: any) {
+      throw error
+    }
+  }
+
   return {
     user: readonly(user),
     token: readonly(token),
@@ -177,6 +198,7 @@ export const useAuth = () => {
     login,
     logout,
     fetchUser,
+    updateProfile,
     initAuth,
     setToken,
     setUser

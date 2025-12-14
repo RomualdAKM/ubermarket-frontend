@@ -145,7 +145,7 @@ export const useCart = () => {
     shopSubdomain: string, 
     productId: number, 
     quantity: number = 1, 
-    variantId: number | null = null
+    variantIds: number[] | null = null
   ): Promise<boolean> => {
     isLoading.value = true
     error.value = null
@@ -156,7 +156,7 @@ export const useCart = () => {
         method: 'POST',
         body: JSON.stringify({
           product_id: productId,
-          variant_id: variantId,
+          variant_ids: variantIds, // Envoyer un tableau de variant_ids
           quantity: quantity,
           session_id: sessionId
         })
@@ -165,6 +165,16 @@ export const useCart = () => {
       if (response.success) {
         // Recharger le panier après ajout
         await fetchCart(shopSubdomain)
+        
+        // Tracker l'ajout au panier pour le marketing
+        if (process.client) {
+          const { trackAddToCart } = useMarketingTracking()
+          const addedItem = cartItems.value.find(item => item.product_id === productId)
+          if (addedItem) {
+            trackAddToCart(addedItem.product, quantity)
+          }
+        }
+        
         return true
       }
 

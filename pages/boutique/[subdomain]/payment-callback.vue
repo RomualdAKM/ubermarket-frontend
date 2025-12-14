@@ -39,6 +39,7 @@
 import { usePayment } from '~/composables/usePayment'
 import { useAuth } from '~/composables/useAuth'
 import { useCart } from '~/composables/useCart'
+import { useMarketingTracking } from '~/composables/useMarketingTracking'
 import { ref, computed, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 
@@ -47,6 +48,7 @@ const subdomain = route.params.subdomain as string
 const { verifyPayment } = usePayment()
 const { user } = useAuth()
 const { clearCart } = useCart()
+const { trackPurchase } = useMarketingTracking()
 
 const isVerifying = ref(true)
 const verificationError = ref('')
@@ -77,6 +79,11 @@ onMounted(async () => {
     if (result.success && result.status === 'completed') {
       paymentSuccess.value = true
       orderNumber.value = result.order_number || 'N/A'
+      
+      // Tracker l'événement d'achat pour le marketing
+      if (result.order) {
+        trackPurchase(result.order)
+      }
       
       // Vider le panier après paiement réussi
       await clearCart(subdomain)
