@@ -12,7 +12,12 @@
       <component v-if="!isLoading && !error" :is="themeComponent" :shop="shop" :product="product" :customizations="customizations" />
     </div>
     
-    <!-- Pages statiques (à-propos, CGU, panier, etc.) -->
+    <!-- Page panier -->
+    <div v-else-if="isCart">
+      <component v-if="!isLoading && !error" :is="themeComponent" :shop="shop" :customizations="customizations" />
+    </div>
+    
+    <!-- Pages statiques (à-propos, CGU, etc.) -->
     <div v-else>
       <component v-if="!isLoading && !error" :is="themeComponent" :shop="shop" :customizations="customizations" :page="currentPage" />
     </div>
@@ -68,6 +73,7 @@ const currentPage = ref<string>('')
 // Déterminer la page actuelle
 const isHome = computed(() => !slug || slug.length === 0)
 const isProduct = computed(() => slug && slug[0] === 'produit' && slug.length === 2 && !isNaN(parseInt(slug[1])))
+const isCart = computed(() => slug && slug[0] === 'panier' && slug.length === 1)
 
 // Charger la boutique
 const loadShop = async () => {
@@ -97,6 +103,10 @@ const loadShop = async () => {
         if (isProduct.value) {
           themeComponent.value = defineAsyncComponent(() => 
             import(`~/pages/boutique/${themeSlug}/produit.vue`)
+          )
+        } else if (isCart.value) {
+          themeComponent.value = defineAsyncComponent(() => 
+            import(`~/pages/boutique/${themeSlug}/panier.vue`)
           )
         } else {
           themeComponent.value = defineAsyncComponent(() => 
@@ -148,6 +158,12 @@ const loadData = async () => {
     
     if (isProduct.value) {
       await loadProduct()
+    } else if (isCart.value) {
+      // Charger le panier via le composable useCart
+      const { fetchCart } = useCart()
+      if (subdomain) {
+        await fetchCart(subdomain)
+      }
     } else if (slug && slug.length > 0) {
       currentPage.value = slug[0]
     }

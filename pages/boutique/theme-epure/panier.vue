@@ -28,7 +28,7 @@
           <div class="md:w-2/3">
             <div class="flex justify-between items-center mb-8">
               <h1 class="text-2xl font-medium text-gray-900">Votre panier ({{ itemsCount }} article{{ itemsCount > 1 ? 's' : '' }})</h1>
-              <NuxtLink :to="`/boutique/${shopSubdomain}`" class="text-primary hover:text-secondary">
+              <NuxtLink :to="getHomeUrl(shop)" class="text-primary hover:text-secondary">
                 Continuer vos achats
               </NuxtLink>
             </div>
@@ -152,14 +152,14 @@
                 
                 <div class="space-y-2">
                   <NuxtLink 
-                    :to="`/connexion?redirect=/boutique/${shopSubdomain}/panier`"
+                    :to="getLoginUrl(getCartUrl(shop), shop)"
                     class="block w-full px-6 py-3 bg-primary text-white font-medium hover:bg-secondary rounded-md transition-colors text-center"
                   >
                     Se connecter
                   </NuxtLink>
                   
                   <NuxtLink 
-                    :to="`/inscription?redirect=/boutique/${shopSubdomain}/panier`"
+                    :to="getSignupUrl(getCartUrl(shop), shop)"
                     class="block w-full px-6 py-3 border border-gray-300 text-gray-700 font-medium hover:bg-gray-50 rounded-md transition-colors text-center"
                   >
                     Créer un compte
@@ -228,8 +228,8 @@
                   </div>
                 </div>
               
-              <!-- Mode de livraison -->
-              <div class="mb-6 pb-6 border-b border-gray-200">
+              <!-- Mode de livraison (UNIQUEMENT pour boutiques physiques) -->
+              <div v-if="!isDigitalShop" class="mb-6 pb-6 border-b border-gray-200">
                 <h3 class="text-sm font-medium text-gray-900 mb-3">Mode de livraison</h3>
                 
                 <div class="space-y-2">
@@ -280,6 +280,21 @@
                     placeholder="Pays *"
                     class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary"
                   >
+                </div>
+              </div>
+              
+              <!-- Message informatif pour boutiques digitales -->
+              <div v-if="isDigitalShop" class="mb-6 pb-6 border-b border-gray-200">
+                <div class="bg-blue-50 border border-blue-200 rounded-md p-4">
+                  <div class="flex">
+                    <svg class="h-5 w-5 text-blue-400 mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                    <div>
+                      <h3 class="text-sm font-medium text-blue-800 mb-1">Produits numériques</h3>
+                      <p class="text-xs text-blue-700">Après paiement, vous recevrez un email avec les liens de téléchargement de vos fichiers.</p>
+                    </div>
+                  </div>
                 </div>
               </div>
               
@@ -416,6 +431,7 @@ const { validatePromoCode } = usePromoCodes()
 const { createOrder } = useOrders()
 const { initializePayment } = usePayment()
 const { user } = useAuth()
+const { getHomeUrl, getCartUrl, getLoginUrl, getSignupUrl } = useShopNavigation()
 const config = useRuntimeConfig()
 
 // Données
@@ -423,6 +439,9 @@ const shopSubdomain = computed(() => props.shop?.subdomain || '')
 const primaryColor = computed(() => props.customizations?.home?.colors?.primary || '#e56a19')
 const secondaryColor = computed(() => props.customizations?.home?.colors?.secondary || '#5b6ac5')
 const itemsCount = computed(() => cartItems.value.reduce((total: number, item: any) => total + item.quantity, 0))
+
+// Déterminer si la boutique vend des produits digitaux
+const isDigitalShop = computed(() => props.shop?.product_type === 'digital')
 
 // État
 const isUpdating = ref<number | null>(null)
@@ -454,31 +473,39 @@ const orderForm = ref({
 
 const isCreatingOrder = ref(false)
 
-// Méthodes de paiement
-const paymentMethods = ref([
-  {
-    id: 'mobile_money',
-    label: 'Mobile Money',
-    description: 'MTN, Moov, Orange Money'
-  },
-  {
-    id: 'card',
-    label: 'Carte bancaire',
-    description: 'Visa, Mastercard'
-  },
-  {
-    id: 'paypal',
-    label: 'PayPal',
-    description: 'Compte PayPal'
-  },
-  {
-    id: 'cash_on_delivery',
-    label: 'Paiement à la livraison',
-    description: 'Payer en espèces à la réception'
+// Méthodes de paiement (adaptées selon le type de boutique)
+const paymentMethods = computed(() => {
+  const methods = [
+    {
+      id: 'mobile_money',
+      label: 'Mobile Money',
+      description: 'MTN, Moov, Orange Money'
+    },
+    {
+      id: 'card',
+      label: 'Carte bancaire',
+      description: 'Visa, Mastercard'
+    },
+    {
+      id: 'paypal',
+      label: 'PayPal',
+      description: 'Compte PayPal'
+    }
+  ]
+  
+  // Ajouter "Paiement à la livraison" UNIQUEMENT pour boutiques physiques
+  if (!isDigitalShop.value) {
+    methods.push({
+      id: 'cash_on_delivery',
+      label: 'Paiement à la livraison',
+      description: 'Payer en espèces à la réception'
+    })
   }
-])
+  
+  return methods
+})
 
-const selectedPaymentMethod = ref('cash_on_delivery')
+const selectedPaymentMethod = ref('mobile_money')
 
 // Pré-remplir le formulaire avec les infos de l'utilisateur connecté
 watch(user, (newUser) => {
@@ -486,6 +513,14 @@ watch(user, (newUser) => {
     orderForm.value.customer_name = newUser.name || ''
     orderForm.value.customer_email = newUser.email || ''
     orderForm.value.customer_phone = newUser.phone || ''
+  }
+}, { immediate: true })
+
+// Adapter le mode de livraison par défaut selon le type de boutique
+watch(() => props.shop?.product_type, (productType) => {
+  if (productType === 'digital') {
+    // Pour boutiques digitales : pas de livraison
+    orderForm.value.delivery_method = 'pickup' // Valeur technique (sera ignorée côté backend)
   }
 }, { immediate: true })
 
@@ -498,11 +533,19 @@ const isFormValid = computed(() => {
     return false
   }
   
-  // Si livraison à domicile, vérifier l'adresse
-  if (form.delivery_method === 'delivery') {
-    if (!form.shipping_address.address || !form.shipping_address.city || !form.shipping_address.country) {
-      return false
+  // Pour boutiques PHYSIQUES : vérifier livraison
+  if (!isDigitalShop.value) {
+    // Si livraison à domicile, vérifier l'adresse
+    if (form.delivery_method === 'delivery') {
+      if (!form.shipping_address.address || !form.shipping_address.city || !form.shipping_address.country) {
+        return false
+      }
     }
+  }
+  
+  // Pour boutiques DIGITALES : paiement en ligne obligatoire
+  if (isDigitalShop.value && selectedPaymentMethod.value === 'cash_on_delivery') {
+    return false
   }
   
   return true

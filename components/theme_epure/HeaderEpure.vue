@@ -149,6 +149,7 @@ import { computed, onMounted, watch } from 'vue'
 import { useRuntimeConfig, useRouter } from '#app'
 import { useCart } from '~/composables/useCart'
 import { useAuth } from '~/composables/useAuth'
+import { useShopNavigation } from '~/composables/useShopNavigation'
 
 interface Props {
   shop?: any
@@ -167,6 +168,9 @@ const { itemsCount, fetchCart } = useCart()
 // Composable pour gérer l'authentification
 const { user, logout } = useAuth()
 
+// Composable pour la navigation adaptative
+const { getHomeUrl, getCartUrl, getLoginUrl, getSignupUrl } = useShopNavigation()
+
 const shopName = computed(() => props.shop?.name || 'Boutique')
 const shopLogo = computed(() => {
   if (props.shop?.logo) {
@@ -177,13 +181,11 @@ const shopLogo = computed(() => {
   return null
 })
 
-const homeUrl = computed(() => {
-  const subdomain = props.shop?.subdomain
-  return subdomain ? `/boutique/${subdomain}` : '/boutique'
-})
+// URL de la page d'accueil (s'adapte automatiquement aux domaines personnalisés)
+const homeUrl = computed(() => getHomeUrl(props.shop))
 
-// URL du panier
-const cartUrl = computed(() => `${homeUrl.value}/panier`)
+// URL du panier (s'adapte automatiquement aux domaines personnalisés)
+const cartUrl = computed(() => getCartUrl(props.shop))
 
 // Nombre d'articles dans le panier (reactive)
 const cartCount = computed(() => itemsCount.value || 0)

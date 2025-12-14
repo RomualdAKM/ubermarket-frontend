@@ -106,9 +106,34 @@
                     <h4 class="font-medium text-gray-900">{{ item.product_name }}</h4>
                     <p v-if="item.variant_name" class="text-sm text-gray-600">{{ item.variant_name }}</p>
                     <p class="text-sm text-gray-600">Quantité: {{ item.quantity }}</p>
+                    
+                    <!-- Badge produit digital -->
+                    <span v-if="isDigitalProduct(item)" class="inline-flex items-center mt-1 px-2 py-1 text-xs font-medium rounded-full bg-purple-100 text-purple-800">
+                      <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10"></path>
+                      </svg>
+                      Produit numérique
+                    </span>
                   </div>
                   <div class="text-right">
                     <div class="font-medium text-gray-900">{{ formatPrice(item.total_price, order.currency) }}</div>
+                    
+                    <!-- Bouton téléchargement pour produits digitaux -->
+                    <button
+                      v-if="isDigitalProduct(item) && order.payment_status === 'paid'"
+                      @click="downloadDigitalFile(order.id, item.id)"
+                      class="mt-2 inline-flex items-center px-3 py-1.5 text-xs font-medium text-white bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg hover:from-blue-700 hover:to-purple-700 transition-all shadow-sm"
+                    >
+                      <svg class="w-3.5 h-3.5 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3 3m0 0l-3-3m3 3V10"></path>
+                      </svg>
+                      Télécharger
+                    </button>
+                    
+                    <!-- Message paiement en attente -->
+                    <p v-if="isDigitalProduct(item) && order.payment_status !== 'paid'" class="mt-2 text-xs text-orange-600">
+                      Disponible après paiement
+                    </p>
                   </div>
                 </div>
               </div>
@@ -492,6 +517,76 @@ const handleCancelOrder = async (orderId: number) => {
     } else {
       alert('Erreur lors de l\'annulation de la commande')
     }
+  }
+}
+
+// Vérifier si un produit est digital
+const isDigitalProduct = (item: any) => {
+  return item.product && item.product.digital_file
+}
+
+// Télécharger un fichier digital
+const downloadDigitalFile = async (orderId: number, orderItemId: number) => {
+  try {
+    const config = useRuntimeConfig()
+    const token = process.client ? localStorage.getItem('auth_token') : null
+    
+    if (!token) {
+      alert('Vous devez être connecté pour télécharger le fichier')
+      return
+    }
+    
+    // Créer une URL de téléchargement
+    const url = `${config.public.apiBase}/client/orders/${orderId}/items/${orderItemId}/download`
+    
+    // Ouvrir dans un nouvel onglet pour déclencher le téléchargement
+    const link = document.createElement('a')
+    link.href = url
+    link.setAttribute('download', '')
+    link.target = '_blank'
+    
+    // Ajouter le token dans les headers via fetch puis download
+    const response = await fetch(url, {
+      method: 'GET',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Accept': 'application/octet-stream'
+      }
+    })
+    
+    if (!response.ok) {
+      const errorData = await response.json()
+      alert(errorData.message || 'Erreur lors du téléchargement')
+      return
+    }
+    
+    // Récupérer le nom du fichier depuis les headers
+    const contentDisposition = response.headers.get('Content-Disposition')
+    let filename = 'fichier_telechargement'
+    if (contentDisposition) {
+      const filenameMatch = contentDisposition.match(/filename="(.+)"/)
+      if (filenameMatch) {
+        filename = filenameMatch[1]
+      }
+    }
+    
+    // Créer un blob et déclencher le téléchargement
+    const blob = await response.blob()
+    const blobUrl = window.URL.createObjectURL(blob)
+    
+    const downloadLink = document.createElement('a')
+    downloadLink.href = blobUrl
+    downloadLink.download = filename
+    document.body.appendChild(downloadLink)
+    downloadLink.click()
+    document.body.removeChild(downloadLink)
+    
+    // Libérer l'URL du blob
+    window.URL.revokeObjectURL(blobUrl)
+    
+  } catch (err: any) {
+    console.error('Erreur téléchargement:', err)
+    alert('Erreur lors du téléchargement du fichier')
   }
 }
 

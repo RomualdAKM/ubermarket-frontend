@@ -215,7 +215,7 @@
                   {{ isAddingToCart ? 'Ajout en cours...' : (availableStock === 0 ? 'Rupture de stock' : 'Ajouter au panier') }}
                 </button>
                 <NuxtLink 
-                  :to="`/boutique/${shopSubdomain}/panier`"
+                  :to="getCartUrl(props.shop)"
                   class="flex-1 px-6 py-3 border border-gray-300 text-gray-900 font-medium hover:bg-gray-50 transition-all rounded-md text-center"
                 >
                   Voir le panier
@@ -529,6 +529,7 @@ const { addToCart, itemsCount } = useCart()
 const { reviews: productReviews, fetchProductReviews, isLoading: isLoadingReviews } = useReviews()
 const { addToWishlist, removeFromWishlist: removeFromWishlistAPI, isInWishlist } = useWishlist()
 const { isAuthenticated } = useAuth()
+const { getCartUrl } = useShopNavigation()
 
 const promoCodeInput = ref('')
 const promoApplied = ref(false)
