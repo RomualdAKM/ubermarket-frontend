@@ -82,6 +82,13 @@ export const useShopNavigation = () => {
   }
 
   /**
+   * Génère l'URL de la page produits
+   */
+  const getProductsUrl = (shop?: any): string => {
+    return getShopUrl('produits', shop)
+  }
+
+  /**
    * Génère l'URL de connexion avec redirection
    */
   const getLoginUrl = (redirectTo?: string, shop?: any): string => {
@@ -113,6 +120,7 @@ export const useShopNavigation = () => {
     getShopUrl,
     getCartUrl,
     getProductUrl,
+    getProductsUrl,
     getLoginUrl,
     getSignupUrl
   }

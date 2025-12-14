@@ -17,6 +17,11 @@
       <component v-if="!isLoading && !error" :is="themeComponent" :shop="shop" :customizations="customizations" />
     </div>
     
+    <!-- Page produits -->
+    <div v-else-if="isProducts">
+      <component v-if="!isLoading && !error" :is="themeComponent" :shop="shop" :customizations="customizations" />
+    </div>
+    
     <!-- Pages statiques (à-propos, CGU, etc.) -->
     <div v-else>
       <component v-if="!isLoading && !error" :is="themeComponent" :shop="shop" :customizations="customizations" :page="currentPage" />
@@ -74,6 +79,7 @@ const currentPage = ref<string>('')
 const isHome = computed(() => !slug || slug.length === 0)
 const isProduct = computed(() => slug && slug[0] === 'produit' && slug.length === 2 && !isNaN(parseInt(slug[1])))
 const isCart = computed(() => slug && slug[0] === 'panier' && slug.length === 1)
+const isProducts = computed(() => slug && slug[0] === 'produits' && slug.length === 1)
 
 // Charger la boutique
 const loadShop = async () => {
@@ -107,6 +113,10 @@ const loadShop = async () => {
         } else if (isCart.value) {
           themeComponent.value = defineAsyncComponent(() => 
             import(`~/pages/boutique/${themeSlug}/panier.vue`)
+          )
+        } else if (isProducts.value) {
+          themeComponent.value = defineAsyncComponent(() => 
+            import(`~/pages/boutique/${themeSlug}/produits.vue`)
           )
         } else {
           themeComponent.value = defineAsyncComponent(() => 

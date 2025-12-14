@@ -12,7 +12,7 @@
         <!-- Navigation desktop -->
         <nav class="hidden md:flex space-x-8">
           <NuxtLink :to="homeUrl" class="text-gray-900 font-medium border-b-2 border-primary">Accueil</NuxtLink>
-          <NuxtLink :to="homeUrl" class="text-gray-600 hover:text-gray-900">Produits</NuxtLink>
+          <NuxtLink :to="productsUrl" class="text-gray-600 hover:text-gray-900">Produits</NuxtLink>
           <NuxtLink :to="`${homeUrl}/a-propos`" class="text-gray-600 hover:text-gray-900">À propos</NuxtLink>
           <NuxtLink :to="`${homeUrl}/cgu`" class="text-gray-600 hover:text-gray-900">CGU</NuxtLink>
         </nav>
@@ -133,19 +133,143 @@
           </NuxtLink>
           
           <!-- Menu mobile -->
-          <button class="ml-4 md:hidden text-gray-600">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <button 
+            @click="toggleMobileMenu" 
+            class="ml-4 md:hidden text-gray-600"
+            :aria-label="isMobileMenuOpen ? 'Fermer le menu' : 'Ouvrir le menu'"
+          >
+            <svg v-if="!isMobileMenuOpen" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+            </svg>
+            <svg v-else class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
             </svg>
           </button>
         </div>
       </div>
     </div>
+
+    <!-- Menu mobile (affiché en bas du header) -->
+    <div 
+      v-if="isMobileMenuOpen" 
+      class="md:hidden border-t border-gray-200 bg-white"
+    >
+      <nav class="px-4 py-4 space-y-2">
+        <NuxtLink 
+          :to="homeUrl" 
+          @click="closeMobileMenu"
+          class="block px-3 py-2 text-gray-900 font-medium bg-gray-100 rounded-md"
+        >
+          Accueil
+        </NuxtLink>
+        <NuxtLink 
+          :to="productsUrl" 
+          @click="closeMobileMenu"
+          class="block px-3 py-2 text-gray-600 hover:bg-gray-100 rounded-md"
+        >
+          Produits
+        </NuxtLink>
+        <NuxtLink 
+          :to="`${homeUrl}/a-propos`" 
+          @click="closeMobileMenu"
+          class="block px-3 py-2 text-gray-600 hover:bg-gray-100 rounded-md"
+        >
+          À propos
+        </NuxtLink>
+        <NuxtLink 
+          :to="`${homeUrl}/cgu`" 
+          @click="closeMobileMenu"
+          class="block px-3 py-2 text-gray-600 hover:bg-gray-100 rounded-md"
+        >
+          CGU
+        </NuxtLink>
+        
+        <!-- Séparateur -->
+        <div class="border-t border-gray-200 my-2"></div>
+        
+        <!-- Connexion / Profil -->
+        <NuxtLink 
+          v-if="!user"
+          to="/connexion"
+          @click="closeMobileMenu"
+          class="flex items-center px-3 py-2 text-gray-700 hover:bg-gray-100 rounded-md"
+        >
+          <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+          </svg>
+          Connexion
+        </NuxtLink>
+        
+        <!-- Menu utilisateur connecté -->
+        <template v-else>
+          <div class="px-3 py-2 text-sm font-medium text-gray-900">
+            {{ user.name }}
+          </div>
+          
+          <NuxtLink
+            v-if="user.role === 'vendor'"
+            to="/mes-boutiques"
+            @click="closeMobileMenu"
+            class="flex items-center px-3 py-2 text-gray-700 hover:bg-gray-100 rounded-md"
+          >
+            <svg class="w-5 h-5 mr-2 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
+            </svg>
+            Mon Dashboard Vendeur
+          </NuxtLink>
+          
+          <NuxtLink
+            to="/dashboard-client/commandes"
+            @click="closeMobileMenu"
+            class="flex items-center px-3 py-2 text-gray-700 hover:bg-gray-100 rounded-md"
+          >
+            <svg class="w-5 h-5 mr-2 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path>
+            </svg>
+            Mes Commandes
+          </NuxtLink>
+          
+          <NuxtLink
+            v-if="user.role === 'client'"
+            to="/devenir-vendeur"
+            @click="closeMobileMenu"
+            class="flex items-center px-3 py-2 text-white bg-primary hover:bg-opacity-90 rounded-md"
+          >
+            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+            </svg>
+            ⭐ Devenir Vendeur
+          </NuxtLink>
+          
+          <NuxtLink
+            to="/dashboard-client/profil"
+            @click="closeMobileMenu"
+            class="flex items-center px-3 py-2 text-gray-700 hover:bg-gray-100 rounded-md"
+          >
+            <svg class="w-5 h-5 mr-2 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+            </svg>
+            Mon Profil
+          </NuxtLink>
+          
+          <button
+            @click="handleLogout"
+            class="flex items-center w-full px-3 py-2 text-red-600 hover:bg-red-50 rounded-md"
+          >
+            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
+            </svg>
+            Déconnexion
+          </button>
+        </template>
+      </nav>
+    </div>
   </header>
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, watch } from 'vue'
+import { computed, onMounted, watch, ref } from 'vue'
 import { useRuntimeConfig, useRouter } from '#app'
 import { useCart } from '~/composables/useCart'
 import { useAuth } from '~/composables/useAuth'
@@ -169,7 +293,7 @@ const { itemsCount, fetchCart } = useCart()
 const { user, logout } = useAuth()
 
 // Composable pour la navigation adaptative
-const { getHomeUrl, getCartUrl, getLoginUrl, getSignupUrl } = useShopNavigation()
+const { getHomeUrl, getCartUrl, getLoginUrl, getSignupUrl, getProductsUrl } = useShopNavigation()
 
 const shopName = computed(() => props.shop?.name || 'Boutique')
 const shopLogo = computed(() => {
@@ -187,8 +311,24 @@ const homeUrl = computed(() => getHomeUrl(props.shop))
 // URL du panier (s'adapte automatiquement aux domaines personnalisés)
 const cartUrl = computed(() => getCartUrl(props.shop))
 
+// URL de la page produits (s'adapte automatiquement aux domaines personnalisés)
+const productsUrl = computed(() => getProductsUrl(props.shop))
+
 // Nombre d'articles dans le panier (reactive)
 const cartCount = computed(() => itemsCount.value || 0)
+
+// État du menu mobile
+const isMobileMenuOpen = ref(false)
+
+// Fonction pour basculer le menu mobile
+const toggleMobileMenu = () => {
+  isMobileMenuOpen.value = !isMobileMenuOpen.value
+}
+
+// Fonction pour fermer le menu mobile
+const closeMobileMenu = () => {
+  isMobileMenuOpen.value = false
+}
 
 // Fonction de déconnexion
 const handleLogout = async () => {
