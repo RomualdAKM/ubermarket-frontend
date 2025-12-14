@@ -1,12 +1,7 @@
 <template>
   <div class="min-h-screen bg-white">
     <!-- En-tête -->
-    <HeaderEpure 
-      :backgroundColor="secondaryColor" 
-      :primaryColor="primaryColor"
-      :shopName="props.shop?.name"
-      :shopSubdomain="shopSubdomain"
-    />
+    <HeaderEpure :shop="shop" :primaryColor="primaryColor" />
 
     <main class="py-8">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -308,10 +303,10 @@
     </main>
 
     <FooterEpure 
-      :backgroundColor="secondaryColor" 
+      :backgroundColor="backgroundColor" 
       :primaryColor="primaryColor"
-      :footerText="customizations?.footer?.text"
-      :socialLinks="customizations?.footer?.socialLinks"
+      :footerText="footerText"
+      :socialLinks="footerSocialLinks"
     />
   </div>
 </template>
@@ -335,6 +330,9 @@ interface Props {
 }
 
 const props = defineProps<Props>()
+
+// Variables locales pour le template
+const shop = computed(() => props.shop)
 
 // Données dynamiques du produit
 const productName = computed(() => props.product?.name || 'Produit')
@@ -378,6 +376,24 @@ const shopSubdomain = computed(() => props.shop?.subdomain || '')
 // Couleurs personnalisées
 const primaryColor = computed(() => props.customizations?.home?.colors?.primary || '#e56a19')
 const secondaryColor = computed(() => props.customizations?.home?.colors?.secondary || '#5b6ac5')
+const backgroundColor = computed(() => props.customizations?.home?.colors?.background || '#ffffff')
+
+// Footer (pied de page)
+const footerText = computed(() => {
+  if (props.customizations?.footer?.text) {
+    return props.customizations.footer.text
+  }
+  return `© ${new Date().getFullYear()} ${shop.value?.name || 'Boutique'}. Tous droits réservés.`
+})
+
+const footerSocialLinks = computed(() => {
+  return props.customizations?.footer?.socialLinks || {
+    facebook: '',
+    instagram: '',
+    twitter: '',
+    linkedin: ''
+  }
+})
 
 // Images du produit
 const images = computed(() => {

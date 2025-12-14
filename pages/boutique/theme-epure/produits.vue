@@ -1,7 +1,7 @@
 <template>
   <div class="min-h-screen bg-white">
     <!-- En-tête -->
-    <HeaderEpure />
+    <HeaderEpure :shop="shop" :primaryColor="primaryColor" />
 
     <main class="py-8">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -229,7 +229,12 @@
       </div>
     </main>
 
-    <FooterEpure />
+    <FooterEpure 
+      :backgroundColor="backgroundColor" 
+      :primaryColor="primaryColor"
+      :footerText="footerText"
+      :socialLinks="footerSocialLinks"
+    />
 
   </div>
 </template>
@@ -237,8 +242,42 @@
 <script setup lang="ts">
 import FooterEpure from '@/components/theme_epure/FooterEpure.vue'
 import HeaderEpure from '@/components/theme_epure/HeaderEpure.vue'
+import { computed } from 'vue'
+
 definePageMeta({
   layout: false
+})
+
+// Props pour recevoir les données de la boutique et customizations
+interface Props {
+  shop?: any
+  customizations?: any
+}
+
+const props = defineProps<Props>()
+
+// Variables locales pour le template
+const shop = computed(() => props.shop)
+
+// Couleurs personnalisées
+const primaryColor = computed(() => props.customizations?.home?.colors?.primary || '#e56a19')
+const backgroundColor = computed(() => props.customizations?.home?.colors?.background || '#ffffff')
+
+// Footer (pied de page)
+const footerText = computed(() => {
+  if (props.customizations?.footer?.text) {
+    return props.customizations.footer.text
+  }
+  return `© ${new Date().getFullYear()} ${shop.value?.name || 'Boutique'}. Tous droits réservés.`
+})
+
+const footerSocialLinks = computed(() => {
+  return props.customizations?.footer?.socialLinks || {
+    facebook: '',
+    instagram: '',
+    twitter: '',
+    linkedin: ''
+  }
 })
 </script>
 
