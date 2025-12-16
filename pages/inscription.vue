@@ -2,7 +2,7 @@
   <div class="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
     <div class="max-w-md w-full space-y-8">
       <div>
-        <h2 class="mt-6 text-center text-3xl font-extrabold text-gray-900">
+        <h2 class="mt-4 text-center text-xl font-extrabold text-gray-900">
           Créez votre compte
         </h2>
         <p class="mt-2 text-center text-sm text-gray-600">
@@ -19,7 +19,7 @@
       </div>
       
       <form class="mt-8 space-y-6" @submit.prevent="handleSignup">
-        <div class="shadow-sm space-y-4">
+        <div class="space-y-4">
           <div>
             <label for="name" class="sr-only">Nom complet</label>
             <input 
@@ -29,7 +29,7 @@
               autocomplete="name" 
               required 
               v-model="name" 
-              class="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-blue-500 focus:border-blue-500" 
+             class="mt-1 block w-full px-3 py-2 border-0 border-b-2 border-gray-300 placeholder-gray-300 placeholder:italic text-gray-900 focus:outline-none focus:ring-0 focus:border-primary transition-colors duration-200" 
               placeholder="Nom complet"
             >
           </div>
@@ -42,7 +42,7 @@
               autocomplete="email" 
               required 
               v-model="email" 
-              class="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-blue-500 focus:border-blue-500" 
+             class="mt-1 block w-full px-3 py-2 border-0 border-b-2 border-gray-300 placeholder-gray-300 placeholder:italic text-gray-900 focus:outline-none focus:ring-0 focus:border-primary transition-colors duration-200" 
               placeholder="Adresse e-mail"
             >
           </div>
@@ -55,7 +55,7 @@
               autocomplete="new-password" 
               required 
               v-model="password" 
-              class="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-blue-500 focus:border-blue-500" 
+             class="mt-1 block w-full px-3 py-2 border-0 border-b-2 border-gray-300 placeholder-gray-300 placeholder:italic text-gray-900 focus:outline-none focus:ring-0 focus:border-primary transition-colors duration-200" 
               placeholder="Mot de passe (min. 8 caractères)"
             >
             <p class="mt-1 text-xs text-gray-500">Le mot de passe doit contenir au moins une majuscule, une minuscule et un chiffre.</p>
@@ -69,7 +69,7 @@
               autocomplete="new-password" 
               required 
               v-model="passwordConfirm" 
-              class="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-blue-500 focus:border-blue-500" 
+             class="mt-1 block w-full px-3 py-2 border-0 border-b-2 border-gray-300 placeholder-gray-300 placeholder:italic text-gray-900 focus:outline-none focus:ring-0 focus:border-primary transition-colors duration-200" 
               placeholder="Confirmez le mot de passe"
             >
           </div>

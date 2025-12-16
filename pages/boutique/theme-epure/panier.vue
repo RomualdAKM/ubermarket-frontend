@@ -489,36 +489,40 @@ const orderForm = ref({
 
 const isCreatingOrder = ref(false)
 
-// Méthodes de paiement (adaptées selon le type de boutique)
+// Méthodes de paiement (chargées dynamiquement depuis la boutique)
 const paymentMethods = computed(() => {
-  const methods = [
-    {
-      id: 'mobile_money',
-      label: 'Mobile Money',
-      description: 'MTN, Moov, Orange Money'
-    },
-    {
-      id: 'card',
-      label: 'Carte bancaire',
-      description: 'Visa, Mastercard'
-    },
-    {
-      id: 'paypal',
-      label: 'PayPal',
-      description: 'Compte PayPal'
-    }
-  ]
+  // Récupérer les méthodes ACTIVES depuis les données de la boutique
+  const activeMethods = props.shop?.paymentMethods || []
   
-  // Ajouter "Paiement à la livraison" UNIQUEMENT pour boutiques physiques
-  if (!isDigitalShop.value) {
-    methods.push({
-      id: 'cash_on_delivery',
-      label: 'Paiement à la livraison',
-      description: 'Payer en espèces à la réception'
-    })
+  // Mapper les méthodes actives vers le format UI
+  const methodsMap: Record<string, { id: string; label: string; description: string }> = {
+    mobile_money: { 
+      id: 'mobile_money', 
+      label: 'Mobile Money', 
+      description: 'MTN, Moov, Orange Money' 
+    },
+    card: { 
+      id: 'card', 
+      label: 'Carte bancaire', 
+      description: 'Visa, Mastercard' 
+    },
+    paypal: { 
+      id: 'paypal', 
+      label: 'PayPal', 
+      description: 'Compte PayPal' 
+    },
+    cash_on_delivery: { 
+      id: 'cash_on_delivery', 
+      label: 'Paiement à la livraison', 
+      description: 'Payer en espèces à la réception' 
+    }
   }
   
-  return methods
+  // Filtrer : retourner uniquement les méthodes actives et disponibles
+  return activeMethods
+    .filter((m: any) => m.is_active)
+    .map((m: any) => methodsMap[m.method])
+    .filter(Boolean) // Supprimer les undefined
 })
 
 const selectedPaymentMethod = ref('mobile_money')

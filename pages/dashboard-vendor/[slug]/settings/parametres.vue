@@ -18,6 +18,9 @@
           <button @click="activeTab = 'paiement'" :class="[activeTab === 'paiement' ? 'border-secondary text-primary' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300', 'whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm']">
             Paiement
           </button>
+          <button @click="activeTab = 'methodes'" :class="[activeTab === 'methodes' ? 'border-secondary text-primary' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300', 'whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm']">
+            Méthodes de paiement
+          </button>
           <!-- <button @click="activeTab = 'notifications'" :class="[activeTab === 'notifications' ? 'border-secondary text-primary' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300', 'whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm']">
             Notifications
           </button>
@@ -318,6 +321,97 @@
   </div>
 </div>
 
+    <!-- Section Méthodes de paiement (NOUVEAU) -->
+    <div v-if="activeTab === 'methodes'" class="bg-white p-6 border-t border-gray-200">
+      <h2 class="text-lg font-medium text-gray-900 mb-6">
+        Méthodes de paiement disponibles pour vos clients
+      </h2>
+      
+      <p class="text-sm text-gray-600 mb-6">
+        Activez ou désactivez les méthodes de paiement que vous souhaitez proposer à vos clients lors du passage de commande.
+      </p>
+      
+      <div class="space-y-4">
+        <!-- Mobile Money -->
+        <div class="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
+          <div>
+            <h3 class="font-medium text-gray-900">Mobile Money</h3>
+            <p class="text-sm text-gray-500">MTN, Moov, Orange Money</p>
+          </div>
+          <label class="relative inline-flex items-center cursor-pointer">
+            <input 
+              type="checkbox" 
+              v-model="paymentMethodsStatus.mobile_money"
+              @change="togglePaymentMethod('mobile_money')"
+              class="sr-only peer"
+            >
+            <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+          </label>
+        </div>
+        
+        <!-- Carte bancaire -->
+        <div class="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
+          <div>
+            <h3 class="font-medium text-gray-900">Carte bancaire</h3>
+            <p class="text-sm text-gray-500">Visa, Mastercard</p>
+          </div>
+          <label class="relative inline-flex items-center cursor-pointer">
+            <input 
+              type="checkbox" 
+              v-model="paymentMethodsStatus.card"
+              @change="togglePaymentMethod('card')"
+              class="sr-only peer"
+            >
+            <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+          </label>
+        </div>
+        
+        <!-- PayPal -->
+        <div class="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
+          <div>
+            <h3 class="font-medium text-gray-900">PayPal</h3>
+            <p class="text-sm text-gray-500">Compte PayPal</p>
+          </div>
+          <label class="relative inline-flex items-center cursor-pointer">
+            <input 
+              type="checkbox" 
+              v-model="paymentMethodsStatus.paypal"
+              @change="togglePaymentMethod('paypal')"
+              class="sr-only peer"
+            >
+            <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+          </label>
+        </div>
+        
+        <!-- Paiement à la livraison (conditionnel) -->
+        <div 
+          v-if="currentShop?.product_type === 'physical'" 
+          class="flex items-center justify-between p-4 border border-gray-200 rounded-lg"
+        >
+          <div>
+            <h3 class="font-medium text-gray-900">Paiement à la livraison</h3>
+            <p class="text-sm text-gray-500">Payer en espèces à la réception</p>
+          </div>
+          <label class="relative inline-flex items-center cursor-pointer">
+            <input 
+              type="checkbox" 
+              v-model="paymentMethodsStatus.cash_on_delivery"
+              @change="togglePaymentMethod('cash_on_delivery')"
+              class="sr-only peer"
+            >
+            <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+          </label>
+        </div>
+      </div>
+      
+      <!-- Information -->
+      <div class="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+        <p class="text-sm text-blue-800">
+          💡 <strong>Bon à savoir :</strong> Les méthodes activées utilisent les clés API d'UberMarket par défaut. Pour utiliser vos propres clés, configurez-les dans l'onglet "Paiement".
+        </p>
+      </div>
+    </div>
+
     <!-- Section Notifications -->
     <div v-if="activeTab === 'notifications'" class="bg-white p-6 border-t border-gray-200">
       <h2 class="text-lg font-medium text-gray-900 mb-4">Préférences de notification</h2>
@@ -485,7 +579,7 @@ definePageMeta({
 
 const route = useRoute()
 const { shops, checkCustomDomainAvailability, updateShop } = useShops()
-const { user, updateProfile } = useAuth()
+const { user, updateProfile, token } = useAuth()
 
 const activeTab = ref('general')
 const customDomainInput = ref('')
@@ -502,6 +596,14 @@ const showMonerooConfig = ref(false)
 const showPaypalConfig = ref(false)
 const monerooConfig = ref({ api_key: '', is_active: false })
 const paypalConfig = ref({ client_id: '', client_secret: '', is_active: false })
+
+// Section Méthodes de paiement
+const paymentMethodsStatus = ref({
+  mobile_money: true,
+  card: true,
+  paypal: true,
+  cash_on_delivery: true
+})
 
 // Section Général
 const isUpdatingGeneral = ref(false)
@@ -565,12 +667,62 @@ const savePaymentConfig = async (method: string, credentials: any) => {
     const config = useRuntimeConfig()
     await $fetch(`${config.public.apiBase}/shops/${currentShop.value.id}/payment-methods`, {
       method: 'POST',
-      headers: { Authorization: `Bearer ${useCookie('auth_token').value}` },
+      headers: { 
+        Authorization: `Bearer ${token.value}`,
+        Accept: 'application/json'
+      },
       body: { method, credentials, is_active: credentials.is_active }
     })
     alert('Configuration enregistrée !')
   } catch (e) {
     alert('Erreur lors de l\'enregistrement')
+  }
+}
+
+// Charger les méthodes de paiement
+const loadPaymentMethods = async () => {
+  if (!currentShop.value) return
+  
+  try {
+    const config = useRuntimeConfig()
+    const response: any = await $fetch(`${config.public.apiBase}/shops/${currentShop.value.id}/payment-methods`, {
+      headers: { 
+        Authorization: `Bearer ${token.value}`,
+        Accept: 'application/json'
+      }
+    })
+    
+    if (response.success && response.data) {
+      // Mettre à jour les status
+      response.data.forEach((method: any) => {
+        if (method.method in paymentMethodsStatus.value) {
+          paymentMethodsStatus.value[method.method as keyof typeof paymentMethodsStatus.value] = method.is_active
+        }
+      })
+    }
+  } catch (error) {
+    console.error('Erreur chargement méthodes:', error)
+  }
+}
+
+// Toggle une méthode de paiement ON/OFF
+const togglePaymentMethod = async (method: string) => {
+  if (!currentShop.value) return
+  
+  try {
+    const config = useRuntimeConfig()
+    await $fetch(`${config.public.apiBase}/shops/${currentShop.value.id}/payment-methods/${method}/toggle`, {
+      method: 'PUT',
+      headers: { 
+        Authorization: `Bearer ${token.value}`,
+        Accept: 'application/json'
+      },
+      body: { is_active: paymentMethodsStatus.value[method as keyof typeof paymentMethodsStatus.value] }
+    })
+  } catch (error) {
+    console.error('Erreur toggle:', error)
+    // Revenir à l'état précédent en cas d'erreur
+    paymentMethodsStatus.value[method as keyof typeof paymentMethodsStatus.value] = !paymentMethodsStatus.value[method as keyof typeof paymentMethodsStatus.value]
   }
 }
 // Récupérer la boutique actuelle
@@ -586,6 +738,9 @@ onMounted(() => {
     customDomain.value = currentShop.value.custom_domain || null
     customDomainInput.value = customDomain.value || ''
   }
+  
+  // Charger les méthodes de paiement
+  loadPaymentMethods()
 })
 
 // Vérifier la disponibilité du domaine
