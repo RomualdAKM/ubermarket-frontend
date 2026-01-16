@@ -59,10 +59,10 @@
           <!-- Prix -->
           <div class="mb-3">
             <div v-if="isOnPromotion(item.product)" class="flex items-center gap-2">
-              <p class="text-lg font-medium text-red-600">{{ formatPrice(item.product?.promotional_price) }}</p>
-              <p class="text-sm text-gray-400 line-through">{{ formatPrice(item.product?.price) }}</p>
+              <p class="text-lg font-medium text-red-600">{{ formatPrice(item.product?.promotional_price, item.product) }}</p>
+              <p class="text-sm text-gray-400 line-through">{{ formatPrice(item.product?.price, item.product) }}</p>
             </div>
-            <p v-else class="text-lg font-medium text-gray-900">{{ formatPrice(item.product?.price) }}</p>
+            <p v-else class="text-lg font-medium text-gray-900">{{ formatPrice(item.product?.price, item.product) }}</p>
           </div>
           
           <!-- Boutique -->
@@ -149,10 +149,18 @@ const isOnPromotion = (product: any): boolean => {
   return afterStart && beforeEnd
 }
 
-// Formater le prix
-const formatPrice = (price: any): string => {
+// Formater le prix avec la devise de la boutique du produit
+const formatPrice = (price: any, product?: any): string => {
   if (!price) return '0 FCFA'
-  return `${parseFloat(price).toLocaleString('fr-FR')} FCFA`
+  const currency = product?.shop?.currency || 'XOF'
+  const amount = parseFloat(price)
+  if (currency === 'XOF') {
+    return `${amount.toLocaleString('fr-FR')} FCFA`
+  }
+  return new Intl.NumberFormat('fr-FR', {
+    style: 'currency',
+    currency: currency
+  }).format(amount)
 }
 
 // Retirer de la wishlist

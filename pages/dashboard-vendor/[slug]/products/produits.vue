@@ -506,18 +506,19 @@ const availableSubcategories = computed(() => {
   return Array.from(subcategoryNames).sort()
 })
 
-// Computed pour obtenir l'ID de la boutique actuelle
-const currentShopId = computed(() => {
+// Computed pour obtenir la boutique courante
+const currentShop = computed(() => {
   const shopSlug = route.params.slug as string
   
-  // Vérifier que shops.value existe et est un tableau
   if (!shops.value || !Array.isArray(shops.value)) {
     return undefined
   }
   
-  const shop = shops.value.find(s => s.subdomain === shopSlug)
-  return shop?.id
+  return shops.value.find(s => s.subdomain === shopSlug)
 })
+
+// Computed pour obtenir l'ID de la boutique actuelle
+const currentShopId = computed(() => currentShop.value?.id)
 
 // Fonctions utilitaires
 const getDashboardLink = (path: string = '') => {
@@ -525,9 +526,13 @@ const getDashboardLink = (path: string = '') => {
 }
 
 function formatPrice(price: number): string {
+  const currency = currentShop.value?.currency || 'XOF'
+  if (currency === 'XOF') {
+    return `${price.toLocaleString('fr-FR')} FCFA`
+  }
   return new Intl.NumberFormat('fr-FR', {
     style: 'currency',
-    currency: 'EUR'
+    currency: currency
   }).format(price)
 }
 

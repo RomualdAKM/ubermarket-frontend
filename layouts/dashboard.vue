@@ -186,7 +186,7 @@
                 </span>
               </NuxtLink>
             </li>
-            <li>
+            <li v-if="isPhysicalShop">
               <NuxtLink 
                 :to="getDashboardLink('inventory/stocks')" 
                 class="flex items-center px-3 py-2 text-sm font-medium text-gray-700 rounded hover:bg-gray-100 transition-all duration-200"
@@ -243,7 +243,8 @@
           </ul>
         </div>
         
-        <div class="px-4 mt-8">
+        <!-- Section Livraison - uniquement pour boutiques physiques -->
+        <div v-if="isPhysicalShop" class="px-4 mt-8">
           <h3 
             class="text-xs font-semibold text-gray-500 uppercase tracking-wider transition-opacity duration-300"
             :class="isSidebarOpen ? 'opacity-100' : 'opacity-0 lg:opacity-0'"
@@ -456,6 +457,9 @@ import { ref, onMounted, onUnmounted, computed } from 'vue'
 // Récupération de la boutique courante
 const { currentShop } = useShops()
 const config = useRuntimeConfig()
+
+// Computed pour déterminer si c'est une boutique physique
+const isPhysicalShop = computed(() => currentShop.value?.product_type === 'physical')
 
 // Fonction pour obtenir l'URL du logo
 const getLogoUrl = (logoPath: string) => {

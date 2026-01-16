@@ -228,14 +228,16 @@ const formData = ref<CreateDeliveryZoneData>({
   is_active: true
 })
 
-// Computed pour l'ID de la boutique
-const currentShopId = computed(() => {
+// Computed pour la boutique courante
+const currentShop = computed(() => {
   if (!shops.value || !Array.isArray(shops.value)) {
     return undefined
   }
-  const shop = shops.value.find(s => s.subdomain === shopSlug || s.slug === shopSlug)
-  return shop?.id
+  return shops.value.find(s => s.subdomain === shopSlug || s.slug === shopSlug)
 })
+
+// Computed pour l'ID de la boutique
+const currentShopId = computed(() => currentShop.value?.id)
 
 // Charger les zones
 const loadZones = async () => {
@@ -336,11 +338,15 @@ const confirmDelete = async (zone: DeliveryZone) => {
   }
 }
 
-// Formater le prix
+// Formater le prix avec la devise de la boutique
 const formatPrice = (price: number) => {
+  const currency = currentShop.value?.currency || 'XOF'
+  if (currency === 'XOF') {
+    return `${price.toLocaleString('fr-FR')} FCFA`
+  }
   return new Intl.NumberFormat('fr-FR', {
     style: 'currency',
-    currency: 'EUR'
+    currency: currency
   }).format(price)
 }
 

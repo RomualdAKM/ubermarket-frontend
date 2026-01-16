@@ -125,7 +125,7 @@
             <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
               <div>
                 <label for="prix-normal" class="block text-sm font-medium text-gray-700 mb-1">
-                  Prix normal ({{ currentShop?.currency || 'EUR' }})<span class="text-red-500">*</span>
+                  Prix normal ({{ currentShop?.currency || 'XOF' }})<span class="text-red-500">*</span>
                 </label>
                 <input
                   type="number"
@@ -141,7 +141,7 @@
               
               <div>
                 <label for="prix-promo" class="block text-sm font-medium text-gray-700 mb-1">
-                  Prix promotionnel ({{ currentShop?.currency || 'EUR' }})
+                  Prix promotionnel ({{ currentShop?.currency || 'XOF' }})
                 </label>
                 <input
                   type="number"
@@ -311,7 +311,7 @@
                   
                   <div>
                     <label :for="'variant-price-' + index" class="block text-xs font-medium text-gray-700 mb-1">
-                      Prix supplémentaire ({{ currentShop?.currency || 'EUR' }})
+                      Prix supplémentaire ({{ currentShop?.currency || 'XOF' }})
                     </label>
                     <input
                       :id="'variant-price-' + index"

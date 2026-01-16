@@ -264,7 +264,14 @@ const formatValue = (promo: PromoCode) => {
   if (promo.type === 'percentage') {
     return `${promo.value}%`
   }
-  return `${promo.value.toLocaleString('fr-FR', { minimumFractionDigits: 2 })} XOF`
+  const currency = currentShop.value?.currency || 'XOF'
+  if (currency === 'XOF') {
+    return `${promo.value.toLocaleString('fr-FR', { minimumFractionDigits: 2 })} FCFA`
+  }
+  return new Intl.NumberFormat('fr-FR', {
+    style: 'currency',
+    currency: currency
+  }).format(promo.value)
 }
 
 const formatDates = (promo: PromoCode) => {

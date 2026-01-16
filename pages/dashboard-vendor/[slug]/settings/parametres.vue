@@ -21,6 +21,9 @@
           <button @click="activeTab = 'methodes'" :class="[activeTab === 'methodes' ? 'border-secondary text-primary' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300', 'whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm']">
             Méthodes de paiement
           </button>
+          <button @click="activeTab = 'statut'" :class="[activeTab === 'statut' ? 'border-secondary text-primary' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300', 'whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm']">
+            Statut
+          </button>
           <!-- <button @click="activeTab = 'notifications'" :class="[activeTab === 'notifications' ? 'border-secondary text-primary' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300', 'whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm']">
             Notifications
           </button>
@@ -412,6 +415,131 @@
       </div>
     </div>
 
+    <!-- Section Statut -->
+    <div v-if="activeTab === 'statut'" class="bg-white p-6 border-t border-gray-200">
+      <h2 class="text-lg font-medium text-gray-900 mb-6">Statut et mode maintenance</h2>
+      
+      <!-- Messages -->
+      <div v-if="statusSuccessMessage" class="mb-4 p-3 bg-green-50 border-l-4 border-green-500 text-green-700">
+        {{ statusSuccessMessage }}
+      </div>
+      
+      <div v-if="statusErrorMessage" class="mb-4 p-3 bg-red-50 border-l-4 border-red-500 text-red-700">
+        {{ statusErrorMessage }}
+      </div>
+      
+      <div class="space-y-6">
+        <!-- Statut de la boutique -->
+        <div class="border border-gray-200 rounded-lg p-4">
+          <div class="flex items-center justify-between">
+            <div>
+              <h3 class="font-medium text-gray-900">Boutique active</h3>
+              <p class="text-sm text-gray-500 mt-1">Quand désactivée, votre boutique n'est plus accessible aux visiteurs</p>
+            </div>
+            <label class="relative inline-flex items-center cursor-pointer">
+              <input 
+                type="checkbox" 
+                v-model="statusForm.isActive"
+                class="sr-only peer"
+              >
+              <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-green-500"></div>
+            </label>
+          </div>
+          
+          <div class="mt-3 flex items-center">
+            <span :class="[
+              'px-2 py-1 text-xs font-medium rounded-full',
+              statusForm.isActive ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
+            ]">
+              {{ statusForm.isActive ? 'Active' : 'Inactive' }}
+            </span>
+          </div>
+        </div>
+        
+        <!-- Mode maintenance -->
+        <div class="border border-gray-200 rounded-lg p-4">
+          <div class="flex items-center justify-between">
+            <div>
+              <h3 class="font-medium text-gray-900">Mode maintenance</h3>
+              <p class="text-sm text-gray-500 mt-1">Activez pour afficher une page de maintenance temporaire</p>
+            </div>
+            <label class="relative inline-flex items-center cursor-pointer">
+              <input 
+                type="checkbox" 
+                v-model="statusForm.isMaintenance"
+                class="sr-only peer"
+              >
+              <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-orange-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-orange-500"></div>
+            </label>
+          </div>
+          
+          <!-- Options de maintenance (visibles si activé) -->
+          <div v-if="statusForm.isMaintenance" class="mt-4 space-y-4 pt-4 border-t border-gray-200">
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2">Message de maintenance</label>
+              <textarea 
+                v-model="statusForm.maintenanceMessage"
+                rows="3"
+                placeholder="Notre boutique est temporairement en maintenance. Nous serons bientôt de retour !"
+                class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary transition-colors duration-200"
+              ></textarea>
+              <p class="mt-1 text-xs text-gray-500">Ce message sera affiché aux visiteurs pendant la maintenance</p>
+            </div>
+            
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2">Date de fin (optionnel)</label>
+              <input 
+                type="datetime-local" 
+                v-model="statusForm.maintenanceEndDate"
+                :min="minMaintenanceDate"
+                class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary transition-colors duration-200"
+              >
+              <p class="mt-1 text-xs text-gray-500">Le mode maintenance sera automatiquement désactivé à cette date</p>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Aperçu (si maintenance active) -->
+        <div v-if="statusForm.isMaintenance" class="border border-orange-200 bg-orange-50 rounded-lg p-4">
+          <h4 class="text-sm font-medium text-orange-800 mb-2">Aperçu de la page de maintenance</h4>
+          <div class="bg-white border border-orange-200 rounded p-4 text-center">
+            <div class="w-12 h-12 mx-auto mb-3 bg-gray-200 rounded-full flex items-center justify-center">
+              <svg class="w-6 h-6 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+              </svg>
+            </div>
+            <h3 class="text-lg font-medium text-gray-900">{{ currentShop?.name || 'Votre boutique' }}</h3>
+            <p class="text-sm text-gray-600 mt-2">{{ statusForm.maintenanceMessage || 'Notre boutique est temporairement en maintenance.' }}</p>
+            <p v-if="statusForm.maintenanceEndDate" class="text-xs text-gray-500 mt-2">
+              Retour prévu : {{ formatMaintenanceDate(statusForm.maintenanceEndDate) }}
+            </p>
+          </div>
+        </div>
+        
+        <!-- Bouton de sauvegarde -->
+        <div class="flex justify-end pt-4">
+          <button 
+            @click="updateShopStatus"
+            :disabled="isUpdatingStatus"
+            :class="[
+              'px-6 py-2 text-white text-sm font-medium rounded focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary',
+              isUpdatingStatus ? 'bg-gray-300 cursor-not-allowed' : 'bg-primary hover:bg-secondary'
+            ]"
+          >
+            <span v-if="isUpdatingStatus" class="flex items-center">
+              <svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              </svg>
+              Mise à jour...
+            </span>
+            <span v-else>Enregistrer les modifications</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
     <!-- Section Notifications -->
     <div v-if="activeTab === 'notifications'" class="bg-white p-6 border-t border-gray-200">
       <h2 class="text-lg font-medium text-gray-900 mb-4">Préférences de notification</h2>
@@ -597,6 +725,73 @@ const showPaypalConfig = ref(false)
 const monerooConfig = ref({ api_key: '', is_active: false })
 const paypalConfig = ref({ client_id: '', client_secret: '', is_active: false })
 
+// Section Statut
+const isUpdatingStatus = ref(false)
+const statusSuccessMessage = ref('')
+const statusErrorMessage = ref('')
+const statusForm = reactive({
+  isActive: true,
+  isMaintenance: false,
+  maintenanceMessage: '',
+  maintenanceEndDate: ''
+})
+
+// Date minimum pour la maintenance (maintenant)
+const minMaintenanceDate = computed(() => {
+  const now = new Date()
+  return now.toISOString().slice(0, 16)
+})
+
+// Formater la date de maintenance pour l'affichage
+const formatMaintenanceDate = (dateString: string) => {
+  if (!dateString) return ''
+  const date = new Date(dateString)
+  return date.toLocaleDateString('fr-FR', {
+    weekday: 'long',
+    day: 'numeric',
+    month: 'long',
+    hour: '2-digit',
+    minute: '2-digit'
+  })
+}
+
+// Mettre à jour le statut de la boutique
+const updateShopStatus = async () => {
+  if (!currentShop.value) return
+  
+  isUpdatingStatus.value = true
+  statusErrorMessage.value = ''
+  statusSuccessMessage.value = ''
+  
+  try {
+    const config = useRuntimeConfig()
+    const response: any = await $fetch(`${config.public.apiBase}/shops/${currentShop.value.id}/status`, {
+      method: 'PUT',
+      headers: { 
+        Authorization: `Bearer ${token.value}`,
+        Accept: 'application/json'
+      },
+      body: {
+        status: statusForm.isActive ? 'active' : 'inactive',
+        is_maintenance: statusForm.isMaintenance,
+        maintenance_message: statusForm.isMaintenance ? statusForm.maintenanceMessage : null,
+        maintenance_end_date: statusForm.isMaintenance && statusForm.maintenanceEndDate ? statusForm.maintenanceEndDate : null
+      }
+    })
+    
+    if (response.success) {
+      statusSuccessMessage.value = 'Statut de la boutique mis à jour avec succès'
+      setTimeout(() => statusSuccessMessage.value = '', 3000)
+    } else {
+      statusErrorMessage.value = response.message || 'Erreur lors de la mise à jour'
+    }
+  } catch (error: any) {
+    statusErrorMessage.value = error.data?.message || error.message || 'Erreur lors de la mise à jour du statut'
+  } finally {
+    isUpdatingStatus.value = false
+  }
+}
+
 // Section Méthodes de paiement
 const paymentMethodsStatus = ref({
   mobile_money: true,
@@ -616,20 +811,10 @@ const profileForm = reactive({
   country: 'FR'
 })
 
-// Initialiser le formulaire avec les données utilisateur
-onMounted(() => {
-  if (user.value) {
-    profileForm.name = user.value.name || ''
-    profileForm.email = user.value.email || ''
-    profileForm.phone = user.value.phone || ''
-    profileForm.country = user.value.country || 'FR'
-  }
-  
-  if (currentShop.value) {
-    currentShopSubdomain.value = currentShop.value.subdomain || ''
-    customDomain.value = currentShop.value.custom_domain || null
-    customDomainInput.value = customDomain.value || ''
-  }
+// Récupérer la boutique actuelle
+const currentShop = computed(() => {
+  const slug = route.params.slug as string
+  return shops.value.find(s => s.slug === slug) || null
 })
 
 // Mettre à jour les paramètres généraux
@@ -725,14 +910,18 @@ const togglePaymentMethod = async (method: string) => {
     paymentMethodsStatus.value[method as keyof typeof paymentMethodsStatus.value] = !paymentMethodsStatus.value[method as keyof typeof paymentMethodsStatus.value]
   }
 }
-// Récupérer la boutique actuelle
-const currentShop = computed(() => {
-  const slug = route.params.slug as string
-  return shops.value.find(s => s.slug === slug) || null
-})
 
 // Initialiser les données au montage
 onMounted(() => {
+  // Initialiser le formulaire utilisateur
+  if (user.value) {
+    profileForm.name = user.value.name || ''
+    profileForm.email = user.value.email || ''
+    profileForm.phone = user.value.phone || ''
+    profileForm.country = user.value.country || 'FR'
+  }
+  
+  // Initialiser les données de domaine
   if (currentShop.value) {
     currentShopSubdomain.value = currentShop.value.subdomain || ''
     customDomain.value = currentShop.value.custom_domain || null
@@ -741,6 +930,18 @@ onMounted(() => {
   
   // Charger les méthodes de paiement
   loadPaymentMethods()
+  
+  // Initialiser le formulaire de statut
+  if (currentShop.value) {
+    statusForm.isActive = currentShop.value.status === 'active'
+    statusForm.isMaintenance = currentShop.value.is_maintenance || false
+    statusForm.maintenanceMessage = currentShop.value.maintenance_message || ''
+    // Convertir la date ISO en format datetime-local
+    if (currentShop.value.maintenance_end_date) {
+      const date = new Date(currentShop.value.maintenance_end_date)
+      statusForm.maintenanceEndDate = date.toISOString().slice(0, 16)
+    }
+  }
 })
 
 // Vérifier la disponibilité du domaine

@@ -491,10 +491,7 @@ const isCreatingOrder = ref(false)
 
 // Méthodes de paiement (chargées dynamiquement depuis la boutique)
 const paymentMethods = computed(() => {
-  // Récupérer les méthodes ACTIVES depuis les données de la boutique
-  const activeMethods = props.shop?.paymentMethods || []
-  
-  // Mapper les méthodes actives vers le format UI
+  // Définition des méthodes disponibles
   const methodsMap: Record<string, { id: string; label: string; description: string }> = {
     mobile_money: { 
       id: 'mobile_money', 
@@ -518,11 +515,28 @@ const paymentMethods = computed(() => {
     }
   }
   
-  // Filtrer : retourner uniquement les méthodes actives et disponibles
-  return activeMethods
-    .filter((m: any) => m.is_active)
-    .map((m: any) => methodsMap[m.method])
-    .filter(Boolean) // Supprimer les undefined
+  // Récupérer les méthodes depuis les données de la boutique (snake_case depuis l'API)
+  const shopMethods = props.shop?.payment_methods || []
+  
+  // Si des méthodes sont définies dans la boutique, les utiliser
+  if (shopMethods.length > 0) {
+    return shopMethods
+      .map((m: any) => methodsMap[m.method])
+      .filter(Boolean)
+  }
+  
+  // Fallback : méthodes par défaut si aucune méthode n'est définie
+  const defaultMethods = [
+    methodsMap.mobile_money,
+    methodsMap.card,
+    methodsMap.paypal
+  ]
+  
+  if (!isDigitalShop.value) {
+    defaultMethods.push(methodsMap.cash_on_delivery)
+  }
+  
+  return defaultMethods
 })
 
 const selectedPaymentMethod = ref('mobile_money')

@@ -143,7 +143,21 @@
             </select>
           </div>
           
-     
+          <div>
+            <label for="currency" class="block text-sm font-medium text-gray-700 mb-1">Devise <span class="text-red-500">*</span></label>
+            <select 
+              id="currency" 
+              name="currency" 
+              v-model="boutiqueForm.currency" 
+              required 
+              class="block w-full px-3 py-2 border-0 border-b-2 border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-0 focus:border-primary bg-white"
+            >
+              <option value="XOF">Franc CFA (XOF)</option>
+              <option value="EUR">Euro (EUR)</option>
+              <option value="USD">Dollar US (USD)</option>
+            </select>
+            <p class="mt-1 text-xs text-gray-500">La devise ne pourra plus être modifiée après création</p>
+          </div>
           
           <!-- <div>
             <label for="color" class="block text-sm font-medium text-gray-700 mb-1">Couleur principale</label>
@@ -155,7 +169,7 @@
           </div> -->
           
           <div class="sm:col-span-2">
-            <label for="domain" class="block text-sm font-medium text-gray-700 mb-1">Sous-domaine personnalisé</label>
+            <label for="domain" class="block text-sm font-medium text-gray-700 mb-1">Sous-domaine personnalisé <span class="text-gray-400 font-normal">(optionnel)</span></label>
             <div class="mt-1 flex items-center">
               <input 
                 type="text" 
@@ -169,7 +183,7 @@
               >
               <span class="ml-2 text-gray-500 whitespace-nowrap">.uber-market.com</span>
             </div>
-            <p class="mt-1 text-xs text-gray-500">Utilisez uniquement des lettres minuscules, chiffres et tirets</p>
+            <p class="mt-1 text-xs text-gray-500">Si laissé vide, le nom de votre boutique sera utilisé automatiquement. Lettres minuscules, chiffres et tirets uniquement.</p>
             <p v-if="boutiqueForm.domain" class="mt-1 text-sm text-primary font-medium">Votre boutique sera accessible sur : <span class="font-semibold">{{ boutiqueForm.domain }}.uber-market.com</span></p>
           </div>
         </div>

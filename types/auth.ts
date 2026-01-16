@@ -43,6 +43,9 @@ export interface Shop {
   custom_domain?: string
   currency: 'EUR' | 'USD' | 'XOF'
   status: 'active' | 'inactive' | 'suspended'
+  is_maintenance: boolean
+  maintenance_message?: string
+  maintenance_end_date?: string
   created_at: string
   updated_at: string
   // Relations

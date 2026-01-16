@@ -191,11 +191,26 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'
+import { useShops } from '~/composables/useShops'
+
 definePageMeta({
   layout: 'dashboard',
   middleware: ['shop-access']
 })
+
+const route = useRoute()
+const shopSlug = route.params.slug as string
+const { shops, fetchShops } = useShops()
+
+// Computed pour la boutique courante
+const currentShop = computed(() => {
+  if (!shops.value || !Array.isArray(shops.value)) {
+    return undefined
+  }
+  return shops.value.find(s => s.subdomain === shopSlug || s.slug === shopSlug)
+})
+
 // Données réactives
 const selectedPeriod = ref('month')
 const selectedCountry = ref('all')
@@ -240,9 +255,13 @@ const formatNumber = (num: number): string => {
 }
 
 const formatCurrency = (amount: number): string => {
+  const currency = currentShop.value?.currency || 'XOF'
+  if (currency === 'XOF') {
+    return `${amount.toLocaleString('fr-FR')} FCFA`
+  }
   return new Intl.NumberFormat('fr-FR', {
     style: 'currency',
-    currency: 'EUR'
+    currency: currency
   }).format(amount)
 }
 
@@ -254,4 +273,9 @@ const exportToPDF = () => {
     country: selectedCountry.value
   })
 }
+
+// Chargement initial
+onMounted(async () => {
+  await fetchShops()
+})
 </script>
