@@ -143,8 +143,8 @@
               </div>
             </div>
 
-            <!-- Code promo -->
-            <div class="border-b border-gray-200 py-6">
+            <!-- Code promo (masqué pour les boutiques vitrine) -->
+            <div v-if="props.shop?.shop_type !== 'website'" class="border-b border-gray-200 py-6">
               <h3 class="text-sm font-medium text-gray-900 mb-3">Code promo</h3>
               
               <!-- Message de succès -->
@@ -187,35 +187,46 @@
             </div>
 
             <div class="py-6">
-              <!-- Message de succès ajout panier -->
-              <div v-if="addToCartSuccess" class="mb-4 p-3 bg-green-50 border border-green-200 rounded-md">
-                <p class="text-sm text-green-800 font-medium">✓ Produit ajouté au panier</p>
-              </div>
+              <!-- Section E-commerce (panier) - masquée pour boutiques vitrine -->
+              <template v-if="props.shop?.shop_type !== 'website'">
+                <!-- Message de succès ajout panier -->
+                <div v-if="addToCartSuccess" class="mb-4 p-3 bg-green-50 border border-green-200 rounded-md">
+                  <p class="text-sm text-green-800 font-medium">Produit ajouté au panier</p>
+                </div>
+                
+                <!-- Message d'erreur ajout panier -->
+                <div v-if="addToCartError" class="mb-4 p-3 bg-red-50 border border-red-200 rounded-md">
+                  <p class="text-sm text-red-800">{{ addToCartError }}</p>
+                </div>
+                
+                <div class="flex flex-col sm:flex-row sm:space-x-4 space-y-4 sm:space-y-0">
+                  <button 
+                    @click="handleAddToCart"
+                    :disabled="isAddingToCart || availableStock === 0"
+                    class="flex-1 px-6 py-3 bg-primary text-white font-medium hover:bg-secondary transition-all rounded-md disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
+                  >
+                    <svg v-if="isAddingToCart" class="animate-spin -ml-1 mr-2 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                      <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                      <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    {{ isAddingToCart ? 'Ajout en cours...' : (availableStock === 0 ? 'Rupture de stock' : 'Ajouter au panier') }}
+                  </button>
+                  <NuxtLink 
+                    :to="getCartUrl(props.shop)"
+                    class="flex-1 px-6 py-3 border border-gray-300 text-gray-900 font-medium hover:bg-gray-50 transition-all rounded-md text-center"
+                  >
+                    Voir le panier
+                  </NuxtLink>
+                </div>
+              </template>
               
-              <!-- Message d'erreur ajout panier -->
-              <div v-if="addToCartError" class="mb-4 p-3 bg-red-50 border border-red-200 rounded-md">
-                <p class="text-sm text-red-800">{{ addToCartError }}</p>
-              </div>
+              <!-- Section Vitrine - message informatif -->
+              <template v-else>
+                <div class="mb-4 p-4 bg-gray-50 border border-gray-200 rounded-md">
+                  <p class="text-sm text-gray-700 text-center">Ce produit est présenté à titre informatif. Contactez-nous pour plus de détails.</p>
+                </div>
+              </template>
               
-              <div class="flex flex-col sm:flex-row sm:space-x-4 space-y-4 sm:space-y-0">
-                <button 
-                  @click="handleAddToCart"
-                  :disabled="isAddingToCart || availableStock === 0"
-                  class="flex-1 px-6 py-3 bg-primary text-white font-medium hover:bg-secondary transition-all rounded-md disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
-                >
-                  <svg v-if="isAddingToCart" class="animate-spin -ml-1 mr-2 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                  </svg>
-                  {{ isAddingToCart ? 'Ajout en cours...' : (availableStock === 0 ? 'Rupture de stock' : 'Ajouter au panier') }}
-                </button>
-                <NuxtLink 
-                  :to="getCartUrl(props.shop)"
-                  class="flex-1 px-6 py-3 border border-gray-300 text-gray-900 font-medium hover:bg-gray-50 transition-all rounded-md text-center"
-                >
-                  Voir le panier
-                </NuxtLink>
-              </div>
               <div class="mt-4">
                 <button 
                   @click="toggleWishlist"

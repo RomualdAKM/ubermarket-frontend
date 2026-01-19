@@ -91,7 +91,9 @@
                   </span>
                 </div>
                 
+                <!-- Bouton panier masqué pour les boutiques vitrine -->
                 <button 
+                  v-if="shop?.shop_type !== 'website'"
                   class="p-2 bg-primary text-white transition-all rounded-md hover:bg-secondary"
                   @click.prevent="() => {}"
                 >

@@ -115,8 +115,9 @@
             </div>
           </div>
 
-          <!-- Bouton Panier -->
+          <!-- Bouton Panier (masqué pour les boutiques vitrine) -->
           <NuxtLink 
+            v-if="props.shop?.shop_type !== 'website'"
             :to="cartUrl" 
             class="p-2 text-gray-600 hover:text-gray-900 relative transition-colors"
             :title="`Panier (${cartCount} article${cartCount > 1 ? 's' : ''})`"

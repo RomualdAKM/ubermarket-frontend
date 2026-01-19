@@ -7,7 +7,7 @@
         </svg>
         Retour à mes boutiques
       </NuxtLink>
-      <h1 class="text-xl font-bold text-gray-900">Créer une nouvelle boutique</h1>
+      <h1 class="text-xl font-bold text-gray-900">{{ boutiqueForm.type === 'website' ? 'Créer un nouveau site' : 'Créer une nouvelle boutique' }}</h1>
       <!-- <p class="text-gray-600 mt-1">Remplissez les informations ci-dessous pour créer votre boutique</p> -->
     </div>
 
