@@ -326,18 +326,8 @@ const loadShop = async () => {
     
     shop.value = data.data
     
-    // DEBUG - À supprimer après test
-    console.log('=== DEBUG WEBSITE BUILDER ===')
-    console.log('shop.value:', shop.value)
-    console.log('shop.value.shop_type:', shop.value.shop_type)
-    console.log('typeof shop_type:', typeof shop.value.shop_type)
-    console.log('shop_type === "website":', shop.value.shop_type === 'website')
-    
     // Vérifier si c'est une boutique de type "website"
     isWebsiteType.value = shop.value.shop_type === 'website'
-    
-    console.log('isWebsiteType.value:', isWebsiteType.value)
-    console.log('=== FIN DEBUG ===')
     
     if (isWebsiteType.value) {
       // Charger les pages du Website Builder

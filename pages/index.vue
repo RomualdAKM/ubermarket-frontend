@@ -109,8 +109,18 @@
       </div>
     </div>
     
-    <!-- Afficher la boutique si on est sur un sous-domaine -->
-    <component v-else-if="!isLoading && !error" :is="themeComponent" :shop="shop" :customizations="customizations" />
+    <!-- ===== RENDU POUR LES BOUTIQUES DE TYPE "WEBSITE" (Website Builder) ===== -->
+    <div v-else-if="isWebsiteType && !isLoading && !error">
+      <WebsitePagePublic
+        :shop="shop"
+        :pages="websitePages"
+        :currentPage="currentWebsitePage"
+        :isLoading="isLoading"
+      />
+    </div>
+    
+    <!-- ===== RENDU POUR LES BOUTIQUES E-COMMERCE ===== -->
+    <component v-else-if="!isWebsiteType && !isLoading && !error" :is="themeComponent" :shop="shop" :customizations="customizations" />
     
     <!-- Écran de chargement -->
     <div v-if="isLoading" class="min-h-screen flex items-center justify-center bg-white">
@@ -150,6 +160,11 @@ const customizations = ref<any>({})
 const isLoading = ref(false)
 const error = ref('')
 const themeComponent = ref<any>(null)
+
+// États pour le Website Builder
+const isWebsiteType = ref(false)
+const websitePages = ref<any[]>([])
+const currentWebsitePage = ref<any>(null)
 
 // États pour maintenance et boutique inactive
 const isInMaintenance = ref(false)
@@ -263,31 +278,80 @@ const loadShop = async () => {
 
     shop.value = data.data
     
-    // Charger les customizations de la boutique
-    await fetchCustomizations(subdomain)
-    const customizationData = useState('shop.customizations')
-    customizations.value = customizationData.value || {}
-
-    // Charger le composant de thème dynamiquement
-    if (shop.value.theme && shop.value.theme.slug) {
-      const themeSlug = shop.value.theme.slug
-      
-      try {
-        themeComponent.value = defineAsyncComponent(() => 
-          import(`~/pages/boutique/${themeSlug}/index.vue`)
-        )
-      } catch (err) {
-        console.error(`Erreur lors du chargement du thème ${themeSlug}:`, err)
-        error.value = `Le thème "${shop.value.theme.name}" n'est pas disponible`
-      }
+    // Vérifier si c'est une boutique de type "website"
+    isWebsiteType.value = shop.value.shop_type === 'website'
+    
+    if (isWebsiteType.value) {
+      // Charger les pages du Website Builder
+      await loadWebsitePages()
     } else {
-      error.value = 'Cette boutique n\'a pas de thème configuré'
+      // Charger les customizations de la boutique (pour e-commerce)
+      await fetchCustomizations(subdomain)
+      const customizationData = useState('shop.customizations')
+      customizations.value = customizationData.value || {}
+
+      // Charger le composant de thème dynamiquement
+      if (shop.value.theme && shop.value.theme.slug) {
+        const themeSlug = shop.value.theme.slug
+        
+        try {
+          themeComponent.value = defineAsyncComponent(() => 
+            import(`~/pages/boutique/${themeSlug}/index.vue`)
+          )
+        } catch (err) {
+          console.error(`Erreur lors du chargement du thème ${themeSlug}:`, err)
+          error.value = `Le thème "${shop.value.theme.name}" n'est pas disponible`
+        }
+      } else {
+        error.value = 'Cette boutique n\'a pas de thème configuré'
+      }
     }
   } catch (err: any) {
     console.error('Erreur lors du chargement de la boutique:', err)
     error.value = err.message || 'Une erreur est survenue'
   } finally {
     isLoading.value = false
+  }
+}
+
+// Charger les pages du Website Builder
+const loadWebsitePages = async () => {
+  if (!subdomain) return
+  
+  try {
+    const config = useRuntimeConfig()
+    
+    // Charger toutes les pages publiées
+    const pagesResponse = await fetch(`${config.public.apiBase}/shop/${subdomain}/pages`)
+    const pagesData = await pagesResponse.json()
+    
+    if (pagesData.success && pagesData.data) {
+      websitePages.value = pagesData.data
+      
+      // Afficher la page d'accueil
+      const homePage = websitePages.value.find((p: any) => p.is_homepage)
+      if (homePage) {
+        // Charger le contenu complet de la page d'accueil
+        const pageResponse = await fetch(`${config.public.apiBase}/shop/${subdomain}/pages/${homePage.slug}`)
+        const pageData = await pageResponse.json()
+        
+        if (pageData.success && pageData.data) {
+          currentWebsitePage.value = pageData.data
+        }
+      } else if (websitePages.value.length > 0) {
+        // Si pas de homepage définie, prendre la première page
+        const firstPage = websitePages.value[0]
+        const pageResponse = await fetch(`${config.public.apiBase}/shop/${subdomain}/pages/${firstPage.slug}`)
+        const pageData = await pageResponse.json()
+        
+        if (pageData.success && pageData.data) {
+          currentWebsitePage.value = pageData.data
+        }
+      }
+    }
+  } catch (err: any) {
+    console.error('Erreur lors du chargement des pages:', err)
+    error.value = err.message || 'Une erreur est survenue'
   }
 }
 
