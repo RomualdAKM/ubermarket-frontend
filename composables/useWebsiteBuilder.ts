@@ -7,31 +7,71 @@ export interface BlockContent {
 }
 
 export interface BlockStyle {
+  // Layout
   alignment?: 'left' | 'center' | 'right'
   maxWidth?: string
+  height?: 'auto' | 'small' | 'medium' | 'large' | 'full'
+  verticalSpacing?: 'none' | 'small' | 'medium' | 'large'
+  horizontalSpacing?: 'none' | 'small' | 'medium' | 'large'
+  // Couleurs
   backgroundColor?: string
   textColor?: string
+  // Background
+  backgroundType?: 'color' | 'gradient' | 'image'
+  backgroundGradient?: string
+  backgroundImage?: string
+  backgroundOverlay?: number
+  // Padding
   padding?: {
     top: number
     bottom: number
     left?: number
     right?: number
   }
-  backgroundImage?: string
-  backgroundOverlay?: number
 }
 
 export interface BlockTypography {
-  titleSize?: string
-  titleWeight?: string
-  subtitleSize?: string
+  // Titre
+  titleFont?: string
+  titleSize?: 'small' | 'medium' | 'large' | 'xlarge'
+  titleWeight?: '400' | '500' | '600' | '700' | '800'
+  titleColor?: string
+  titleLetterSpacing?: 'tight' | 'normal' | 'wide'
+  titleTransform?: 'none' | 'uppercase' | 'lowercase' | 'capitalize'
+  titleLineHeight?: 'tight' | 'normal' | 'relaxed'
+  // Sous-titre
+  subtitleFont?: string
+  subtitleSize?: 'small' | 'medium' | 'large'
+  subtitleOpacity?: number
+  subtitleColor?: string
+  // Texte general
   textSize?: string
 }
 
 export interface BlockAnimation {
-  type: 'none' | 'fade' | 'slide-up' | 'slide-down' | 'zoom'
+  type: 'none' | 'fade' | 'slide-up' | 'slide-down' | 'slide-left' | 'slide-right' | 'zoom' | 'bounce'
   duration?: number
   delay?: number
+  scrollTrigger?: boolean
+}
+
+export interface BlockAdvanced {
+  cssId?: string
+  cssClasses?: string
+  elementSpacing?: 'none' | 'small' | 'medium' | 'large'
+  verticalAlign?: 'top' | 'center' | 'bottom'
+}
+
+export interface ButtonConfig {
+  text?: string
+  url?: string
+  target?: '_self' | '_blank'
+  color?: string
+  textColor?: string
+  size?: 'small' | 'medium' | 'large'
+  width?: 'auto' | 'full'
+  hoverEffect?: 'none' | 'lift' | 'glow' | 'scale'
+  alignment?: 'left' | 'center' | 'right'
 }
 
 export interface PageSection {
@@ -43,6 +83,7 @@ export interface PageSection {
   style: BlockStyle
   typography?: BlockTypography
   animation?: BlockAnimation
+  advanced?: BlockAdvanced
 }
 
 export interface PageSettings {
@@ -619,6 +660,51 @@ export const useWebsiteBuilder = () => {
   }
 
   /**
+   * Mettre à jour la typographie d'une section
+   */
+  const updateSectionTypography = (sectionId: string, typography: Partial<BlockTypography>): void => {
+    if (!currentPage.value) return
+
+    currentPage.value = {
+      ...currentPage.value,
+      sections: currentPage.value.sections.map(s =>
+        s.id === sectionId ? { ...s, typography: { ...s.typography, ...typography } } : s
+      )
+    }
+    hasUnsavedChanges.value = true
+  }
+
+  /**
+   * Mettre à jour l'animation d'une section
+   */
+  const updateSectionAnimation = (sectionId: string, animation: Partial<BlockAnimation>): void => {
+    if (!currentPage.value) return
+
+    currentPage.value = {
+      ...currentPage.value,
+      sections: currentPage.value.sections.map(s =>
+        s.id === sectionId ? { ...s, animation: { ...s.animation, ...animation } } : s
+      )
+    }
+    hasUnsavedChanges.value = true
+  }
+
+  /**
+   * Mettre à jour les options avancées d'une section
+   */
+  const updateSectionAdvanced = (sectionId: string, advanced: Partial<BlockAdvanced>): void => {
+    if (!currentPage.value) return
+
+    currentPage.value = {
+      ...currentPage.value,
+      sections: currentPage.value.sections.map(s =>
+        s.id === sectionId ? { ...s, advanced: { ...s.advanced, ...advanced } } : s
+      )
+    }
+    hasUnsavedChanges.value = true
+  }
+
+  /**
    * Récupérer la section sélectionnée
    */
   const getSelectedSection = computed((): PageSection | null => {
@@ -704,6 +790,9 @@ export const useWebsiteBuilder = () => {
     reorderSections,
     updateSectionContent,
     updateSectionStyle,
+    updateSectionTypography,
+    updateSectionAnimation,
+    updateSectionAdvanced,
     getSelectedSection,
     
     // Routes publiques

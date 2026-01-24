@@ -5,36 +5,28 @@
       <div :style="{ maxWidth: section.style?.maxWidth || '1024px', margin: '0 auto', padding: '0 1rem' }">
         <div :style="{ textAlign: section.style?.alignment || 'center' }">
           <h1 
-            class="font-bold mb-4"
-            :style="{ 
-              fontSize: getFontSize(section.typography?.titleSize || '4xl'),
-              color: section.style?.textColor || '#000000'
-            }"
+            class="mb-4"
+            :style="getTitleStyle"
           >
             {{ section.content?.title || 'Titre principal' }}
           </h1>
           <p 
             class="mb-6"
-            :style="{ 
-              fontSize: getFontSize(section.typography?.subtitleSize || 'xl'),
-              color: section.style?.textColor || '#000000',
-              opacity: 0.8
-            }"
+            :style="getSubtitleStyle"
           >
             {{ section.content?.subtitle || 'Sous-titre' }}
           </p>
-          <a
-            v-if="section.content?.button"
-            :href="section.content.button.url || '#'"
-            class="inline-block px-6 py-3 rounded-lg font-semibold transition-opacity hover:opacity-90"
-            :style="{ 
-              backgroundColor: section.content.button.style === 'primary' ? '#10B981' : 'transparent',
-              color: section.content.button.style === 'primary' ? '#ffffff' : section.style?.textColor,
-              border: section.content.button.style === 'secondary' ? '2px solid currentColor' : 'none'
-            }"
-          >
-            {{ section.content.button.text || 'Bouton' }}
-          </a>
+          <div v-if="section.content?.button" :style="{ textAlign: section.content.button.alignment || 'center' }">
+            <a
+              :href="section.content.button.url || '#'"
+              :target="section.content.button.target || '_self'"
+              class="inline-block rounded-lg font-semibold transition-all"
+              :class="getButtonClasses"
+              :style="getButtonStyle"
+            >
+              {{ section.content.button.text || 'Bouton' }}
+            </a>
+          </div>
         </div>
       </div>
     </template>
@@ -43,10 +35,10 @@
     <template v-else-if="section.type === 'features'">
       <div :style="{ maxWidth: section.style?.maxWidth || '1280px', margin: '0 auto', padding: '0 1rem' }">
         <div :style="{ textAlign: section.style?.alignment || 'center' }" class="mb-8">
-          <h2 class="text-3xl font-bold mb-2" :style="{ color: section.style?.textColor }">
+          <h2 class="mb-2" :style="getTitleStyle">
             {{ section.content?.title || 'Nos avantages' }}
           </h2>
-          <p v-if="section.content?.subtitle" class="text-lg opacity-80" :style="{ color: section.style?.textColor }">
+          <p v-if="section.content?.subtitle" :style="getSubtitleStyle">
             {{ section.content.subtitle }}
           </p>
         </div>
@@ -96,23 +88,23 @@
     <!-- CTA -->
     <template v-else-if="section.type === 'cta'">
       <div :style="{ maxWidth: section.style?.maxWidth || '800px', margin: '0 auto', padding: '0 1rem', textAlign: 'center' }">
-        <h2 class="text-3xl font-bold mb-4" :style="{ color: section.style?.textColor }">
+        <h2 class="mb-4" :style="getTitleStyle">
           {{ section.content?.title || 'Prêt à commencer ?' }}
         </h2>
-        <p v-if="section.content?.subtitle" class="text-lg mb-6 opacity-90" :style="{ color: section.style?.textColor }">
+        <p v-if="section.content?.subtitle" class="mb-6" :style="getSubtitleStyle">
           {{ section.content.subtitle }}
         </p>
-        <a
-          v-if="section.content?.button"
-          :href="section.content.button.url || '#'"
-          class="inline-block px-8 py-4 rounded-lg font-bold text-lg transition-transform hover:scale-105"
-          :style="{ 
-            backgroundColor: '#ffffff',
-            color: section.style?.backgroundColor || '#10B981'
-          }"
-        >
-          {{ section.content.button.text || 'Commencer' }}
-        </a>
+        <div v-if="section.content?.button" :style="{ textAlign: section.content.button?.alignment || 'center' }">
+          <a
+            :href="section.content.button.url || '#'"
+            :target="section.content.button.target || '_self'"
+            class="inline-block rounded-lg font-bold transition-all"
+            :class="getButtonClasses"
+            :style="getButtonStyle"
+          >
+            {{ section.content.button.text || 'Commencer' }}
+          </a>
+        </div>
       </div>
     </template>
     
@@ -228,13 +220,17 @@
               <span>{{ feature }}</span>
             </li>
           </ul>
-          <a
-            v-if="section.content?.button"
-            :href="section.content.button.url || '#'"
-            class="block w-full py-3 rounded-lg font-semibold text-white bg-primary hover:opacity-90 transition-opacity"
-          >
-            {{ section.content.button.text || 'Commencer' }}
-          </a>
+          <div v-if="section.content?.button" :style="{ textAlign: section.content.button?.alignment || 'center' }">
+            <a
+              :href="section.content.button.url || '#'"
+              :target="section.content.button.target || '_self'"
+              class="block rounded-lg font-semibold transition-all"
+              :class="[getButtonClasses, section.content.button?.width !== 'full' ? 'inline-block' : 'w-full']"
+              :style="getButtonStyle"
+            >
+              {{ section.content.button.text || 'Commencer' }}
+            </a>
+          </div>
         </div>
       </div>
     </template>
@@ -440,14 +436,41 @@ interface PageSection {
     backgroundColor?: string
     textColor?: string
     backgroundImage?: string
+    backgroundType?: 'color' | 'gradient' | 'image'
+    backgroundGradient?: string
+    backgroundOverlay?: number
+    height?: 'auto' | 'small' | 'medium' | 'large' | 'full'
+    verticalSpacing?: 'none' | 'small' | 'medium' | 'large'
+    horizontalSpacing?: 'none' | 'small' | 'medium' | 'large'
     padding?: {
       top: number
       bottom: number
     }
   }
   typography?: {
-    titleSize?: string
-    subtitleSize?: string
+    titleFont?: string
+    titleSize?: 'small' | 'medium' | 'large' | 'xlarge'
+    titleWeight?: '400' | '500' | '600' | '700' | '800'
+    titleColor?: string
+    titleLetterSpacing?: 'tight' | 'normal' | 'wide'
+    titleTransform?: 'none' | 'uppercase' | 'lowercase' | 'capitalize'
+    titleLineHeight?: 'tight' | 'normal' | 'relaxed'
+    subtitleFont?: string
+    subtitleSize?: 'small' | 'medium' | 'large'
+    subtitleOpacity?: number
+    subtitleColor?: string
+  }
+  animation?: {
+    type?: string
+    duration?: number
+    delay?: number
+    scrollTrigger?: boolean
+  }
+  advanced?: {
+    cssId?: string
+    cssClasses?: string
+    elementSpacing?: 'none' | 'small' | 'medium' | 'large'
+    verticalAlign?: 'top' | 'center' | 'bottom'
   }
 }
 
@@ -459,15 +482,65 @@ const props = defineProps<{
 const sectionStyle = computed(() => {
   const style = props.section.style || {}
   const padding = style.padding || { top: 40, bottom: 40 }
+  const advanced = props.section.advanced
+  
+  // Calculer la hauteur basée sur la propriété height
+  const heightMap: Record<string, string> = {
+    'auto': 'auto',
+    'small': '300px',
+    'medium': '500px',
+    'large': '700px',
+    'full': '100vh'
+  }
+  
+  // Calculer le padding vertical basé sur verticalSpacing
+  const vSpacingMap: Record<string, number> = {
+    'none': 0,
+    'small': 24,
+    'medium': 48,
+    'large': 80
+  }
+  
+  // Calculer le padding horizontal basé sur horizontalSpacing
+  const hSpacingMap: Record<string, string> = {
+    'none': '0',
+    'small': '1rem',
+    'medium': '2rem',
+    'large': '4rem'
+  }
+  
+  const verticalPadding = style.verticalSpacing 
+    ? vSpacingMap[style.verticalSpacing] || padding.top
+    : padding.top
+  
+  const horizontalPadding = style.horizontalSpacing 
+    ? hSpacingMap[style.horizontalSpacing] || '1rem'
+    : '1rem'
+  
+  // Calculer le background
+  let background = style.backgroundColor || 'transparent'
+  if (style.backgroundType === 'gradient' && style.backgroundGradient) {
+    background = style.backgroundGradient
+  } else if (style.backgroundType === 'image' && style.backgroundImage) {
+    background = `url(${style.backgroundImage})`
+  }
   
   return {
-    backgroundColor: style.backgroundColor || 'transparent',
-    paddingTop: `${padding.top}px`,
-    paddingBottom: `${padding.bottom}px`,
-    backgroundImage: style.backgroundImage ? `url(${style.backgroundImage})` : undefined,
+    backgroundColor: style.backgroundType !== 'gradient' ? (style.backgroundColor || 'transparent') : undefined,
+    background: style.backgroundType === 'gradient' ? style.backgroundGradient : undefined,
+    paddingTop: `${verticalPadding}px`,
+    paddingBottom: `${verticalPadding}px`,
+    paddingLeft: horizontalPadding,
+    paddingRight: horizontalPadding,
+    backgroundImage: style.backgroundType === 'image' && style.backgroundImage ? `url(${style.backgroundImage})` : undefined,
     backgroundSize: 'cover',
     backgroundPosition: 'center',
-    position: 'relative' as const
+    position: 'relative' as const,
+    minHeight: heightMap[style.height || 'auto'] || 'auto',
+    // Animation
+    ...(props.section.animation?.type && props.section.animation.type !== 'none' ? {
+      animation: `${props.section.animation.type} ${props.section.animation.duration || 500}ms ease-out ${props.section.animation.delay || 0}ms both`
+    } : {})
   }
 })
 
@@ -509,10 +582,122 @@ const getFontSize = (size: string): string => {
     '3xl': '1.875rem',
     '4xl': '2.25rem',
     '5xl': '3rem',
-    '6xl': '3.75rem'
+    '6xl': '3.75rem',
+    // Nouvelles tailles de typographie
+    'small': '1.875rem',  // 3xl
+    'medium': '2.25rem',  // 4xl
+    'large': '3rem',      // 5xl
+    'xlarge': '3.75rem'   // 6xl
   }
   return sizes[size] || size
 }
+
+// Taille des sous-titres
+const getSubtitleSize = (size: string): string => {
+  const sizes: Record<string, string> = {
+    'small': '1rem',
+    'medium': '1.25rem',
+    'large': '1.5rem'
+  }
+  return sizes[size] || '1.25rem'
+}
+
+// Computed pour le style du titre
+const getTitleStyle = computed(() => {
+  const typo = props.section.typography || {}
+  const style = props.section.style || {}
+  
+  const fontFamilies: Record<string, string> = {
+    'system': 'system-ui, -apple-system, sans-serif',
+    'inter': "'Inter', sans-serif",
+    'poppins': "'Poppins', sans-serif",
+    'roboto': "'Roboto', sans-serif",
+    'playfair': "'Playfair Display', serif",
+    'montserrat': "'Montserrat', sans-serif"
+  }
+  
+  const letterSpacingMap: Record<string, string> = {
+    'tight': '-0.025em',
+    'normal': '0',
+    'wide': '0.05em'
+  }
+  
+  const lineHeightMap: Record<string, string> = {
+    'tight': '1.1',
+    'normal': '1.3',
+    'relaxed': '1.5'
+  }
+  
+  return {
+    fontFamily: fontFamilies[typo.titleFont || 'system'],
+    fontSize: getFontSize(typo.titleSize || 'medium'),
+    fontWeight: typo.titleWeight || '700',
+    color: typo.titleColor || style.textColor || '#171717',
+    letterSpacing: letterSpacingMap[typo.titleLetterSpacing || 'normal'],
+    lineHeight: lineHeightMap[typo.titleLineHeight || 'normal'],
+    textTransform: typo.titleTransform || 'none'
+  }
+})
+
+// Computed pour le style du sous-titre
+const getSubtitleStyle = computed(() => {
+  const typo = props.section.typography || {}
+  const style = props.section.style || {}
+  
+  return {
+    fontSize: getSubtitleSize(typo.subtitleSize || 'medium'),
+    color: typo.subtitleColor || style.textColor || '#171717',
+    opacity: (typo.subtitleOpacity ?? 80) / 100
+  }
+})
+
+// Computed pour les classes du bouton
+const getButtonClasses = computed(() => {
+  const button = props.section.content?.button || {}
+  const classes: string[] = []
+  
+  // Effet hover
+  if (button.hoverEffect === 'lift') {
+    classes.push('hover:-translate-y-1 hover:shadow-lg')
+  } else if (button.hoverEffect === 'glow') {
+    classes.push('hover:shadow-[0_0_20px_rgba(16,185,129,0.4)]')
+  } else if (button.hoverEffect === 'scale') {
+    classes.push('hover:scale-105')
+  } else {
+    classes.push('hover:opacity-90')
+  }
+  
+  // Largeur
+  if (button.width === 'full') {
+    classes.push('w-full')
+  }
+  
+  return classes.join(' ')
+})
+
+// Computed pour le style du bouton
+const getButtonStyle = computed(() => {
+  const button = props.section.content?.button || {}
+  
+  // Tailles
+  const sizeMap: Record<string, { px: string; py: string; fontSize: string }> = {
+    'small': { px: '1rem', py: '0.5rem', fontSize: '0.875rem' },
+    'medium': { px: '1.5rem', py: '0.75rem', fontSize: '1rem' },
+    'large': { px: '2rem', py: '1rem', fontSize: '1.125rem' }
+  }
+  
+  const size = sizeMap[button.size || 'medium'] || sizeMap.medium
+  
+  return {
+    backgroundColor: button.color || '#10B981',
+    color: button.textColor || '#ffffff',
+    paddingLeft: size.px,
+    paddingRight: size.px,
+    paddingTop: size.py,
+    paddingBottom: size.py,
+    fontSize: size.fontSize
+  }
+})
 
 // Mapping des icônes
 const getIconPath = (icon: string): string => {
@@ -534,3 +719,43 @@ const getIconPath = (icon: string): string => {
   return icons[icon] || icons.default
 }
 </script>
+
+<style scoped>
+/* Animations */
+@keyframes fade {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slide-up {
+  from { opacity: 0; transform: translateY(30px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes slide-down {
+  from { opacity: 0; transform: translateY(-30px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes slide-left {
+  from { opacity: 0; transform: translateX(30px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes slide-right {
+  from { opacity: 0; transform: translateX(-30px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes zoom {
+  from { opacity: 0; transform: scale(0.9); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+@keyframes bounce {
+  0% { opacity: 0; transform: translateY(-30px); }
+  50% { transform: translateY(10px); }
+  70% { transform: translateY(-5px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+</style>

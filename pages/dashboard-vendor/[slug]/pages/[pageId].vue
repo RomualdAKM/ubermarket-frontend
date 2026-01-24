@@ -283,6 +283,9 @@
           :section="selectedSection"
           @update:content="handleContentUpdate"
           @update:style="handleStyleUpdate"
+          @update:typography="handleTypographyUpdate"
+          @update:animation="handleAnimationUpdate"
+          @update:advanced="handleAdvancedUpdate"
         />
       </aside>
       
@@ -508,6 +511,9 @@ const {
   moveSection,
   updateSectionContent,
   updateSectionStyle,
+  updateSectionTypography,
+  updateSectionAnimation,
+  updateSectionAdvanced,
   getSelectedSection,
   resetBuilder
 } = useWebsiteBuilder()
@@ -709,6 +715,24 @@ const handleContentUpdate = (content: BlockContent) => {
 const handleStyleUpdate = (style: Partial<BlockStyle>) => {
   if (selectedSectionId.value) {
     updateSectionStyle(selectedSectionId.value, style)
+  }
+}
+
+const handleTypographyUpdate = (typography: Record<string, any>) => {
+  if (selectedSectionId.value) {
+    updateSectionTypography(selectedSectionId.value, typography)
+  }
+}
+
+const handleAnimationUpdate = (animation: Record<string, any>) => {
+  if (selectedSectionId.value) {
+    updateSectionAnimation(selectedSectionId.value, animation)
+  }
+}
+
+const handleAdvancedUpdate = (advanced: Record<string, any>) => {
+  if (selectedSectionId.value) {
+    updateSectionAdvanced(selectedSectionId.value, advanced)
   }
 }
 </script>
