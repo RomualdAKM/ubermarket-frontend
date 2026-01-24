@@ -997,8 +997,11 @@ const FeatureItem = defineComponent({
   emits: ['update', 'remove'],
   setup(props, { emit }) {
     return () => h('div', { class: 'item-card' }, [
-      h('button', { class: 'item-delete-btn', onClick: () => emit('remove') }, '×'),
-      h('div', { class: 'flex gap-2 mb-3' }, [
+      h('div', { class: 'flex items-center justify-between mb-2' }, [
+        h('span', { class: 'text-xs font-medium text-neutral-500' }, `#${(props.index || 0) + 1}`),
+        h('button', { class: 'item-delete-btn', onClick: () => emit('remove') }, 'Supprimer')
+      ]),
+      h('div', { class: 'flex gap-2 mb-2' }, [
         h('input', { value: props.item?.icon, onInput: (e: Event) => emit('update', props.index, 'icon', (e.target as HTMLInputElement).value), class: 'item-card-input', style: 'width: 60px; text-align: center;', placeholder: 'icon' }),
         h('input', { value: props.item?.title, onInput: (e: Event) => emit('update', props.index, 'title', (e.target as HTMLInputElement).value), placeholder: 'Titre', class: 'item-card-input flex-1' })
       ]),
@@ -1012,8 +1015,11 @@ const TestimonialItem = defineComponent({
   emits: ['update', 'remove'],
   setup(props, { emit }) {
     return () => h('div', { class: 'item-card' }, [
-      h('button', { class: 'item-delete-btn', onClick: () => emit('remove') }, '×'),
-      h('textarea', { value: props.item?.text, onInput: (e: Event) => emit('update', props.index, 'text', (e.target as HTMLTextAreaElement).value), rows: 2, placeholder: 'Témoignage...', class: 'item-card-input resize-none mb-3' }),
+      h('div', { class: 'flex items-center justify-between mb-2' }, [
+        h('span', { class: 'text-xs font-medium text-neutral-500' }, `#${(props.index || 0) + 1}`),
+        h('button', { class: 'item-delete-btn', onClick: () => emit('remove') }, 'Supprimer')
+      ]),
+      h('textarea', { value: props.item?.text, onInput: (e: Event) => emit('update', props.index, 'text', (e.target as HTMLTextAreaElement).value), rows: 2, placeholder: 'Témoignage...', class: 'item-card-input resize-none mb-2' }),
       h('div', { class: 'grid grid-cols-2 gap-2' }, [
         h('input', { value: props.item?.name, onInput: (e: Event) => emit('update', props.index, 'name', (e.target as HTMLInputElement).value), placeholder: 'Nom', class: 'item-card-input' }),
         h('input', { value: props.item?.role, onInput: (e: Event) => emit('update', props.index, 'role', (e.target as HTMLInputElement).value), placeholder: 'Rôle', class: 'item-card-input' })
@@ -1027,8 +1033,11 @@ const FaqItem = defineComponent({
   emits: ['update', 'remove'],
   setup(props, { emit }) {
     return () => h('div', { class: 'item-card' }, [
-      h('button', { class: 'item-delete-btn', onClick: () => emit('remove') }, '×'),
-      h('input', { value: props.item?.question, onInput: (e: Event) => emit('update', props.index, 'question', (e.target as HTMLInputElement).value), placeholder: 'Question ?', class: 'item-card-input mb-3' }),
+      h('div', { class: 'flex items-center justify-between mb-2' }, [
+        h('span', { class: 'text-xs font-medium text-neutral-500' }, `#${(props.index || 0) + 1}`),
+        h('button', { class: 'item-delete-btn', onClick: () => emit('remove') }, 'Supprimer')
+      ]),
+      h('input', { value: props.item?.question, onInput: (e: Event) => emit('update', props.index, 'question', (e.target as HTMLInputElement).value), placeholder: 'Question ?', class: 'item-card-input mb-2' }),
       h('textarea', { value: props.item?.answer, onInput: (e: Event) => emit('update', props.index, 'answer', (e.target as HTMLTextAreaElement).value), rows: 2, placeholder: 'Réponse...', class: 'item-card-input resize-none' })
     ])
   }
@@ -1061,133 +1070,102 @@ const SpacerIcon = createIcon('M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v
 
 <style scoped>
 .builder-editor {
-  background-color: #fafafa;
+  background-color: #ffffff;
   height: 100%;
   overflow-y: auto;
 }
 
-/* Header de section */
-.builder-editor > div:first-child {
-  background: white;
-  border-bottom: 1px solid #e5e5e5;
-}
-
-/* Accordions - Style compact professionnel */
+/* Accordions - Style LeekPay minimal */
 .accordion-trigger {
   width: 100%;
-  padding: 10px 16px;
+  padding: 16px 20px;
   display: flex;
   align-items: center;
   justify-content: space-between;
   text-align: left;
-  background: white;
-  transition: background-color 120ms;
+  background: transparent;
+  transition: none;
+  border-bottom: 1px solid #f0f0f0;
 }
 
 .accordion-trigger:hover {
-  background-color: #f5f5f5;
+  background-color: transparent;
 }
 
 .accordion-label {
-  display: flex;
-  align-items: center;
-  gap: 8px;
   font-size: 11px;
   font-weight: 600;
   text-transform: uppercase;
-  letter-spacing: 0.05em;
-  color: #525252;
+  letter-spacing: 0.08em;
+  color: #666666;
 }
 
+/* Retirer la barre colorée */
 .accordion-label::before {
-  content: '';
-  width: 3px;
-  height: 12px;
-  background: linear-gradient(135deg, #6366f1, #8b5cf6);
-  border-radius: 2px;
+  display: none;
 }
 
 .accordion-chevron {
-  color: #a3a3a3;
-  width: 14px;
-  height: 14px;
+  color: #999999;
+  width: 16px;
+  height: 16px;
 }
 
 .accordion-content {
-  padding: 12px 16px 16px;
-  background: white;
+  padding: 20px;
+  background: transparent;
 }
 
-/* Labels - Plus visibles */
+/* Labels - Style LeekPay subtil */
 .field-label {
-  font-size: 11px;
-  font-weight: 600;
-  color: #525252;
-  letter-spacing: 0.01em;
-  text-transform: uppercase;
+  display: block;
+  font-size: 12px;
+  font-weight: 400;
+  color: #666666;
+  margin-bottom: 6px;
 }
 
-/* Section Group - Mini cards pour grouper */
-.field-group {
-  background: #f5f5f5;
-  border-radius: 8px;
-  padding: 12px;
-  margin-bottom: 12px;
-}
-
-.field-group-title {
-  font-size: 10px;
-  font-weight: 700;
-  color: #737373;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  margin-bottom: 10px;
-  padding-bottom: 6px;
-  border-bottom: 1px solid #e5e5e5;
-}
-
-/* Inputs - Bordures plus visibles, compact */
+/* Inputs - Style LeekPay épuré */
 .input-field {
   width: 100%;
-  padding: 8px 10px;
-  font-size: 12px;
+  padding: 10px 12px;
+  font-size: 13px;
   line-height: 1.4;
-  color: #171717;
-  background-color: white;
-  border: 1.5px solid #d4d4d4;
-  border-radius: 6px;
-  transition: all 150ms;
+  color: #333333;
+  background-color: #ffffff;
+  border: 1px solid #e0e0e0;
+  border-radius: 4px;
+  transition: border-color 150ms;
   outline: none;
 }
 
 .input-field:hover {
-  border-color: #a3a3a3;
+  border-color: #cccccc;
 }
 
 .input-field:focus {
-  border-color: #6366f1;
-  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
+  border-color: #4a90e2;
 }
 
 .input-field::placeholder {
-  color: #a3a3a3;
+  color: #aaaaaa;
 }
 
-/* Select - Style très visible */
+/* Select - Style LeekPay */
 .select-field {
   width: 100%;
-  padding: 8px 32px 8px 10px;
-  font-size: 12px;
+  padding: 10px 12px;
+  font-size: 13px;
   line-height: 1.4;
-  color: #171717;
-  background-color: white;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3E%3Cpath stroke='%23525252' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M6 8l4 4 4-4'/%3E%3C/svg%3E");
-  background-position: right 8px center;
+  color: #333333;
+  background-color: #ffffff;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3E%3Cpath stroke='%23666666' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3E%3C/svg%3E");
+  background-position: right 10px center;
   background-repeat: no-repeat;
-  background-size: 14px;
-  border: 1.5px solid #d4d4d4;
-  border-radius: 6px;
-  transition: all 150ms;
+  background-size: 16px;
+  border: 1px solid #e0e0e0;
+  border-radius: 4px;
+  transition: border-color 150ms;
   outline: none;
   cursor: pointer;
   appearance: none;
@@ -1195,16 +1173,14 @@ const SpacerIcon = createIcon('M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v
 }
 
 .select-field:hover {
-  border-color: #a3a3a3;
-  background-color: #fafafa;
+  border-color: #cccccc;
 }
 
 .select-field:focus {
-  border-color: #6366f1;
-  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
+  border-color: #4a90e2;
 }
 
-/* Number input - Compact */
+/* Number input */
 .number-field-wrapper {
   position: relative;
   display: flex;
@@ -1213,14 +1189,14 @@ const SpacerIcon = createIcon('M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v
 
 .number-field {
   width: 100%;
-  padding: 8px 32px 8px 10px;
-  font-size: 12px;
+  padding: 10px 36px 10px 12px;
+  font-size: 13px;
   font-variant-numeric: tabular-nums;
-  color: #171717;
-  background-color: white;
-  border: 1.5px solid #d4d4d4;
-  border-radius: 6px;
-  transition: all 150ms;
+  color: #333333;
+  background-color: #ffffff;
+  border: 1px solid #e0e0e0;
+  border-radius: 4px;
+  transition: border-color 150ms;
   outline: none;
   appearance: textfield;
   -moz-appearance: textfield;
@@ -1233,128 +1209,118 @@ const SpacerIcon = createIcon('M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v
 }
 
 .number-field:hover {
-  border-color: #a3a3a3;
+  border-color: #cccccc;
 }
 
 .number-field:focus {
-  border-color: #6366f1;
-  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
+  border-color: #4a90e2;
 }
 
 .number-field-suffix {
   position: absolute;
-  right: 10px;
+  right: 12px;
   top: 50%;
   transform: translateY(-50%);
-  font-size: 10px;
-  font-weight: 600;
-  color: #737373;
+  font-size: 11px;
+  font-weight: 400;
+  color: #999999;
   pointer-events: none;
 }
 
-/* Color picker - Unifié et compact */
+/* Color picker - Style LeekPay (swatch + input séparés) */
 .color-picker-wrapper {
   display: flex;
-  align-items: stretch;
-  border: 1.5px solid #d4d4d4;
-  border-radius: 6px;
-  overflow: hidden;
-  background: white;
-  transition: all 150ms;
-}
-
-.color-picker-wrapper:hover {
-  border-color: #a3a3a3;
-}
-
-.color-picker-wrapper:focus-within {
-  border-color: #6366f1;
-  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
+  align-items: center;
+  gap: 10px;
 }
 
 .color-swatch {
-  width: 36px;
-  height: 34px;
-  padding: 5px;
-  border: none;
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  border: 1px solid #e0e0e0;
+  border-radius: 4px;
   cursor: pointer;
-  background: #f5f5f5;
-  border-right: 1.5px solid #d4d4d4;
+  background: transparent;
 }
 
 .color-swatch::-webkit-color-swatch-wrapper {
-  padding: 0;
+  padding: 3px;
 }
 
 .color-swatch::-webkit-color-swatch {
   border: none;
-  border-radius: 4px;
-  box-shadow: inset 0 0 0 1px rgba(0,0,0,0.15);
+  border-radius: 2px;
 }
 
 .color-hex-input {
   flex: 1;
-  padding: 8px 10px;
-  font-size: 11px;
+  padding: 10px 12px;
+  font-size: 13px;
   font-family: 'SF Mono', 'Monaco', 'Inconsolata', 'Consolas', monospace;
-  font-weight: 600;
-  color: #525252;
-  background: transparent;
-  border: none;
+  font-weight: 400;
+  color: #333333;
+  background: #ffffff;
+  border: 1px solid #e0e0e0;
+  border-radius: 4px;
   outline: none;
   text-transform: uppercase;
-  letter-spacing: 0.02em;
+  transition: border-color 150ms;
 }
 
-/* Toggle - Compact */
+.color-hex-input:hover {
+  border-color: #cccccc;
+}
+
+.color-hex-input:focus {
+  border-color: #4a90e2;
+}
+
+/* Checkbox - Native simple (pas toggle) */
 .toggle-wrapper {
   display: flex;
   align-items: center;
   gap: 10px;
-  cursor: pointer;
-  padding: 6px 0;
+  padding: 4px 0;
 }
 
 .toggle-switch {
-  position: relative;
-  width: 32px;
+  width: 18px;
   height: 18px;
-  background: #d4d4d4;
-  border-radius: 9px;
-  transition: background-color 150ms;
+  border: 1px solid #e0e0e0;
+  border-radius: 3px;
+  background: white;
+  cursor: pointer;
+  position: relative;
   flex-shrink: 0;
 }
 
-.toggle-switch::after {
-  content: '';
-  position: absolute;
-  top: 2px;
-  left: 2px;
-  width: 14px;
-  height: 14px;
-  background: white;
-  border-radius: 50%;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.25);
-  transition: transform 150ms;
-}
-
 .toggle-switch.active {
-  background: #6366f1;
+  background: #4a90e2;
+  border-color: #4a90e2;
 }
 
 .toggle-switch.active::after {
-  transform: translateX(14px);
+  content: '✓';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: white;
+  font-size: 12px;
+  font-weight: 600;
 }
 
 .toggle-label {
-  font-size: 12px;
-  font-weight: 500;
-  color: #404040;
+  font-size: 13px;
+  font-weight: 400;
+  color: #333333;
+  cursor: pointer;
 }
 
-/* Slider - Compact */
+/* Slider */
 .slider-wrapper {
-  padding: 2px 0;
+  padding: 0;
 }
 
 .slider-header {
@@ -1365,20 +1331,17 @@ const SpacerIcon = createIcon('M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v
 }
 
 .slider-value {
-  font-size: 11px;
-  font-weight: 700;
-  color: #6366f1;
-  background: #eef2ff;
-  padding: 2px 6px;
-  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 400;
+  color: #666666;
   font-variant-numeric: tabular-nums;
 }
 
 .slider-track {
   width: 100%;
-  height: 5px;
-  background: #e5e5e5;
-  border-radius: 3px;
+  height: 4px;
+  background: #e0e0e0;
+  border-radius: 2px;
   cursor: pointer;
   appearance: none;
   -webkit-appearance: none;
@@ -1389,152 +1352,143 @@ const SpacerIcon = createIcon('M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v
   -webkit-appearance: none;
   width: 16px;
   height: 16px;
-  background: #6366f1;
+  background: #4a90e2;
   border-radius: 50%;
   cursor: pointer;
-  box-shadow: 0 2px 4px rgba(99, 102, 241, 0.4);
-  transition: transform 100ms;
-}
-
-.slider-track::-webkit-slider-thumb:hover {
-  transform: scale(1.15);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
 }
 
 .slider-track::-moz-range-thumb {
   width: 16px;
   height: 16px;
-  background: #6366f1;
+  background: #4a90e2;
   border: none;
   border-radius: 50%;
   cursor: pointer;
-  box-shadow: 0 2px 4px rgba(99, 102, 241, 0.4);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
 }
 
-/* Segmented Control - Compact */
+/* Segmented Control */
 .segmented-control {
   display: flex;
   gap: 2px;
-  padding: 3px;
-  background: #e5e5e5;
-  border-radius: 6px;
+  padding: 2px;
+  background: #f5f5f5;
+  border-radius: 4px;
 }
 
 .segment-btn {
   flex: 1;
-  padding: 6px 8px;
-  font-size: 11px;
-  font-weight: 600;
-  color: #737373;
+  padding: 8px 12px;
+  font-size: 12px;
+  font-weight: 400;
+  color: #666666;
   background: transparent;
   border: none;
-  border-radius: 4px;
+  border-radius: 3px;
   cursor: pointer;
   transition: all 150ms;
 }
 
 .segment-btn:hover {
-  color: #525252;
+  color: #333333;
 }
 
 .segment-btn.active {
-  background: white;
-  color: #171717;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+  background: #ffffff;
+  color: #333333;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
 }
 
-/* Items (Features, FAQ, etc.) - Compact */
+/* Items (Features, FAQ, etc.) - Simple sans card */
 .item-card {
   position: relative;
-  padding: 10px;
-  background: #f5f5f5;
-  border: 1px solid #e5e5e5;
-  border-radius: 6px;
-  transition: all 150ms;
-}
-
-.item-card:hover {
-  border-color: #d4d4d4;
-  background: #f0f0f0;
+  padding: 12px;
+  background: #fafafa;
+  border: 1px solid #f0f0f0;
+  border-radius: 4px;
+  margin-bottom: 8px;
 }
 
 .item-card-input {
   width: 100%;
-  padding: 6px 8px;
-  font-size: 12px;
-  color: #171717;
-  background: white;
-  border: 1px solid #d4d4d4;
-  border-radius: 4px;
+  padding: 8px 10px;
+  font-size: 13px;
+  color: #333333;
+  background: #ffffff;
+  border: 1px solid #e0e0e0;
+  border-radius: 3px;
   outline: none;
-  transition: all 100ms;
+  transition: border-color 150ms;
 }
 
 .item-card-input:focus {
-  border-color: #6366f1;
-  box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.12);
+  border-color: #4a90e2;
 }
 
 .item-card-input::placeholder {
-  color: #a3a3a3;
+  color: #aaaaaa;
 }
 
 .item-delete-btn {
   position: absolute;
-  top: -5px;
-  right: -5px;
-  width: 18px;
-  height: 18px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: #ef4444;
-  color: white;
-  font-size: 12px;
-  font-weight: 600;
-  border: 2px solid white;
-  border-radius: 50%;
+  top: 8px;
+  right: 8px;
+  padding: 0;
+  width: auto;
+  height: auto;
+  background: transparent;
+  color: #e74c3c;
+  font-size: 11px;
+  font-weight: 400;
+  border: none;
   cursor: pointer;
-  opacity: 0;
-  transform: scale(0.8);
-  transition: all 100ms;
-  line-height: 1;
-}
-
-.item-card:hover .item-delete-btn {
-  opacity: 1;
-  transform: scale(1);
+  text-decoration: underline;
 }
 
 .item-delete-btn:hover {
-  background: #dc2626;
-  transform: scale(1.1);
+  color: #c0392b;
 }
 
-/* Margin bottom utilities */
-.mb-4 { margin-bottom: 10px !important; }
-.mt-4 { margin-top: 10px !important; }
-.mt-5 { margin-top: 14px !important; }
-.pt-5 { padding-top: 14px !important; }
-.mb-3 { margin-bottom: 8px !important; }
-.mb-2 { margin-bottom: 6px !important; }
-.gap-3 { gap: 8px !important; }
-.gap-2 { gap: 6px !important; }
-.space-y-2 > * + * { margin-top: 6px !important; }
-.space-y-3 > * + * { margin-top: 8px !important; }
+/* Spacing utilities */
+.mb-3 { margin-bottom: 16px; }
+.mb-2 { margin-bottom: 8px; }
+.mt-3 { margin-top: 16px; }
+.pt-3 { padding-top: 16px; }
+.gap-2 { gap: 10px; }
+.space-y-2 > * + * { margin-top: 8px; }
 
-/* Grid compact */
+/* Flex utilities */
+.flex { display: flex; }
+.items-center { align-items: center; }
+.justify-between { justify-content: space-between; }
+
+/* Text utilities */
+.text-xs { font-size: 11px; }
+.font-medium { font-weight: 500; }
+.text-neutral-500 { color: #737373; }
+
+/* Grid */
 .grid.grid-cols-2 {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
 }
 
-/* Divider for sections */
-.divide-y > * + * {
-  border-top: 1px solid #e5e5e5;
+/* Borders */
+.border-t {
+  border-top: 1px solid #f0f0f0;
 }
 
-/* Header styles */
-.px-5 { padding-left: 16px !important; padding-right: 16px !important; }
-.py-4 { padding-top: 12px !important; padding-bottom: 12px !important; }
-.border-b { border-bottom: 1px solid #e5e5e5 !important; }
+.border-neutral-200 {
+  border-color: #f0f0f0;
+}
+
+/* Divider */
+.divide-y > * {
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.divide-y > *:last-child {
+  border-bottom: none;
+}
 </style>
