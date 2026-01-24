@@ -727,6 +727,8 @@ const SpacerIcon = createIcon('M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v
 </script>
 
 <style scoped>
+@reference "tailwindcss";
+
 .builder-editor {
   @apply bg-white h-full overflow-y-auto;
 }
