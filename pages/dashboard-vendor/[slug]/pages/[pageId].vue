@@ -335,7 +335,7 @@
                     <p class="text-xs text-neutral-400 mt-0.5">Choisissez un type de bloc à ajouter</p>
                   </div>
                   <button 
-                    @click="showAddBlockModal = false" 
+                    @click="closeAddBlockModal" 
                     class="p-2 rounded-lg text-neutral-400 hover:text-neutral-600 hover:bg-neutral-100 transition-colors"
                   >
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -346,77 +346,130 @@
                 
                 <!-- Content -->
                 <div class="p-6 max-h-[65vh] overflow-y-auto">
-                  <!-- Catégorie: Basique -->
-                  <div class="mb-6">
-                    <h4 class="text-[11px] font-semibold uppercase tracking-wider text-neutral-400 mb-3">Basique</h4>
-                    <div class="grid grid-cols-4 gap-3">
+                  <!-- Vue sélection de templates -->
+                  <template v-if="selectedBlockType && getSelectedBlockDefinition()">
+                    <button 
+                      @click="selectedBlockType = null" 
+                      class="flex items-center gap-2 text-sm text-neutral-500 hover:text-neutral-700 mb-4"
+                    >
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+                      </svg>
+                      Retour aux blocs
+                    </button>
+                    
+                    <div class="mb-4">
+                      <h4 class="text-base font-semibold text-neutral-800">{{ getSelectedBlockDefinition()?.name }}</h4>
+                      <p class="text-sm text-neutral-500 mt-1">Choisissez un style pour ce bloc</p>
+                    </div>
+                    
+                    <div class="grid grid-cols-2 gap-4">
                       <button
-                        v-for="block in getBlocksByCategory('basic')"
-                        :key="block.type"
-                        @click="handleAddBlock(block.type)"
-                        class="group p-4 bg-neutral-50 rounded-xl hover:bg-primary/5 hover:ring-1 hover:ring-primary/20 transition-all text-center"
+                        v-for="template in getSelectedBlockDefinition()?.templates"
+                        :key="template.id"
+                        @click="handleAddBlockWithTemplate(template.id)"
+                        class="group text-left rounded-xl border border-neutral-200 hover:border-primary/40 hover:shadow-md transition-all overflow-hidden"
                       >
-                        <div class="w-10 h-10 mx-auto bg-white rounded-lg flex items-center justify-center mb-2 shadow-sm group-hover:shadow group-hover:scale-105 transition-all">
-                          <component :is="getSectionIconComponent(block.type)" class="w-5 h-5 text-neutral-600 group-hover:text-primary" />
+                        <!-- Preview du template -->
+                        <div 
+                          class="h-24 flex items-center justify-center"
+                          :style="{
+                            backgroundColor: template.defaultStyle.backgroundColor?.startsWith('linear') 
+                              ? '#667eea' 
+                              : template.defaultStyle.backgroundColor || '#f5f5f5',
+                            color: template.defaultStyle.textColor || '#262626'
+                          }"
+                        >
+                          <div class="text-center px-4">
+                            <div class="text-xs font-medium opacity-80">{{ template.name }}</div>
+                          </div>
                         </div>
-                        <span class="text-sm font-medium text-neutral-700 group-hover:text-neutral-900">{{ block.name }}</span>
+                        <!-- Nom du template -->
+                        <div class="p-3 bg-white">
+                          <span class="text-sm font-medium text-neutral-700 group-hover:text-neutral-900">{{ template.name }}</span>
+                        </div>
                       </button>
                     </div>
-                  </div>
+                  </template>
                   
-                  <!-- Catégorie: Engagement -->
-                  <div class="mb-6">
-                    <h4 class="text-[11px] font-semibold uppercase tracking-wider text-neutral-400 mb-3">Engagement</h4>
-                    <div class="grid grid-cols-4 gap-3">
-                      <button
-                        v-for="block in getBlocksByCategory('engagement')"
-                        :key="block.type"
-                        @click="handleAddBlock(block.type)"
-                        class="group p-4 bg-neutral-50 rounded-xl hover:bg-primary/5 hover:ring-1 hover:ring-primary/20 transition-all text-center"
-                      >
-                        <div class="w-10 h-10 mx-auto bg-white rounded-lg flex items-center justify-center mb-2 shadow-sm group-hover:shadow group-hover:scale-105 transition-all">
-                          <component :is="getSectionIconComponent(block.type)" class="w-5 h-5 text-neutral-600 group-hover:text-primary" />
-                        </div>
-                        <span class="text-sm font-medium text-neutral-700 group-hover:text-neutral-900">{{ block.name }}</span>
-                      </button>
+                  <!-- Vue sélection de type de bloc -->
+                  <template v-else>
+                    <!-- Catégorie: Basique -->
+                    <div class="mb-6">
+                      <h4 class="text-[11px] font-semibold uppercase tracking-wider text-neutral-400 mb-3">Basique</h4>
+                      <div class="grid grid-cols-4 gap-3">
+                        <button
+                          v-for="block in getBlocksByCategory('basic')"
+                          :key="block.type"
+                          @click="handleSelectBlockType(block.type)"
+                          class="group p-4 bg-neutral-50 rounded-xl hover:bg-primary/5 hover:ring-1 hover:ring-primary/20 transition-all text-center"
+                        >
+                          <div class="w-10 h-10 mx-auto bg-white rounded-lg flex items-center justify-center mb-2 shadow-sm group-hover:shadow group-hover:scale-105 transition-all">
+                            <component :is="getSectionIconComponent(block.type)" class="w-5 h-5 text-neutral-600 group-hover:text-primary" />
+                          </div>
+                          <span class="text-sm font-medium text-neutral-700 group-hover:text-neutral-900">{{ block.name }}</span>
+                          <span v-if="block.templates.length > 1" class="block text-[10px] text-neutral-400 mt-0.5">{{ block.templates.length }} styles</span>
+                        </button>
+                      </div>
                     </div>
-                  </div>
-                  
-                  <!-- Catégorie: Conversion -->
-                  <div class="mb-6">
-                    <h4 class="text-[11px] font-semibold uppercase tracking-wider text-neutral-400 mb-3">Conversion</h4>
-                    <div class="grid grid-cols-4 gap-3">
-                      <button
-                        v-for="block in getBlocksByCategory('conversion')"
-                        :key="block.type"
-                        @click="handleAddBlock(block.type)"
-                        class="group p-4 bg-neutral-50 rounded-xl hover:bg-primary/5 hover:ring-1 hover:ring-primary/20 transition-all text-center"
-                      >
-                        <div class="w-10 h-10 mx-auto bg-white rounded-lg flex items-center justify-center mb-2 shadow-sm group-hover:shadow group-hover:scale-105 transition-all">
-                          <component :is="getSectionIconComponent(block.type)" class="w-5 h-5 text-neutral-600 group-hover:text-primary" />
-                        </div>
-                        <span class="text-sm font-medium text-neutral-700 group-hover:text-neutral-900">{{ block.name }}</span>
-                      </button>
+                    
+                    <!-- Catégorie: Engagement -->
+                    <div class="mb-6">
+                      <h4 class="text-[11px] font-semibold uppercase tracking-wider text-neutral-400 mb-3">Engagement</h4>
+                      <div class="grid grid-cols-4 gap-3">
+                        <button
+                          v-for="block in getBlocksByCategory('engagement')"
+                          :key="block.type"
+                          @click="handleSelectBlockType(block.type)"
+                          class="group p-4 bg-neutral-50 rounded-xl hover:bg-primary/5 hover:ring-1 hover:ring-primary/20 transition-all text-center"
+                        >
+                          <div class="w-10 h-10 mx-auto bg-white rounded-lg flex items-center justify-center mb-2 shadow-sm group-hover:shadow group-hover:scale-105 transition-all">
+                            <component :is="getSectionIconComponent(block.type)" class="w-5 h-5 text-neutral-600 group-hover:text-primary" />
+                          </div>
+                          <span class="text-sm font-medium text-neutral-700 group-hover:text-neutral-900">{{ block.name }}</span>
+                          <span v-if="block.templates.length > 1" class="block text-[10px] text-neutral-400 mt-0.5">{{ block.templates.length }} styles</span>
+                        </button>
+                      </div>
                     </div>
-                  </div>
-                  
-                  <!-- Catégorie: Structure -->
-                  <div>
-                    <h4 class="text-[11px] font-semibold uppercase tracking-wider text-neutral-400 mb-3">Structure</h4>
-                    <div class="grid grid-cols-4 gap-3">
-                      <button
-                        v-for="block in getBlocksByCategory('structure')"
-                        :key="block.type"
-                        @click="handleAddBlock(block.type)"
-                        class="group p-4 bg-neutral-50 rounded-xl hover:bg-primary/5 hover:ring-1 hover:ring-primary/20 transition-all text-center"
-                      >
-                        <div class="w-10 h-10 mx-auto bg-white rounded-lg flex items-center justify-center mb-2 shadow-sm group-hover:shadow group-hover:scale-105 transition-all">
-                          <component :is="getSectionIconComponent(block.type)" class="w-5 h-5 text-neutral-600 group-hover:text-primary" />
-                        </div>
-                        <span class="text-sm font-medium text-neutral-700 group-hover:text-neutral-900">{{ block.name }}</span>
-                      </button>
+                    
+                    <!-- Catégorie: Conversion -->
+                    <div class="mb-6">
+                      <h4 class="text-[11px] font-semibold uppercase tracking-wider text-neutral-400 mb-3">Conversion</h4>
+                      <div class="grid grid-cols-4 gap-3">
+                        <button
+                          v-for="block in getBlocksByCategory('conversion')"
+                          :key="block.type"
+                          @click="handleSelectBlockType(block.type)"
+                          class="group p-4 bg-neutral-50 rounded-xl hover:bg-primary/5 hover:ring-1 hover:ring-primary/20 transition-all text-center"
+                        >
+                          <div class="w-10 h-10 mx-auto bg-white rounded-lg flex items-center justify-center mb-2 shadow-sm group-hover:shadow group-hover:scale-105 transition-all">
+                            <component :is="getSectionIconComponent(block.type)" class="w-5 h-5 text-neutral-600 group-hover:text-primary" />
+                          </div>
+                          <span class="text-sm font-medium text-neutral-700 group-hover:text-neutral-900">{{ block.name }}</span>
+                          <span v-if="block.templates.length > 1" class="block text-[10px] text-neutral-400 mt-0.5">{{ block.templates.length }} styles</span>
+                        </button>
+                      </div>
                     </div>
-                  </div>
+                    
+                    <!-- Catégorie: Structure -->
+                    <div>
+                      <h4 class="text-[11px] font-semibold uppercase tracking-wider text-neutral-400 mb-3">Structure</h4>
+                      <div class="grid grid-cols-4 gap-3">
+                        <button
+                          v-for="block in getBlocksByCategory('structure')"
+                          :key="block.type"
+                          @click="handleSelectBlockType(block.type)"
+                          class="group p-4 bg-neutral-50 rounded-xl hover:bg-primary/5 hover:ring-1 hover:ring-primary/20 transition-all text-center"
+                        >
+                          <div class="w-10 h-10 mx-auto bg-white rounded-lg flex items-center justify-center mb-2 shadow-sm group-hover:shadow group-hover:scale-105 transition-all">
+                            <component :is="getSectionIconComponent(block.type)" class="w-5 h-5 text-neutral-600 group-hover:text-primary" />
+                          </div>
+                          <span class="text-sm font-medium text-neutral-700 group-hover:text-neutral-900">{{ block.name }}</span>
+                          <span v-if="block.templates.length > 1" class="block text-[10px] text-neutral-400 mt-0.5">{{ block.templates.length }} styles</span>
+                        </button>
+                      </div>
+                    </div>
+                  </template>
                 </div>
               </div>
             </Transition>
@@ -462,6 +515,7 @@ const {
 // États locaux
 const previewMode = ref<'desktop' | 'tablet' | 'mobile'>('desktop')
 const showAddBlockModal = ref(false)
+const selectedBlockType = ref<BlockType | null>(null)
 const pageTitle = ref('')
 const blockDefinitions = BLOCK_DEFINITIONS
 
@@ -503,28 +557,6 @@ const loadPage = async () => {
 watch(() => currentPage.value?.title, (newTitle) => {
   if (newTitle) pageTitle.value = newTitle
 })
-
-// Icônes des blocs (emojis pour la modal)
-const getBlockIcon = (type: BlockType): string => {
-  const icons: Record<BlockType, string> = {
-    hero: '🎯',
-    features: '✨',
-    testimonials: '💬',
-    pricing: '💰',
-    cta: '👆',
-    text: '📝',
-    image: '🖼️',
-    gallery: '🖼️',
-    video: '🎬',
-    faq: '❓',
-    contact: '📧',
-    countdown: '⏱️',
-    social: '🔗',
-    spacer: '↕️',
-    divider: '➖'
-  }
-  return icons[type] || '📦'
-}
 
 // Labels des sections
 const getSectionLabel = (type: string): string => {
@@ -634,12 +666,38 @@ const handlePublish = async () => {
   await togglePublish(currentShop.value.id, currentPage.value.id)
 }
 
-const handleAddBlock = (type: BlockType) => {
+const handleSelectBlockType = (type: BlockType) => {
   const blockDef = blockDefinitions.find(b => b.type === type)
-  if (blockDef && blockDef.templates.length > 0) {
-    addSection(type, blockDef.templates[0])
-    showAddBlockModal.value = false
+  if (blockDef) {
+    if (blockDef.templates.length === 1) {
+      // Un seul template, ajouter directement
+      addSection(type, blockDef.templates[0])
+      closeAddBlockModal()
+    } else {
+      // Plusieurs templates, afficher la sélection
+      selectedBlockType.value = type
+    }
   }
+}
+
+const handleAddBlockWithTemplate = (templateId: string) => {
+  if (!selectedBlockType.value) return
+  const blockDef = blockDefinitions.find(b => b.type === selectedBlockType.value)
+  const template = blockDef?.templates.find(t => t.id === templateId)
+  if (template) {
+    addSection(selectedBlockType.value, template)
+    closeAddBlockModal()
+  }
+}
+
+const closeAddBlockModal = () => {
+  showAddBlockModal.value = false
+  selectedBlockType.value = null
+}
+
+const getSelectedBlockDefinition = () => {
+  if (!selectedBlockType.value) return null
+  return blockDefinitions.find(b => b.type === selectedBlockType.value)
 }
 
 const handleContentUpdate = (content: BlockContent) => {

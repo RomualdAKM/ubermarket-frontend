@@ -391,7 +391,7 @@ const handlePaddingBottom = (event: Event) => {
 // Feature items
 const addFeatureItem = () => {
   const items = [...(props.section.content?.items || [])]
-  items.push({ icon: '✓', title: 'Nouveau', description: 'Description' })
+  items.push({ icon: 'check', title: 'Nouveau', description: 'Description' })
   emit('update:content', { items })
 }
 
