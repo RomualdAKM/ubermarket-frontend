@@ -217,19 +217,19 @@
               :value="section.content?.button?.target || '_self'"
               @update="updateButton('target', $event)"
             />
-            <div class="grid grid-cols-2 gap-3 mt-4">
+            <div class="grid grid-cols-2 gap-2">
               <ColorPickerField 
-                label="Couleur"
+                label="Fond"
                 :value="section.content?.button?.color || '#10B981'"
                 @update="updateButton('color', $event)"
               />
               <ColorPickerField 
-                label="Couleur texte"
+                label="Texte"
                 :value="section.content?.button?.textColor || '#ffffff'"
                 @update="updateButton('textColor', $event)"
               />
             </div>
-            <div class="grid grid-cols-2 gap-3 mt-4">
+            <div class="grid grid-cols-2 gap-2">
               <SelectField 
                 label="Taille"
                 :options="buttonSizeOptions"
@@ -248,14 +248,12 @@
               :options="hoverEffectOptions"
               :value="section.content?.button?.hoverEffect || 'none'"
               @update="updateButton('hoverEffect', $event)"
-              class="mt-4"
             />
             <SegmentedControl 
-              label="Alignement boutons"
+              label="Alignement"
               :options="alignmentOptions"
               :value="section.content?.button?.alignment || 'center'"
               @update="updateButton('alignment', $event)"
-              class="mt-4"
             />
           </div>
         </template>
@@ -284,7 +282,6 @@
               label="Couleur de fond"
               :value="section.style?.backgroundColor || '#ffffff'"
               @update="updateStyle('backgroundColor', $event)"
-              class="mt-4"
             />
             
             <!-- Dégradé -->
@@ -311,7 +308,6 @@
                 :max="100"
                 suffix="%"
                 @update="updateStyle('backgroundOverlay', $event)"
-                class="mt-4"
               />
             </template>
             
@@ -320,18 +316,17 @@
               :options="heightOptions"
               :value="section.style?.height || 'auto'"
               @update="updateStyle('height', $event)"
-              class="mt-4"
             />
             
-            <div class="grid grid-cols-2 gap-3 mt-4">
+            <div class="grid grid-cols-2 gap-2">
               <SelectField 
-                label="Espacement vertical"
+                label="Espacement V"
                 :options="spacingOptions"
                 :value="section.style?.verticalSpacing || 'large'"
                 @update="updateStyle('verticalSpacing', $event)"
               />
               <SelectField 
-                label="Espacement horizontal"
+                label="Espacement H"
                 :options="spacingOptions"
                 :value="section.style?.horizontalSpacing || 'medium'"
                 @update="updateStyle('horizontalSpacing', $event)"
@@ -357,15 +352,15 @@
               :value="section.typography?.titleFont || 'system'"
               @update="updateTypography('titleFont', $event)"
             />
-            <div class="grid grid-cols-2 gap-3 mt-4">
+            <div class="grid grid-cols-2 gap-2">
               <SelectField 
-                label="Taille titre"
+                label="Taille"
                 :options="titleSizeOptions"
                 :value="section.typography?.titleSize || 'medium'"
                 @update="updateTypography('titleSize', $event)"
               />
               <SelectField 
-                label="Poids titre"
+                label="Poids"
                 :options="weightOptions"
                 :value="section.typography?.titleWeight || '700'"
                 @update="updateTypography('titleWeight', $event)"
@@ -376,41 +371,40 @@
               :value="section.typography?.titleColor || section.style?.textColor || '#171717'"
               :showAuto="true"
               @update="updateTypography('titleColor', $event)"
-              class="mt-4"
             />
-            <div class="grid grid-cols-2 gap-3 mt-4">
+            <div class="grid grid-cols-2 gap-2">
               <SelectField 
-                label="Espacement lettres"
+                label="Lettres"
                 :options="letterSpacingOptions"
                 :value="section.typography?.titleLetterSpacing || 'normal'"
                 @update="updateTypography('titleLetterSpacing', $event)"
               />
               <SelectField 
-                label="Transformation"
+                label="Transform"
                 :options="transformOptions"
                 :value="section.typography?.titleTransform || 'none'"
                 @update="updateTypography('titleTransform', $event)"
               />
             </div>
             <SelectField 
-              label="Interligne titre"
+              label="Interligne"
               :options="lineHeightOptions"
               :value="section.typography?.titleLineHeight || 'normal'"
               @update="updateTypography('titleLineHeight', $event)"
-              class="mt-4"
             />
             
             <!-- Sous-titre -->
-            <div class="border-t border-neutral-100 mt-5 pt-5">
+            <div class="border-t border-neutral-200 mt-3 pt-3">
+              <span class="field-label block mb-2" style="color: #737373; font-size: 10px;">SOUS-TITRE</span>
               <SelectField 
-                label="Police sous-titre"
+                label="Police"
                 :options="subtitleFontOptions"
                 :value="section.typography?.subtitleFont || 'same'"
                 @update="updateTypography('subtitleFont', $event)"
               />
-              <div class="grid grid-cols-2 gap-3 mt-4">
+              <div class="grid grid-cols-2 gap-2">
                 <SelectField 
-                  label="Taille sous-titre"
+                  label="Taille"
                   :options="subtitleSizeOptions"
                   :value="section.typography?.subtitleSize || 'medium'"
                   @update="updateTypography('subtitleSize', $event)"
@@ -425,11 +419,10 @@
                 />
               </div>
               <ColorPickerField 
-                label="Couleur sous-titre"
+                label="Couleur"
                 :value="section.typography?.subtitleColor || section.style?.textColor || '#171717'"
                 :showAuto="true"
                 @update="updateTypography('subtitleColor', $event)"
-                class="mt-4"
               />
             </div>
           </div>
@@ -452,9 +445,9 @@
               :value="section.animation?.type || 'none'"
               @update="updateAnimation('type', $event)"
             />
-            <div class="grid grid-cols-2 gap-3 mt-4">
+            <div class="grid grid-cols-2 gap-2">
               <NumberField 
-                label="Durée animation"
+                label="Durée"
                 :value="section.animation?.duration || 500"
                 :min="0"
                 :max="3000"
@@ -463,7 +456,7 @@
                 @update="updateAnimation('duration', $event)"
               />
               <NumberField 
-                label="Délai animation"
+                label="Délai"
                 :value="section.animation?.delay || 0"
                 :min="0"
                 :max="2000"
@@ -476,7 +469,6 @@
               label="Animer au scroll"
               :value="section.animation?.scrollTrigger || false"
               @update="updateAnimation('scrollTrigger', $event)"
-              class="mt-4"
             />
           </div>
         </template>
@@ -492,15 +484,15 @@
         </template>
         <template #content>
           <div class="accordion-content">
-            <div class="grid grid-cols-2 gap-3">
+            <div class="grid grid-cols-2 gap-2">
               <SelectField 
-                label="Espacement éléments"
+                label="Gap éléments"
                 :options="elementSpacingOptions"
                 :value="section.advanced?.elementSpacing || 'medium'"
                 @update="updateAdvanced('elementSpacing', $event)"
               />
               <SelectField 
-                label="Alignement vertical"
+                label="Align. V"
                 :options="verticalAlignOptions"
                 :value="section.advanced?.verticalAlign || 'center'"
                 @update="updateAdvanced('verticalAlign', $event)"
@@ -511,10 +503,9 @@
               :value="section.advanced?.cssId || ''"
               @update="updateAdvanced('cssId', $event)"
               placeholder="hero-section"
-              class="mt-4"
             />
             <InputField 
-              label="Classes CSS personnalisées"
+              label="Classes CSS"
               :value="section.advanced?.cssClasses || ''"
               @update="updateAdvanced('cssClasses', $event)"
               placeholder="my-class another-class"
@@ -876,7 +867,7 @@ const InputField = defineComponent({
   props: { label: String, value: String, placeholder: String, type: { type: String, default: 'text' }, multiline: Boolean, rows: { type: Number, default: 3 } },
   emits: ['update'],
   setup(props, { emit }) {
-    return () => h('div', { class: 'mb-4' }, [
+    return () => h('div', { class: 'mb-3' }, [
       h('label', { class: 'field-label mb-2 block' }, props.label),
       props.multiline
         ? h('textarea', { value: props.value || '', onInput: (e: Event) => emit('update', (e.target as HTMLTextAreaElement).value), rows: props.rows, placeholder: props.placeholder, class: 'input-field resize-none' })
@@ -890,7 +881,7 @@ const SelectField = defineComponent({
   props: { label: String, options: { type: Array as () => { value: string; label: string }[], default: () => [] }, value: String },
   emits: ['update'],
   setup(props, { emit }) {
-    return () => h('div', { class: 'mb-4' }, [
+    return () => h('div', { class: 'mb-3' }, [
       h('label', { class: 'field-label mb-2 block' }, props.label),
       h('select', { value: props.value, onChange: (e: Event) => emit('update', (e.target as HTMLSelectElement).value), class: 'select-field' },
         props.options.map((opt: { value: string; label: string }) => h('option', { value: opt.value }, opt.label)))
@@ -903,7 +894,7 @@ const SegmentedControl = defineComponent({
   props: { label: String, options: { type: Array as () => { value: string; label: string }[], default: () => [] }, value: String },
   emits: ['update'],
   setup(props, { emit }) {
-    return () => h('div', { class: 'mb-4' }, [
+    return () => h('div', { class: 'mb-3' }, [
       h('label', { class: 'field-label mb-2 block' }, props.label),
       h('div', { class: 'segmented-control' },
         props.options.map((opt: { value: string; label: string }) => h('button', {
@@ -919,7 +910,7 @@ const ColorPickerField = defineComponent({
   props: { label: String, value: String, showAuto: Boolean },
   emits: ['update'],
   setup(props, { emit }) {
-    return () => h('div', { class: 'mb-4' }, [
+    return () => h('div', { class: 'mb-3' }, [
       h('label', { class: 'field-label mb-2 block' }, props.label),
       h('div', { class: 'color-picker-wrapper' }, [
         h('input', { 
@@ -945,7 +936,7 @@ const SliderField = defineComponent({
   props: { label: String, value: { type: Number, default: 0 }, min: { type: Number, default: 0 }, max: { type: Number, default: 100 }, suffix: { type: String, default: '' } },
   emits: ['update'],
   setup(props, { emit }) {
-    return () => h('div', { class: 'mb-4 slider-wrapper' }, [
+    return () => h('div', { class: 'mb-3 slider-wrapper' }, [
       h('div', { class: 'slider-header' }, [
         h('label', { class: 'field-label' }, props.label),
         h('span', { class: 'slider-value' }, `${props.value}${props.suffix}`)
@@ -967,7 +958,7 @@ const NumberField = defineComponent({
   props: { label: String, value: { type: Number, default: 0 }, min: { type: Number, default: 0 }, max: { type: Number, default: 9999 }, step: { type: Number, default: 1 }, suffix: { type: String, default: '' } },
   emits: ['update'],
   setup(props, { emit }) {
-    return () => h('div', { class: 'mb-4' }, [
+    return () => h('div', { class: 'mb-3' }, [
       h('label', { class: 'field-label mb-2 block' }, props.label),
       h('div', { class: 'number-field-wrapper' }, [
         h('input', { 
@@ -1070,115 +1061,150 @@ const SpacerIcon = createIcon('M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v
 
 <style scoped>
 .builder-editor {
-  background-color: #ffffff;
+  background-color: #fafafa;
   height: 100%;
   overflow-y: auto;
 }
 
-/* Accordions */
+/* Header de section */
+.builder-editor > div:first-child {
+  background: white;
+  border-bottom: 1px solid #e5e5e5;
+}
+
+/* Accordions - Style compact professionnel */
 .accordion-trigger {
   width: 100%;
-  padding: 14px 20px;
+  padding: 10px 16px;
   display: flex;
   align-items: center;
   justify-content: space-between;
   text-align: left;
-  transition: background-color 150ms;
+  background: white;
+  transition: background-color 120ms;
 }
 
 .accordion-trigger:hover {
-  background-color: #f9fafb;
+  background-color: #f5f5f5;
 }
 
 .accordion-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
   font-size: 11px;
-  font-weight: 700;
+  font-weight: 600;
   text-transform: uppercase;
-  letter-spacing: 0.08em;
-  color: #52525b;
+  letter-spacing: 0.05em;
+  color: #525252;
+}
+
+.accordion-label::before {
+  content: '';
+  width: 3px;
+  height: 12px;
+  background: linear-gradient(135deg, #6366f1, #8b5cf6);
+  border-radius: 2px;
 }
 
 .accordion-chevron {
-  color: #a1a1aa;
+  color: #a3a3a3;
+  width: 14px;
+  height: 14px;
 }
 
 .accordion-content {
-  padding: 4px 20px 20px 20px;
+  padding: 12px 16px 16px;
+  background: white;
 }
 
-/* Labels */
+/* Labels - Plus visibles */
 .field-label {
-  font-size: 12px;
+  font-size: 11px;
   font-weight: 600;
-  color: #3f3f46;
-  letter-spacing: -0.01em;
+  color: #525252;
+  letter-spacing: 0.01em;
+  text-transform: uppercase;
 }
 
-/* Inputs - Design professionnel */
+/* Section Group - Mini cards pour grouper */
+.field-group {
+  background: #f5f5f5;
+  border-radius: 8px;
+  padding: 12px;
+  margin-bottom: 12px;
+}
+
+.field-group-title {
+  font-size: 10px;
+  font-weight: 700;
+  color: #737373;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 10px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid #e5e5e5;
+}
+
+/* Inputs - Bordures plus visibles, compact */
 .input-field {
   width: 100%;
-  padding: 10px 12px;
-  font-size: 13px;
+  padding: 8px 10px;
+  font-size: 12px;
   line-height: 1.4;
-  color: #18181b;
-  background-color: #fafafa;
-  border: 1px solid #e4e4e7;
-  border-radius: 8px;
-  transition: all 200ms cubic-bezier(0.4, 0, 0.2, 1);
+  color: #171717;
+  background-color: white;
+  border: 1.5px solid #d4d4d4;
+  border-radius: 6px;
+  transition: all 150ms;
   outline: none;
-  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.04);
 }
 
 .input-field:hover {
-  border-color: #d4d4d8;
-  background-color: #f4f4f5;
+  border-color: #a3a3a3;
 }
 
 .input-field:focus {
-  background-color: #ffffff;
   border-color: #6366f1;
-  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.12), inset 0 1px 2px rgba(0, 0, 0, 0.04);
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
 }
 
 .input-field::placeholder {
-  color: #a1a1aa;
-  font-weight: 400;
+  color: #a3a3a3;
 }
 
-/* Select personnalisé */
+/* Select - Style très visible */
 .select-field {
   width: 100%;
-  padding: 10px 36px 10px 12px;
-  font-size: 13px;
+  padding: 8px 32px 8px 10px;
+  font-size: 12px;
   line-height: 1.4;
-  color: #18181b;
-  background-color: #fafafa;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3E%3Cpath stroke='%2371717a' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3E%3C/svg%3E");
-  background-position: right 10px center;
+  color: #171717;
+  background-color: white;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3E%3Cpath stroke='%23525252' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M6 8l4 4 4-4'/%3E%3C/svg%3E");
+  background-position: right 8px center;
   background-repeat: no-repeat;
-  background-size: 16px;
-  border: 1px solid #e4e4e7;
-  border-radius: 8px;
-  transition: all 200ms cubic-bezier(0.4, 0, 0.2, 1);
+  background-size: 14px;
+  border: 1.5px solid #d4d4d4;
+  border-radius: 6px;
+  transition: all 150ms;
   outline: none;
   cursor: pointer;
   appearance: none;
   -webkit-appearance: none;
-  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.04);
 }
 
 .select-field:hover {
-  border-color: #d4d4d8;
-  background-color: #f4f4f5;
+  border-color: #a3a3a3;
+  background-color: #fafafa;
 }
 
 .select-field:focus {
-  background-color: #ffffff;
   border-color: #6366f1;
-  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.12), inset 0 1px 2px rgba(0, 0, 0, 0.04);
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
 }
 
-/* Number input */
+/* Number input - Compact */
 .number-field-wrapper {
   position: relative;
   display: flex;
@@ -1187,16 +1213,15 @@ const SpacerIcon = createIcon('M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v
 
 .number-field {
   width: 100%;
-  padding: 10px 40px 10px 12px;
-  font-size: 13px;
+  padding: 8px 32px 8px 10px;
+  font-size: 12px;
   font-variant-numeric: tabular-nums;
-  color: #18181b;
-  background-color: #fafafa;
-  border: 1px solid #e4e4e7;
-  border-radius: 8px;
-  transition: all 200ms;
+  color: #171717;
+  background-color: white;
+  border: 1.5px solid #d4d4d4;
+  border-radius: 6px;
+  transition: all 150ms;
   outline: none;
-  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.04);
   appearance: textfield;
   -moz-appearance: textfield;
 }
@@ -1208,55 +1233,53 @@ const SpacerIcon = createIcon('M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v
 }
 
 .number-field:hover {
-  border-color: #d4d4d8;
-  background-color: #f4f4f5;
+  border-color: #a3a3a3;
 }
 
 .number-field:focus {
-  background-color: #ffffff;
   border-color: #6366f1;
-  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.12);
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
 }
 
 .number-field-suffix {
   position: absolute;
-  right: 12px;
+  right: 10px;
   top: 50%;
   transform: translateY(-50%);
-  font-size: 11px;
-  font-weight: 500;
-  color: #71717a;
+  font-size: 10px;
+  font-weight: 600;
+  color: #737373;
   pointer-events: none;
 }
 
-/* Color picker professionnel */
+/* Color picker - Unifié et compact */
 .color-picker-wrapper {
   display: flex;
   align-items: stretch;
-  gap: 0;
-  border: 1px solid #e4e4e7;
-  border-radius: 8px;
+  border: 1.5px solid #d4d4d4;
+  border-radius: 6px;
   overflow: hidden;
-  background: #fafafa;
-  transition: all 200ms;
+  background: white;
+  transition: all 150ms;
 }
 
 .color-picker-wrapper:hover {
-  border-color: #d4d4d8;
+  border-color: #a3a3a3;
 }
 
 .color-picker-wrapper:focus-within {
   border-color: #6366f1;
-  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.12);
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
 }
 
 .color-swatch {
-  width: 42px;
-  height: 42px;
-  padding: 4px;
+  width: 36px;
+  height: 34px;
+  padding: 5px;
   border: none;
   cursor: pointer;
-  background: transparent;
+  background: #f5f5f5;
+  border-right: 1.5px solid #d4d4d4;
 }
 
 .color-swatch::-webkit-color-swatch-wrapper {
@@ -1265,40 +1288,40 @@ const SpacerIcon = createIcon('M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v
 
 .color-swatch::-webkit-color-swatch {
   border: none;
-  border-radius: 6px;
-  box-shadow: inset 0 0 0 1px rgba(0,0,0,0.1);
+  border-radius: 4px;
+  box-shadow: inset 0 0 0 1px rgba(0,0,0,0.15);
 }
 
 .color-hex-input {
   flex: 1;
-  padding: 10px 12px;
-  font-size: 12px;
-  font-family: 'SF Mono', 'Monaco', 'Inconsolata', monospace;
-  font-weight: 500;
-  color: #3f3f46;
+  padding: 8px 10px;
+  font-size: 11px;
+  font-family: 'SF Mono', 'Monaco', 'Inconsolata', 'Consolas', monospace;
+  font-weight: 600;
+  color: #525252;
   background: transparent;
   border: none;
-  border-left: 1px solid #e4e4e7;
   outline: none;
   text-transform: uppercase;
+  letter-spacing: 0.02em;
 }
 
-/* Checkbox / Toggle professionnel */
+/* Toggle - Compact */
 .toggle-wrapper {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 10px;
   cursor: pointer;
-  padding: 8px 0;
+  padding: 6px 0;
 }
 
 .toggle-switch {
   position: relative;
-  width: 36px;
-  height: 20px;
-  background: #d4d4d8;
-  border-radius: 10px;
-  transition: background-color 200ms;
+  width: 32px;
+  height: 18px;
+  background: #d4d4d4;
+  border-radius: 9px;
+  transition: background-color 150ms;
   flex-shrink: 0;
 }
 
@@ -1307,12 +1330,12 @@ const SpacerIcon = createIcon('M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v
   position: absolute;
   top: 2px;
   left: 2px;
-  width: 16px;
-  height: 16px;
+  width: 14px;
+  height: 14px;
   background: white;
   border-radius: 50%;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
-  transition: transform 200ms;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.25);
+  transition: transform 150ms;
 }
 
 .toggle-switch.active {
@@ -1320,40 +1343,41 @@ const SpacerIcon = createIcon('M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v
 }
 
 .toggle-switch.active::after {
-  transform: translateX(16px);
+  transform: translateX(14px);
 }
 
 .toggle-label {
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 500;
-  color: #3f3f46;
+  color: #404040;
 }
 
-/* Slider professionnel */
+/* Slider - Compact */
 .slider-wrapper {
-  padding: 4px 0;
+  padding: 2px 0;
 }
 
 .slider-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 10px;
+  margin-bottom: 8px;
 }
 
 .slider-value {
-  font-size: 12px;
-  font-weight: 600;
+  font-size: 11px;
+  font-weight: 700;
   color: #6366f1;
   background: #eef2ff;
-  padding: 2px 8px;
+  padding: 2px 6px;
   border-radius: 4px;
+  font-variant-numeric: tabular-nums;
 }
 
 .slider-track {
   width: 100%;
-  height: 6px;
-  background: #e4e4e7;
+  height: 5px;
+  background: #e5e5e5;
   border-radius: 3px;
   cursor: pointer;
   appearance: none;
@@ -1363,117 +1387,117 @@ const SpacerIcon = createIcon('M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v
 .slider-track::-webkit-slider-thumb {
   appearance: none;
   -webkit-appearance: none;
-  width: 18px;
-  height: 18px;
+  width: 16px;
+  height: 16px;
   background: #6366f1;
   border-radius: 50%;
   cursor: pointer;
-  box-shadow: 0 2px 6px rgba(99, 102, 241, 0.4);
-  transition: transform 150ms, box-shadow 150ms;
+  box-shadow: 0 2px 4px rgba(99, 102, 241, 0.4);
+  transition: transform 100ms;
 }
 
 .slider-track::-webkit-slider-thumb:hover {
-  transform: scale(1.1);
-  box-shadow: 0 3px 8px rgba(99, 102, 241, 0.5);
+  transform: scale(1.15);
 }
 
 .slider-track::-moz-range-thumb {
-  width: 18px;
-  height: 18px;
+  width: 16px;
+  height: 16px;
   background: #6366f1;
   border: none;
   border-radius: 50%;
   cursor: pointer;
-  box-shadow: 0 2px 6px rgba(99, 102, 241, 0.4);
+  box-shadow: 0 2px 4px rgba(99, 102, 241, 0.4);
 }
 
-/* Segmented Control */
+/* Segmented Control - Compact */
 .segmented-control {
   display: flex;
-  gap: 4px;
-  padding: 4px;
-  background: #f4f4f5;
-  border-radius: 10px;
+  gap: 2px;
+  padding: 3px;
+  background: #e5e5e5;
+  border-radius: 6px;
 }
 
 .segment-btn {
   flex: 1;
-  padding: 8px 12px;
-  font-size: 12px;
-  font-weight: 500;
-  color: #71717a;
+  padding: 6px 8px;
+  font-size: 11px;
+  font-weight: 600;
+  color: #737373;
   background: transparent;
   border: none;
-  border-radius: 6px;
+  border-radius: 4px;
   cursor: pointer;
-  transition: all 200ms;
+  transition: all 150ms;
 }
 
 .segment-btn:hover {
-  color: #52525b;
+  color: #525252;
 }
 
 .segment-btn.active {
-  background: #ffffff;
-  color: #18181b;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  background: white;
+  color: #171717;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
 }
 
-/* Items (Features, FAQ, etc.) */
+/* Items (Features, FAQ, etc.) - Compact */
 .item-card {
   position: relative;
-  padding: 14px;
-  background: #f9fafb;
-  border: 1px solid #f4f4f5;
-  border-radius: 10px;
-  transition: all 200ms;
+  padding: 10px;
+  background: #f5f5f5;
+  border: 1px solid #e5e5e5;
+  border-radius: 6px;
+  transition: all 150ms;
 }
 
 .item-card:hover {
-  border-color: #e4e4e7;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  border-color: #d4d4d4;
+  background: #f0f0f0;
 }
 
 .item-card-input {
   width: 100%;
-  padding: 8px 10px;
-  font-size: 13px;
-  color: #18181b;
-  background: #ffffff;
-  border: 1px solid #e4e4e7;
-  border-radius: 6px;
+  padding: 6px 8px;
+  font-size: 12px;
+  color: #171717;
+  background: white;
+  border: 1px solid #d4d4d4;
+  border-radius: 4px;
   outline: none;
-  transition: all 150ms;
+  transition: all 100ms;
 }
 
 .item-card-input:focus {
   border-color: #6366f1;
-  box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.1);
+  box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.12);
 }
 
 .item-card-input::placeholder {
-  color: #a1a1aa;
+  color: #a3a3a3;
 }
 
 .item-delete-btn {
   position: absolute;
-  top: -6px;
-  right: -6px;
-  width: 22px;
-  height: 22px;
+  top: -5px;
+  right: -5px;
+  width: 18px;
+  height: 18px;
   display: flex;
   align-items: center;
   justify-content: center;
   background: #ef4444;
   color: white;
-  font-size: 14px;
-  font-weight: 500;
+  font-size: 12px;
+  font-weight: 600;
   border: 2px solid white;
   border-radius: 50%;
   cursor: pointer;
   opacity: 0;
   transform: scale(0.8);
-  transition: all 150ms;
+  transition: all 100ms;
+  line-height: 1;
 }
 
 .item-card:hover .item-delete-btn {
@@ -1485,4 +1509,32 @@ const SpacerIcon = createIcon('M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v
   background: #dc2626;
   transform: scale(1.1);
 }
+
+/* Margin bottom utilities */
+.mb-4 { margin-bottom: 10px !important; }
+.mt-4 { margin-top: 10px !important; }
+.mt-5 { margin-top: 14px !important; }
+.pt-5 { padding-top: 14px !important; }
+.mb-3 { margin-bottom: 8px !important; }
+.mb-2 { margin-bottom: 6px !important; }
+.gap-3 { gap: 8px !important; }
+.gap-2 { gap: 6px !important; }
+.space-y-2 > * + * { margin-top: 6px !important; }
+.space-y-3 > * + * { margin-top: 8px !important; }
+
+/* Grid compact */
+.grid.grid-cols-2 {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+}
+
+/* Divider for sections */
+.divide-y > * + * {
+  border-top: 1px solid #e5e5e5;
+}
+
+/* Header styles */
+.px-5 { padding-left: 16px !important; padding-right: 16px !important; }
+.py-4 { padding-top: 12px !important; padding-bottom: 12px !important; }
+.border-b { border-bottom: 1px solid #e5e5e5 !important; }
 </style>
