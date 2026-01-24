@@ -88,7 +88,7 @@
             <!-- Pages du site web - uniquement pour type website -->
             <li v-if="isWebsiteShop">
               <NuxtLink 
-                :to="getDashboardLink('pages/pages')" 
+                :to="getDashboardLink('pages')" 
                 class="flex items-center px-3 py-2 text-sm font-medium text-gray-700 rounded hover:bg-gray-100 transition-all duration-200"
                 :class="isSidebarOpen ? '' : 'justify-center'"
                 @click="closeSidebar"
