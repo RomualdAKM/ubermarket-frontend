@@ -158,6 +158,65 @@
               </div>
             </template>
 
+            <!-- Gallery -->
+            <template v-else-if="section.type === 'gallery'">
+              <div class="space-y-4">
+                <div class="flex items-center justify-between">
+                  <span class="field-label">Colonnes</span>
+                  <select 
+                    :value="section.content?.columns || 3"
+                    @change="handleColumnsChange"
+                    class="input-field w-20"
+                  >
+                    <option :value="2">2</option>
+                    <option :value="3">3</option>
+                    <option :value="4">4</option>
+                  </select>
+                </div>
+                <div class="text-center py-4 text-neutral-400 text-sm">
+                  <svg class="w-10 h-10 mx-auto mb-2 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                  </svg>
+                  Gestion des images disponible prochainement
+                </div>
+              </div>
+            </template>
+
+            <!-- Video -->
+            <template v-else-if="section.type === 'video'">
+              <InputField label="Titre" :value="section.content?.title" @update="updateContent('title', $event)" placeholder="Optionnel" />
+              <InputField label="URL de la vidéo" :value="section.content?.url" @update="updateContent('url', $event)" placeholder="YouTube ou Vimeo" />
+              <InputField label="Description" :value="section.content?.description" @update="updateContent('description', $event)" placeholder="Optionnel" multiline />
+            </template>
+
+            <!-- Countdown -->
+            <template v-else-if="section.type === 'countdown'">
+              <InputField label="Titre" :value="section.content?.title" @update="updateContent('title', $event)" />
+              <InputField label="Sous-titre" :value="section.content?.subtitle" @update="updateContent('subtitle', $event)" />
+              <div class="mt-4">
+                <span class="field-label mb-2 block">Date de fin</span>
+                <input 
+                  type="datetime-local"
+                  :value="formatDateTimeLocal(section.content?.endDate)"
+                  @change="handleEndDateChange"
+                  class="input-field"
+                />
+              </div>
+            </template>
+
+            <!-- Social -->
+            <template v-else-if="section.type === 'social'">
+              <InputField label="Titre" :value="section.content?.title" @update="updateContent('title', $event)" placeholder="Suivez-nous" />
+              <div class="mt-4 space-y-3">
+                <span class="field-label block">Liens des réseaux</span>
+                <InputField label="Facebook" :value="section.content?.links?.facebook" @update="updateSocialLink('facebook', $event)" placeholder="https://facebook.com/..." />
+                <InputField label="Instagram" :value="section.content?.links?.instagram" @update="updateSocialLink('instagram', $event)" placeholder="https://instagram.com/..." />
+                <InputField label="Twitter/X" :value="section.content?.links?.twitter" @update="updateSocialLink('twitter', $event)" placeholder="https://x.com/..." />
+                <InputField label="YouTube" :value="section.content?.links?.youtube" @update="updateSocialLink('youtube', $event)" placeholder="https://youtube.com/..." />
+                <InputField label="LinkedIn" :value="section.content?.links?.linkedin" @update="updateSocialLink('linkedin', $event)" placeholder="https://linkedin.com/..." />
+              </div>
+            </template>
+
             <!-- Default -->
             <template v-else>
               <div class="text-center py-6 text-neutral-400 text-sm">
@@ -386,6 +445,40 @@ const handlePaddingTop = (event: Event) => {
 const handlePaddingBottom = (event: Event) => {
   const target = event.target as HTMLInputElement
   updatePadding('bottom', Number(target.value))
+}
+
+// Gallery columns handler
+const handleColumnsChange = (event: Event) => {
+  const target = event.target as HTMLSelectElement
+  const items = props.section.content?.images || []
+  emit('update:content', { columns: Number(target.value), images: items })
+}
+
+// Countdown date handler
+const formatDateTimeLocal = (dateStr: string | undefined): string => {
+  if (!dateStr) return ''
+  try {
+    const date = new Date(dateStr)
+    return date.toISOString().slice(0, 16)
+  } catch {
+    return ''
+  }
+}
+
+const handleEndDateChange = (event: Event) => {
+  const target = event.target as HTMLInputElement
+  emit('update:content', { endDate: target.value })
+}
+
+// Social links handler
+const updateSocialLink = (platform: string, value: string) => {
+  const currentLinks = props.section.content?.links || {}
+  emit('update:content', { 
+    links: { 
+      ...currentLinks, 
+      [platform]: value 
+    } 
+  })
 }
 
 // Feature items
