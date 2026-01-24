@@ -1,5 +1,18 @@
 <template>
-  <div :style="sectionStyle">
+  <div 
+    :id="section.advanced?.cssId || undefined"
+    :class="section.advanced?.cssClasses || undefined"
+    :style="sectionStyle"
+  >
+    <!-- Background overlay pour images -->
+    <div 
+      v-if="section.style?.backgroundType === 'image' && section.style?.backgroundOverlay" 
+      class="absolute inset-0 pointer-events-none"
+      :style="{ backgroundColor: `rgba(0, 0, 0, ${(section.style.backgroundOverlay || 0) / 100})` }"
+    ></div>
+    
+    <!-- Contenu de la section avec z-index relatif -->
+    <div class="relative z-10">
     <!-- Hero -->
     <template v-if="section.type === 'hero'">
       <div :style="{ maxWidth: section.style?.maxWidth || '1024px', margin: '0 auto', padding: '0 1rem' }">
@@ -417,6 +430,7 @@
         <p class="text-sm mt-1">Ce type de bloc sera disponible prochainement</p>
       </div>
     </template>
+    </div><!-- Fin du contenu z-10 -->
   </div>
 </template>
 

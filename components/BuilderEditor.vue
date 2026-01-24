@@ -877,7 +877,7 @@ const InputField = defineComponent({
   emits: ['update'],
   setup(props, { emit }) {
     return () => h('div', { class: 'mb-4' }, [
-      h('label', { class: 'field-label mb-1.5 block' }, props.label),
+      h('label', { class: 'field-label mb-2 block' }, props.label),
       props.multiline
         ? h('textarea', { value: props.value || '', onInput: (e: Event) => emit('update', (e.target as HTMLTextAreaElement).value), rows: props.rows, placeholder: props.placeholder, class: 'input-field resize-none' })
         : h('input', { type: props.type, value: props.value || '', onInput: (e: Event) => emit('update', (e.target as HTMLInputElement).value), placeholder: props.placeholder, class: 'input-field' })
@@ -891,8 +891,8 @@ const SelectField = defineComponent({
   emits: ['update'],
   setup(props, { emit }) {
     return () => h('div', { class: 'mb-4' }, [
-      h('label', { class: 'field-label mb-1.5 block' }, props.label),
-      h('select', { value: props.value, onChange: (e: Event) => emit('update', (e.target as HTMLSelectElement).value), class: 'input-field' },
+      h('label', { class: 'field-label mb-2 block' }, props.label),
+      h('select', { value: props.value, onChange: (e: Event) => emit('update', (e.target as HTMLSelectElement).value), class: 'select-field' },
         props.options.map((opt: { value: string; label: string }) => h('option', { value: opt.value }, opt.label)))
     ])
   }
@@ -905,10 +905,10 @@ const SegmentedControl = defineComponent({
   setup(props, { emit }) {
     return () => h('div', { class: 'mb-4' }, [
       h('label', { class: 'field-label mb-2 block' }, props.label),
-      h('div', { class: 'flex gap-1 p-1 bg-neutral-100 rounded-lg' },
+      h('div', { class: 'segmented-control' },
         props.options.map((opt: { value: string; label: string }) => h('button', {
           onClick: () => emit('update', opt.value),
-          class: ['flex-1 py-2 rounded-md text-xs font-medium transition-all', props.value === opt.value ? 'bg-white shadow-sm text-neutral-900' : 'text-neutral-500 hover:text-neutral-700']
+          class: ['segment-btn', props.value === opt.value && 'active']
         }, opt.label)))
     ])
   }
@@ -920,10 +920,21 @@ const ColorPickerField = defineComponent({
   emits: ['update'],
   setup(props, { emit }) {
     return () => h('div', { class: 'mb-4' }, [
-      h('label', { class: 'field-label mb-1.5 block' }, props.label),
-      h('div', { class: 'flex items-center gap-2' }, [
-        h('input', { type: 'color', value: props.value || '#000000', onInput: (e: Event) => emit('update', (e.target as HTMLInputElement).value), class: 'w-9 h-9 rounded-lg cursor-pointer border border-neutral-200 p-0.5' }),
-        h('input', { type: 'text', value: props.value || '', onInput: (e: Event) => emit('update', (e.target as HTMLInputElement).value), class: 'flex-1 px-3 py-2 text-xs font-mono bg-neutral-50 border-0 rounded-lg' })
+      h('label', { class: 'field-label mb-2 block' }, props.label),
+      h('div', { class: 'color-picker-wrapper' }, [
+        h('input', { 
+          type: 'color', 
+          value: props.value || '#000000', 
+          onInput: (e: Event) => emit('update', (e.target as HTMLInputElement).value), 
+          class: 'color-swatch' 
+        }),
+        h('input', { 
+          type: 'text', 
+          value: props.value || '', 
+          onInput: (e: Event) => emit('update', (e.target as HTMLInputElement).value), 
+          placeholder: '#000000',
+          class: 'color-hex-input' 
+        })
       ])
     ])
   }
@@ -934,12 +945,19 @@ const SliderField = defineComponent({
   props: { label: String, value: { type: Number, default: 0 }, min: { type: Number, default: 0 }, max: { type: Number, default: 100 }, suffix: { type: String, default: '' } },
   emits: ['update'],
   setup(props, { emit }) {
-    return () => h('div', { class: 'mb-4' }, [
-      h('div', { class: 'flex items-center justify-between mb-1.5' }, [
+    return () => h('div', { class: 'mb-4 slider-wrapper' }, [
+      h('div', { class: 'slider-header' }, [
         h('label', { class: 'field-label' }, props.label),
-        h('span', { class: 'text-xs text-neutral-500' }, `${props.value}${props.suffix}`)
+        h('span', { class: 'slider-value' }, `${props.value}${props.suffix}`)
       ]),
-      h('input', { type: 'range', min: props.min, max: props.max, value: props.value, onInput: (e: Event) => emit('update', Number((e.target as HTMLInputElement).value)), class: 'w-full h-2 bg-neutral-200 rounded-lg appearance-none cursor-pointer accent-primary' })
+      h('input', { 
+        type: 'range', 
+        min: props.min, 
+        max: props.max, 
+        value: props.value, 
+        onInput: (e: Event) => emit('update', Number((e.target as HTMLInputElement).value)), 
+        class: 'slider-track' 
+      })
     ])
   }
 })
@@ -950,23 +968,34 @@ const NumberField = defineComponent({
   emits: ['update'],
   setup(props, { emit }) {
     return () => h('div', { class: 'mb-4' }, [
-      h('label', { class: 'field-label mb-1.5 block' }, props.label),
-      h('div', { class: 'relative' }, [
-        h('input', { type: 'number', min: props.min, max: props.max, step: props.step, value: props.value, onInput: (e: Event) => emit('update', Number((e.target as HTMLInputElement).value)), class: 'input-field pr-10' }),
-        h('span', { class: 'absolute right-3 top-1/2 -translate-y-1/2 text-xs text-neutral-400' }, props.suffix)
+      h('label', { class: 'field-label mb-2 block' }, props.label),
+      h('div', { class: 'number-field-wrapper' }, [
+        h('input', { 
+          type: 'number', 
+          min: props.min, 
+          max: props.max, 
+          step: props.step, 
+          value: props.value, 
+          onInput: (e: Event) => emit('update', Number((e.target as HTMLInputElement).value)), 
+          class: 'number-field' 
+        }),
+        h('span', { class: 'number-field-suffix' }, props.suffix)
       ])
     ])
   }
 })
 
-// CheckboxField
+// CheckboxField - Toggle style
 const CheckboxField = defineComponent({
   props: { label: String, value: Boolean },
   emits: ['update'],
   setup(props, { emit }) {
-    return () => h('label', { class: 'flex items-center gap-3 cursor-pointer' }, [
-      h('input', { type: 'checkbox', checked: props.value, onChange: (e: Event) => emit('update', (e.target as HTMLInputElement).checked), class: 'w-4 h-4 rounded border-neutral-300 text-primary focus:ring-primary/20' }),
-      h('span', { class: 'text-sm text-neutral-700' }, props.label)
+    return () => h('label', { class: 'toggle-wrapper' }, [
+      h('div', { 
+        class: ['toggle-switch', props.value && 'active'],
+        onClick: () => emit('update', !props.value)
+      }),
+      h('span', { class: 'toggle-label' }, props.label)
     ])
   }
 })
@@ -976,13 +1005,13 @@ const FeatureItem = defineComponent({
   props: { item: Object, index: Number },
   emits: ['update', 'remove'],
   setup(props, { emit }) {
-    return () => h('div', { class: 'p-3 bg-neutral-50 rounded-lg group relative' }, [
-      h('button', { class: 'absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-xs', onClick: () => emit('remove') }, '×'),
-      h('div', { class: 'flex gap-2 mb-2' }, [
-        h('input', { value: props.item?.icon, onInput: (e: Event) => emit('update', props.index, 'icon', (e.target as HTMLInputElement).value), class: 'w-12 px-2 py-1 text-center text-sm bg-white border-0 rounded' }),
-        h('input', { value: props.item?.title, onInput: (e: Event) => emit('update', props.index, 'title', (e.target as HTMLInputElement).value), placeholder: 'Titre', class: 'flex-1 px-2 py-1 text-sm bg-white border-0 rounded' })
+    return () => h('div', { class: 'item-card' }, [
+      h('button', { class: 'item-delete-btn', onClick: () => emit('remove') }, '×'),
+      h('div', { class: 'flex gap-2 mb-3' }, [
+        h('input', { value: props.item?.icon, onInput: (e: Event) => emit('update', props.index, 'icon', (e.target as HTMLInputElement).value), class: 'item-card-input', style: 'width: 60px; text-align: center;', placeholder: 'icon' }),
+        h('input', { value: props.item?.title, onInput: (e: Event) => emit('update', props.index, 'title', (e.target as HTMLInputElement).value), placeholder: 'Titre', class: 'item-card-input flex-1' })
       ]),
-      h('textarea', { value: props.item?.description, onInput: (e: Event) => emit('update', props.index, 'description', (e.target as HTMLTextAreaElement).value), rows: 2, placeholder: 'Description', class: 'w-full px-2 py-1 text-xs bg-white border-0 rounded resize-none' })
+      h('textarea', { value: props.item?.description, onInput: (e: Event) => emit('update', props.index, 'description', (e.target as HTMLTextAreaElement).value), rows: 2, placeholder: 'Description...', class: 'item-card-input resize-none' })
     ])
   }
 })
@@ -991,12 +1020,12 @@ const TestimonialItem = defineComponent({
   props: { item: Object, index: Number },
   emits: ['update', 'remove'],
   setup(props, { emit }) {
-    return () => h('div', { class: 'p-3 bg-neutral-50 rounded-lg group relative' }, [
-      h('button', { class: 'absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-xs', onClick: () => emit('remove') }, '×'),
-      h('textarea', { value: props.item?.text, onInput: (e: Event) => emit('update', props.index, 'text', (e.target as HTMLTextAreaElement).value), rows: 2, placeholder: 'Témoignage', class: 'w-full px-2 py-1 text-sm bg-white border-0 rounded resize-none mb-2' }),
+    return () => h('div', { class: 'item-card' }, [
+      h('button', { class: 'item-delete-btn', onClick: () => emit('remove') }, '×'),
+      h('textarea', { value: props.item?.text, onInput: (e: Event) => emit('update', props.index, 'text', (e.target as HTMLTextAreaElement).value), rows: 2, placeholder: 'Témoignage...', class: 'item-card-input resize-none mb-3' }),
       h('div', { class: 'grid grid-cols-2 gap-2' }, [
-        h('input', { value: props.item?.name, onInput: (e: Event) => emit('update', props.index, 'name', (e.target as HTMLInputElement).value), placeholder: 'Nom', class: 'px-2 py-1 text-xs bg-white border-0 rounded' }),
-        h('input', { value: props.item?.role, onInput: (e: Event) => emit('update', props.index, 'role', (e.target as HTMLInputElement).value), placeholder: 'Rôle', class: 'px-2 py-1 text-xs bg-white border-0 rounded' })
+        h('input', { value: props.item?.name, onInput: (e: Event) => emit('update', props.index, 'name', (e.target as HTMLInputElement).value), placeholder: 'Nom', class: 'item-card-input' }),
+        h('input', { value: props.item?.role, onInput: (e: Event) => emit('update', props.index, 'role', (e.target as HTMLInputElement).value), placeholder: 'Rôle', class: 'item-card-input' })
       ])
     ])
   }
@@ -1006,10 +1035,10 @@ const FaqItem = defineComponent({
   props: { item: Object, index: Number },
   emits: ['update', 'remove'],
   setup(props, { emit }) {
-    return () => h('div', { class: 'p-3 bg-neutral-50 rounded-lg group relative' }, [
-      h('button', { class: 'absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-xs', onClick: () => emit('remove') }, '×'),
-      h('input', { value: props.item?.question, onInput: (e: Event) => emit('update', props.index, 'question', (e.target as HTMLInputElement).value), placeholder: 'Question', class: 'w-full px-2 py-1 text-sm bg-white border-0 rounded mb-2' }),
-      h('textarea', { value: props.item?.answer, onInput: (e: Event) => emit('update', props.index, 'answer', (e.target as HTMLTextAreaElement).value), rows: 2, placeholder: 'Réponse', class: 'w-full px-2 py-1 text-xs bg-white border-0 rounded resize-none' })
+    return () => h('div', { class: 'item-card' }, [
+      h('button', { class: 'item-delete-btn', onClick: () => emit('remove') }, '×'),
+      h('input', { value: props.item?.question, onInput: (e: Event) => emit('update', props.index, 'question', (e.target as HTMLInputElement).value), placeholder: 'Question ?', class: 'item-card-input mb-3' }),
+      h('textarea', { value: props.item?.answer, onInput: (e: Event) => emit('update', props.index, 'answer', (e.target as HTMLTextAreaElement).value), rows: 2, placeholder: 'Réponse...', class: 'item-card-input resize-none' })
     ])
   }
 })
@@ -1041,14 +1070,15 @@ const SpacerIcon = createIcon('M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v
 
 <style scoped>
 .builder-editor {
-  background-color: white;
+  background-color: #ffffff;
   height: 100%;
   overflow-y: auto;
 }
 
+/* Accordions */
 .accordion-trigger {
   width: 100%;
-  padding: 0.75rem 1.25rem;
+  padding: 14px 20px;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -1057,49 +1087,402 @@ const SpacerIcon = createIcon('M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v
 }
 
 .accordion-trigger:hover {
-  background-color: rgb(250 250 250);
+  background-color: #f9fafb;
 }
 
 .accordion-label {
   font-size: 11px;
-  font-weight: 600;
+  font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.05em;
-  color: rgb(115 115 115);
+  letter-spacing: 0.08em;
+  color: #52525b;
 }
 
 .accordion-chevron {
-  color: rgb(163 163 163);
+  color: #a1a1aa;
 }
 
 .accordion-content {
-  padding: 0 1.25rem 1.25rem 1.25rem;
+  padding: 4px 20px 20px 20px;
 }
 
+/* Labels */
 .field-label {
-  font-size: 11px;
-  font-weight: 500;
-  color: rgb(115 115 115);
+  font-size: 12px;
+  font-weight: 600;
+  color: #3f3f46;
+  letter-spacing: -0.01em;
 }
 
+/* Inputs - Design professionnel */
 .input-field {
   width: 100%;
-  padding: 0.5rem 0.75rem;
-  font-size: 0.875rem;
-  background-color: rgb(250 250 250);
-  border: 1px solid rgb(229 229 229);
-  border-radius: 0.5rem;
-  transition: all 150ms;
+  padding: 10px 12px;
+  font-size: 13px;
+  line-height: 1.4;
+  color: #18181b;
+  background-color: #fafafa;
+  border: 1px solid #e4e4e7;
+  border-radius: 8px;
+  transition: all 200ms cubic-bezier(0.4, 0, 0.2, 1);
   outline: none;
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.04);
+}
+
+.input-field:hover {
+  border-color: #d4d4d8;
+  background-color: #f4f4f5;
 }
 
 .input-field:focus {
-  background-color: white;
-  border-color: rgb(99 102 241);
-  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+  background-color: #ffffff;
+  border-color: #6366f1;
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.12), inset 0 1px 2px rgba(0, 0, 0, 0.04);
 }
 
 .input-field::placeholder {
-  color: rgb(163 163 163);
+  color: #a1a1aa;
+  font-weight: 400;
+}
+
+/* Select personnalisé */
+.select-field {
+  width: 100%;
+  padding: 10px 36px 10px 12px;
+  font-size: 13px;
+  line-height: 1.4;
+  color: #18181b;
+  background-color: #fafafa;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3E%3Cpath stroke='%2371717a' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3E%3C/svg%3E");
+  background-position: right 10px center;
+  background-repeat: no-repeat;
+  background-size: 16px;
+  border: 1px solid #e4e4e7;
+  border-radius: 8px;
+  transition: all 200ms cubic-bezier(0.4, 0, 0.2, 1);
+  outline: none;
+  cursor: pointer;
+  appearance: none;
+  -webkit-appearance: none;
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.04);
+}
+
+.select-field:hover {
+  border-color: #d4d4d8;
+  background-color: #f4f4f5;
+}
+
+.select-field:focus {
+  background-color: #ffffff;
+  border-color: #6366f1;
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.12), inset 0 1px 2px rgba(0, 0, 0, 0.04);
+}
+
+/* Number input */
+.number-field-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.number-field {
+  width: 100%;
+  padding: 10px 40px 10px 12px;
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+  color: #18181b;
+  background-color: #fafafa;
+  border: 1px solid #e4e4e7;
+  border-radius: 8px;
+  transition: all 200ms;
+  outline: none;
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.04);
+  appearance: textfield;
+  -moz-appearance: textfield;
+}
+
+.number-field::-webkit-outer-spin-button,
+.number-field::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.number-field:hover {
+  border-color: #d4d4d8;
+  background-color: #f4f4f5;
+}
+
+.number-field:focus {
+  background-color: #ffffff;
+  border-color: #6366f1;
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.12);
+}
+
+.number-field-suffix {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 11px;
+  font-weight: 500;
+  color: #71717a;
+  pointer-events: none;
+}
+
+/* Color picker professionnel */
+.color-picker-wrapper {
+  display: flex;
+  align-items: stretch;
+  gap: 0;
+  border: 1px solid #e4e4e7;
+  border-radius: 8px;
+  overflow: hidden;
+  background: #fafafa;
+  transition: all 200ms;
+}
+
+.color-picker-wrapper:hover {
+  border-color: #d4d4d8;
+}
+
+.color-picker-wrapper:focus-within {
+  border-color: #6366f1;
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.12);
+}
+
+.color-swatch {
+  width: 42px;
+  height: 42px;
+  padding: 4px;
+  border: none;
+  cursor: pointer;
+  background: transparent;
+}
+
+.color-swatch::-webkit-color-swatch-wrapper {
+  padding: 0;
+}
+
+.color-swatch::-webkit-color-swatch {
+  border: none;
+  border-radius: 6px;
+  box-shadow: inset 0 0 0 1px rgba(0,0,0,0.1);
+}
+
+.color-hex-input {
+  flex: 1;
+  padding: 10px 12px;
+  font-size: 12px;
+  font-family: 'SF Mono', 'Monaco', 'Inconsolata', monospace;
+  font-weight: 500;
+  color: #3f3f46;
+  background: transparent;
+  border: none;
+  border-left: 1px solid #e4e4e7;
+  outline: none;
+  text-transform: uppercase;
+}
+
+/* Checkbox / Toggle professionnel */
+.toggle-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  cursor: pointer;
+  padding: 8px 0;
+}
+
+.toggle-switch {
+  position: relative;
+  width: 36px;
+  height: 20px;
+  background: #d4d4d8;
+  border-radius: 10px;
+  transition: background-color 200ms;
+  flex-shrink: 0;
+}
+
+.toggle-switch::after {
+  content: '';
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 16px;
+  height: 16px;
+  background: white;
+  border-radius: 50%;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+  transition: transform 200ms;
+}
+
+.toggle-switch.active {
+  background: #6366f1;
+}
+
+.toggle-switch.active::after {
+  transform: translateX(16px);
+}
+
+.toggle-label {
+  font-size: 13px;
+  font-weight: 500;
+  color: #3f3f46;
+}
+
+/* Slider professionnel */
+.slider-wrapper {
+  padding: 4px 0;
+}
+
+.slider-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.slider-value {
+  font-size: 12px;
+  font-weight: 600;
+  color: #6366f1;
+  background: #eef2ff;
+  padding: 2px 8px;
+  border-radius: 4px;
+}
+
+.slider-track {
+  width: 100%;
+  height: 6px;
+  background: #e4e4e7;
+  border-radius: 3px;
+  cursor: pointer;
+  appearance: none;
+  -webkit-appearance: none;
+}
+
+.slider-track::-webkit-slider-thumb {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 18px;
+  height: 18px;
+  background: #6366f1;
+  border-radius: 50%;
+  cursor: pointer;
+  box-shadow: 0 2px 6px rgba(99, 102, 241, 0.4);
+  transition: transform 150ms, box-shadow 150ms;
+}
+
+.slider-track::-webkit-slider-thumb:hover {
+  transform: scale(1.1);
+  box-shadow: 0 3px 8px rgba(99, 102, 241, 0.5);
+}
+
+.slider-track::-moz-range-thumb {
+  width: 18px;
+  height: 18px;
+  background: #6366f1;
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+  box-shadow: 0 2px 6px rgba(99, 102, 241, 0.4);
+}
+
+/* Segmented Control */
+.segmented-control {
+  display: flex;
+  gap: 4px;
+  padding: 4px;
+  background: #f4f4f5;
+  border-radius: 10px;
+}
+
+.segment-btn {
+  flex: 1;
+  padding: 8px 12px;
+  font-size: 12px;
+  font-weight: 500;
+  color: #71717a;
+  background: transparent;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 200ms;
+}
+
+.segment-btn:hover {
+  color: #52525b;
+}
+
+.segment-btn.active {
+  background: #ffffff;
+  color: #18181b;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+/* Items (Features, FAQ, etc.) */
+.item-card {
+  position: relative;
+  padding: 14px;
+  background: #f9fafb;
+  border: 1px solid #f4f4f5;
+  border-radius: 10px;
+  transition: all 200ms;
+}
+
+.item-card:hover {
+  border-color: #e4e4e7;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
+.item-card-input {
+  width: 100%;
+  padding: 8px 10px;
+  font-size: 13px;
+  color: #18181b;
+  background: #ffffff;
+  border: 1px solid #e4e4e7;
+  border-radius: 6px;
+  outline: none;
+  transition: all 150ms;
+}
+
+.item-card-input:focus {
+  border-color: #6366f1;
+  box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.1);
+}
+
+.item-card-input::placeholder {
+  color: #a1a1aa;
+}
+
+.item-delete-btn {
+  position: absolute;
+  top: -6px;
+  right: -6px;
+  width: 22px;
+  height: 22px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #ef4444;
+  color: white;
+  font-size: 14px;
+  font-weight: 500;
+  border: 2px solid white;
+  border-radius: 50%;
+  cursor: pointer;
+  opacity: 0;
+  transform: scale(0.8);
+  transition: all 150ms;
+}
+
+.item-card:hover .item-delete-btn {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.item-delete-btn:hover {
+  background: #dc2626;
+  transform: scale(1.1);
 }
 </style>
