@@ -727,35 +727,67 @@ const SpacerIcon = createIcon('M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v
 </script>
 
 <style scoped>
-@reference "tailwindcss";
-
 .builder-editor {
-  @apply bg-white h-full overflow-y-auto;
+  background-color: white;
+  height: 100%;
+  overflow-y: auto;
 }
 
 .accordion-trigger {
-  @apply w-full px-5 py-3 flex items-center justify-between text-left hover:bg-neutral-50 transition-colors;
+  width: 100%;
+  padding: 0.75rem 1.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  text-align: left;
+  transition: background-color 150ms;
+}
+
+.accordion-trigger:hover {
+  background-color: rgb(250 250 250);
 }
 
 .accordion-label {
-  @apply text-[11px] font-semibold uppercase tracking-wider text-neutral-500;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: rgb(115 115 115);
 }
 
 .accordion-chevron {
-  @apply text-neutral-400;
+  color: rgb(163 163 163);
 }
 
 .accordion-content {
-  @apply px-5 pb-5;
+  padding: 0 1.25rem 1.25rem 1.25rem;
 }
 
 .field-label {
-  @apply text-[11px] font-medium uppercase tracking-wide text-neutral-400;
+  font-size: 11px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.025em;
+  color: rgb(163 163 163);
 }
 
 .input-field {
-  @apply w-full px-3 py-2 text-sm bg-neutral-50 border-0 rounded-lg transition-all;
-  @apply focus:bg-white focus:ring-2 focus:ring-primary/20 focus:outline-none;
-  @apply placeholder:text-neutral-300;
+  width: 100%;
+  padding: 0.5rem 0.75rem;
+  font-size: 0.875rem;
+  background-color: rgb(250 250 250);
+  border: none;
+  border-radius: 0.5rem;
+  transition: all 150ms;
+  outline: none;
+}
+
+.input-field:focus {
+  background-color: white;
+  box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.2);
+}
+
+.input-field::placeholder {
+  color: rgb(212 212 212);
 }
 </style>
