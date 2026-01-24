@@ -85,7 +85,27 @@
                 </span>
               </NuxtLink>
             </li>
-            <li>
+            <!-- Pages du site web - uniquement pour type website -->
+            <li v-if="isWebsiteShop">
+              <NuxtLink 
+                :to="getDashboardLink('pages/pages')" 
+                class="flex items-center px-3 py-2 text-sm font-medium text-gray-700 rounded hover:bg-gray-100 transition-all duration-200"
+                :class="isSidebarOpen ? '' : 'justify-center'"
+                @click="closeSidebar"
+              >
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>
+                </svg>
+                <span 
+                  class="ml-3 transition-opacity duration-300"
+                  :class="isSidebarOpen ? 'opacity-100' : 'opacity-0 lg:opacity-0'"
+                >
+                  Pages
+                </span>
+              </NuxtLink>
+            </li>
+            <!-- Produits - uniquement pour e-commerce -->
+            <li v-if="!isWebsiteShop">
               <NuxtLink 
                 :to="getDashboardLink('products/produits')" 
                 class="flex items-center px-3 py-2 text-sm font-medium text-gray-700 rounded hover:bg-gray-100 transition-all duration-200"
@@ -106,7 +126,8 @@
           </ul>
         </div>
         
-        <div class="px-4 mt-8">
+        <!-- Section Gestion - uniquement pour e-commerce -->
+        <div v-if="!isWebsiteShop" class="px-4 mt-8">
           <h3 
             class="text-xs font-semibold text-gray-500 uppercase tracking-wider transition-opacity duration-300"
             :class="isSidebarOpen ? 'opacity-100' : 'opacity-0 lg:opacity-0'"
@@ -243,8 +264,8 @@
           </ul>
         </div>
         
-        <!-- Section Livraison - uniquement pour boutiques physiques -->
-        <div v-if="isPhysicalShop" class="px-4 mt-8">
+        <!-- Section Livraison - uniquement pour boutiques physiques e-commerce (pas website) -->
+        <div v-if="isPhysicalShop && !isWebsiteShop" class="px-4 mt-8">
           <h3 
             class="text-xs font-semibold text-gray-500 uppercase tracking-wider transition-opacity duration-300"
             :class="isSidebarOpen ? 'opacity-100' : 'opacity-0 lg:opacity-0'"
@@ -460,6 +481,9 @@ const config = useRuntimeConfig()
 
 // Computed pour déterminer si c'est une boutique physique
 const isPhysicalShop = computed(() => currentShop.value?.product_type === 'physical')
+
+// Computed pour déterminer si c'est un site web (pas e-commerce)
+const isWebsiteShop = computed(() => currentShop.value?.shop_type === 'website')
 
 // Fonction pour obtenir l'URL du logo
 const getLogoUrl = (logoPath: string) => {

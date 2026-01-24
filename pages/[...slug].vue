@@ -109,18 +109,30 @@
       </div>
     </div>
     
+    <!-- ===== RENDU POUR LES BOUTIQUES DE TYPE "WEBSITE" (Website Builder) ===== -->
+    <div v-else-if="isWebsiteType && !isLoading && !error">
+      <WebsitePagePublic
+        :shop="shop"
+        :pages="websitePages"
+        :currentPage="currentWebsitePage"
+        :currentSlug="slug && slug.length > 0 ? slug[0] : undefined"
+        :isLoading="isLoading"
+      />
+    </div>
+    
+    <!-- ===== RENDU POUR LES BOUTIQUES E-COMMERCE ===== -->
     <!-- Page d'accueil de la boutique -->
-    <div v-else-if="isHome">
+    <div v-else-if="!isWebsiteType && isHome">
       <component v-if="!isLoading && !error" :is="themeComponent" :shop="shop" :customizations="customizations" />
     </div>
     
     <!-- Page produit -->
-    <div v-else-if="isProduct">
+    <div v-else-if="!isWebsiteType && isProduct">
       <component v-if="!isLoading && !error" :is="themeComponent" :shop="shop" :product="product" :customizations="customizations" />
     </div>
     
     <!-- Page panier (uniquement pour e-commerce) -->
-    <div v-else-if="isCart">
+    <div v-else-if="!isWebsiteType && isCart">
       <!-- Redirection pour boutiques vitrine -->
       <div v-if="shop?.shop_type === 'website'" class="min-h-screen flex items-center justify-center bg-white">
         <div class="text-center max-w-md mx-auto px-6">
@@ -139,12 +151,12 @@
     </div>
     
     <!-- Page produits -->
-    <div v-else-if="isProducts">
+    <div v-else-if="!isWebsiteType && isProducts">
       <component v-if="!isLoading && !error" :is="themeComponent" :shop="shop" :customizations="customizations" />
     </div>
     
-    <!-- Pages statiques (à-propos, CGU, etc.) -->
-    <div v-else>
+    <!-- Pages statiques (à-propos, CGU, etc.) - uniquement e-commerce -->
+    <div v-else-if="!isWebsiteType">
       <component v-if="!isLoading && !error" :is="themeComponent" :shop="shop" :customizations="customizations" :page="currentPage" />
     </div>
     
@@ -209,6 +221,11 @@ const inactiveData = ref<{
   shop_logo?: string
   primary_color?: string
 }>({})
+
+// États pour les boutiques de type "website" (Website Builder)
+const isWebsiteType = ref(false)
+const websitePages = ref<any[]>([])
+const currentWebsitePage = ref<any>(null)
 
 // Style dynamique de la page de maintenance
 const maintenancePageStyle = computed(() => {
@@ -309,39 +326,47 @@ const loadShop = async () => {
     
     shop.value = data.data
     
-    // Charger les customizations de la boutique
-    await fetchCustomizations(subdomain)
-    const customizationData = useState('shop.customizations')
-    customizations.value = customizationData.value || {}
-
-    // Charger le composant de thème dynamiquement
-    if (shop.value.theme && shop.value.theme.slug) {
-      const themeSlug = shop.value.theme.slug
-      
-      try {
-        if (isProduct.value) {
-          themeComponent.value = defineAsyncComponent(() => 
-            import(`~/pages/boutique/${themeSlug}/produit.vue`)
-          )
-        } else if (isCart.value) {
-          themeComponent.value = defineAsyncComponent(() => 
-            import(`~/pages/boutique/${themeSlug}/panier.vue`)
-          )
-        } else if (isProducts.value) {
-          themeComponent.value = defineAsyncComponent(() => 
-            import(`~/pages/boutique/${themeSlug}/produits.vue`)
-          )
-        } else {
-          themeComponent.value = defineAsyncComponent(() => 
-            import(`~/pages/boutique/${themeSlug}/index.vue`)
-          )
-        }
-      } catch (err) {
-        console.error(`Erreur lors du chargement du thème ${themeSlug}:`, err)
-        error.value = `Le thème "${shop.value.theme.name}" n'est pas disponible`
-      }
+    // Vérifier si c'est une boutique de type "website"
+    isWebsiteType.value = shop.value.shop_type === 'website'
+    
+    if (isWebsiteType.value) {
+      // Charger les pages du Website Builder
+      await loadWebsitePages()
     } else {
-      error.value = 'Cette boutique n\'a pas de thème configuré'
+      // Charger les customizations de la boutique (pour e-commerce)
+      await fetchCustomizations(subdomain)
+      const customizationData = useState('shop.customizations')
+      customizations.value = customizationData.value || {}
+
+      // Charger le composant de thème dynamiquement
+      if (shop.value.theme && shop.value.theme.slug) {
+        const themeSlug = shop.value.theme.slug
+        
+        try {
+          if (isProduct.value) {
+            themeComponent.value = defineAsyncComponent(() => 
+              import(`~/pages/boutique/${themeSlug}/produit.vue`)
+            )
+          } else if (isCart.value) {
+            themeComponent.value = defineAsyncComponent(() => 
+              import(`~/pages/boutique/${themeSlug}/panier.vue`)
+            )
+          } else if (isProducts.value) {
+            themeComponent.value = defineAsyncComponent(() => 
+              import(`~/pages/boutique/${themeSlug}/produits.vue`)
+            )
+          } else {
+            themeComponent.value = defineAsyncComponent(() => 
+              import(`~/pages/boutique/${themeSlug}/index.vue`)
+            )
+          }
+        } catch (err) {
+          console.error(`Erreur lors du chargement du thème ${themeSlug}:`, err)
+          error.value = `Le thème "${shop.value.theme.name}" n'est pas disponible`
+        }
+      } else {
+        error.value = 'Cette boutique n\'a pas de thème configuré'
+      }
     }
   } catch (err: any) {
     console.error('Erreur lors du chargement de la boutique:', err)
@@ -367,6 +392,63 @@ const loadProduct = async () => {
     product.value = data.data
   } catch (err: any) {
     console.error('Erreur lors du chargement du produit:', err)
+    error.value = err.message || 'Une erreur est survenue'
+  }
+}
+
+// Charger les pages du Website Builder
+const loadWebsitePages = async () => {
+  if (!subdomain) return
+  
+  try {
+    const config = useRuntimeConfig()
+    
+    // Charger toutes les pages publiées
+    const pagesResponse = await fetch(`${config.public.apiBase}/shop/${subdomain}/pages`)
+    const pagesData = await pagesResponse.json()
+    
+    if (pagesData.success && pagesData.data) {
+      websitePages.value = pagesData.data
+      
+      // Déterminer quelle page afficher
+      const pageSlug = slug && slug.length > 0 ? slug[0] : null
+      
+      if (pageSlug) {
+        // Charger la page spécifique par son slug
+        const pageResponse = await fetch(`${config.public.apiBase}/shop/${subdomain}/pages/${pageSlug}`)
+        const pageData = await pageResponse.json()
+        
+        if (pageData.success && pageData.data) {
+          currentWebsitePage.value = pageData.data
+        } else {
+          // Page non trouvée
+          error.value = 'Page non trouvée'
+        }
+      } else {
+        // Afficher la page d'accueil
+        const homePage = websitePages.value.find((p: any) => p.is_homepage)
+        if (homePage) {
+          // Charger le contenu complet de la page d'accueil
+          const pageResponse = await fetch(`${config.public.apiBase}/shop/${subdomain}/pages/${homePage.slug}`)
+          const pageData = await pageResponse.json()
+          
+          if (pageData.success && pageData.data) {
+            currentWebsitePage.value = pageData.data
+          }
+        } else if (websitePages.value.length > 0) {
+          // Si pas de homepage définie, prendre la première page
+          const firstPage = websitePages.value[0]
+          const pageResponse = await fetch(`${config.public.apiBase}/shop/${subdomain}/pages/${firstPage.slug}`)
+          const pageData = await pageResponse.json()
+          
+          if (pageData.success && pageData.data) {
+            currentWebsitePage.value = pageData.data
+          }
+        }
+      }
+    }
+  } catch (err: any) {
+    console.error('Erreur lors du chargement des pages:', err)
     error.value = err.message || 'Une erreur est survenue'
   }
 }
@@ -413,7 +495,16 @@ useHead(() => {
   let title = 'Accueil'
   let description = 'Découvrez notre boutique en ligne'
   
-  if (product.value) {
+  // SEO pour Website Builder
+  if (isWebsiteType.value && currentWebsitePage.value) {
+    title = currentWebsitePage.value.settings?.seo?.title || 
+            `${currentWebsitePage.value.title} - ${shop.value?.name}`
+    description = currentWebsitePage.value.settings?.seo?.description || 
+                  shop.value?.description || 
+                  'Découvrez notre site'
+  }
+  // SEO pour E-commerce
+  else if (product.value) {
     title = `${product.value.name} - ${shop.value?.name}`
     description = product.value?.description || 'Découvrez ce produit'
   } else if (shop.value && !isHome.value) {
