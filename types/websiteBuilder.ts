@@ -466,13 +466,15 @@ export const BLOCK_DEFINITIONS: BlockDefinition[] = [
     icon: 'heroicons:sparkles',
     description: 'Présentation des avantages',
     templates: [
+      // === GRILLES CLASSIQUES ===
       {
         id: 'features-grid-3',
-        name: 'Grille moderne',
-        preview: 'grid',
+        name: 'Grille 3 colonnes',
+        preview: 'grid-3',
         defaultContent: {
           title: 'Pourquoi nous choisir',
           subtitle: 'Des avantages qui font la différence',
+          columns: 3,
           items: [
             { icon: 'zap', title: 'Rapide', description: 'Performance optimisée pour une expérience fluide' },
             { icon: 'shield', title: 'Sécurisé', description: 'Protection avancée de vos données' },
@@ -484,54 +486,335 @@ export const BLOCK_DEFINITIONS: BlockDefinition[] = [
           maxWidth: '1100px',
           backgroundColor: '#ffffff',
           textColor: '#171717',
-          padding: { top: 80, bottom: 80 }
+          backgroundType: 'color',
+          verticalSpacing: 'large',
+          horizontalSpacing: 'medium'
         }
       },
       {
-        id: 'features-cards',
-        name: 'Cartes flottantes',
-        preview: 'cards',
+        id: 'features-grid-4',
+        name: 'Grille 4 colonnes',
+        preview: 'grid-4',
         defaultContent: {
           title: 'Nos services',
+          subtitle: '',
+          columns: 4,
           items: [
-            { icon: 'box', title: 'Service 1', description: 'Description concise du premier service' },
-            { icon: 'layers', title: 'Service 2', description: 'Description concise du deuxième service' },
-            { icon: 'globe', title: 'Service 3', description: 'Description concise du troisième service' },
-            { icon: 'settings', title: 'Service 4', description: 'Description concise du quatrième service' }
+            { icon: 'box', title: 'Service 1', description: 'Description concise' },
+            { icon: 'layers', title: 'Service 2', description: 'Description concise' },
+            { icon: 'globe', title: 'Service 3', description: 'Description concise' },
+            { icon: 'settings', title: 'Service 4', description: 'Description concise' }
           ]
         },
         defaultStyle: {
           alignment: 'center',
           maxWidth: '1200px',
-          backgroundColor: '#f5f5f5',
+          backgroundColor: '#fafafa',
           textColor: '#262626',
-          padding: { top: 80, bottom: 80 }
+          backgroundType: 'color',
+          verticalSpacing: 'large',
+          horizontalSpacing: 'medium'
+        }
+      },
+      
+      // === BENTO GRID (Style Apple) ===
+      {
+        id: 'features-bento',
+        name: 'Bento Grid',
+        preview: 'bento',
+        defaultContent: {
+          layout: 'bento',
+          title: 'Tout ce dont vous avez besoin',
+          items: [
+            { icon: 'zap', title: 'Performance', description: 'Des temps de chargement ultra-rapides', size: 'large', image: '' },
+            { icon: 'shield', title: 'Sécurité', description: 'Protection de niveau entreprise', size: 'medium' },
+            { icon: 'refresh', title: 'Mises à jour', description: 'Améliorations continues', size: 'medium' },
+            { icon: 'star', title: 'Support', description: 'Assistance 24/7', size: 'small' },
+            { icon: 'globe', title: 'Global', description: 'Disponible partout', size: 'small' }
+          ]
+        },
+        defaultStyle: {
+          alignment: 'center',
+          maxWidth: '1200px',
+          backgroundColor: '#0a0a0a',
+          textColor: '#fafafa',
+          backgroundType: 'color',
+          verticalSpacing: 'large',
+          horizontalSpacing: 'medium'
+        }
+      },
+      
+      // === CARTES AVEC EFFETS ===
+      {
+        id: 'features-cards-hover',
+        name: 'Cartes Hover',
+        preview: 'cards-hover',
+        defaultContent: {
+          title: 'Ce qui nous distingue',
+          subtitle: 'Survolez pour en savoir plus',
+          items: [
+            { icon: 'zap', title: 'Rapidité', description: 'Livré en 24h maximum', hoverDescription: 'Notre réseau logistique permet une livraison express partout en France.' },
+            { icon: 'shield', title: 'Garantie', description: 'Satisfait ou remboursé', hoverDescription: 'Retournez tout article dans les 30 jours pour un remboursement complet.' },
+            { icon: 'headphones', title: 'Support', description: 'Toujours disponible', hoverDescription: 'Équipe dédiée joignable par chat, email ou téléphone 24/7.' }
+          ]
+        },
+        defaultStyle: {
+          alignment: 'center',
+          maxWidth: '1100px',
+          backgroundColor: '#ffffff',
+          textColor: '#171717',
+          backgroundType: 'color',
+          verticalSpacing: 'large',
+          horizontalSpacing: 'medium'
         }
       },
       {
-        id: 'features-list-check',
-        name: 'Liste épurée',
-        preview: 'list',
+        id: 'features-cards-gradient',
+        name: 'Cartes Gradient',
+        preview: 'cards-gradient',
         defaultContent: {
-          title: 'Ce qui est inclus',
+          title: 'Nos avantages',
           items: [
-            { icon: 'check', title: 'Fonctionnalité essentielle', description: 'Description détaillée' },
-            { icon: 'check', title: 'Support prioritaire', description: 'Assistance dédiée 24/7' },
-            { icon: 'check', title: 'Mises à jour gratuites', description: 'Évolutions continues' }
+            { icon: 'zap', title: 'Performance', description: 'Optimisé pour la vitesse', gradient: 'from-blue-500 to-cyan-500' },
+            { icon: 'shield', title: 'Sécurité', description: 'Protection maximale', gradient: 'from-purple-500 to-pink-500' },
+            { icon: 'star', title: 'Qualité', description: 'Excellence garantie', gradient: 'from-orange-500 to-red-500' }
+          ]
+        },
+        defaultStyle: {
+          alignment: 'center',
+          maxWidth: '1100px',
+          backgroundColor: '#0f172a',
+          textColor: '#f8fafc',
+          backgroundType: 'color',
+          verticalSpacing: 'large',
+          horizontalSpacing: 'medium'
+        }
+      },
+      
+      // === TIMELINE / PROCESS ===
+      {
+        id: 'features-timeline',
+        name: 'Timeline Verticale',
+        preview: 'timeline',
+        defaultContent: {
+          layout: 'timeline',
+          title: 'Comment ça marche',
+          subtitle: 'Un processus simple en quelques étapes',
+          items: [
+            { step: 1, title: 'Inscription', description: 'Créez votre compte en quelques secondes' },
+            { step: 2, title: 'Configuration', description: 'Personnalisez votre espace selon vos besoins' },
+            { step: 3, title: 'Lancement', description: 'Publiez et commencez à vendre immédiatement' },
+            { step: 4, title: 'Croissance', description: 'Analysez et optimisez vos performances' }
+          ]
+        },
+        defaultStyle: {
+          alignment: 'center',
+          maxWidth: '800px',
+          backgroundColor: '#ffffff',
+          textColor: '#171717',
+          backgroundType: 'color',
+          verticalSpacing: 'large',
+          horizontalSpacing: 'medium'
+        }
+      },
+      {
+        id: 'features-process-horizontal',
+        name: 'Process Horizontal',
+        preview: 'process',
+        defaultContent: {
+          layout: 'process',
+          title: 'Votre parcours',
+          items: [
+            { step: 1, title: 'Découvrez', description: 'Explorez notre catalogue', icon: 'search' },
+            { step: 2, title: 'Sélectionnez', description: 'Choisissez vos produits', icon: 'check' },
+            { step: 3, title: 'Commandez', description: 'Validez en un clic', icon: 'box' },
+            { step: 4, title: 'Recevez', description: 'Livraison rapide', icon: 'truck' }
+          ]
+        },
+        defaultStyle: {
+          alignment: 'center',
+          maxWidth: '1200px',
+          backgroundColor: '#fafafa',
+          textColor: '#171717',
+          backgroundType: 'color',
+          verticalSpacing: 'large',
+          horizontalSpacing: 'medium'
+        }
+      },
+      
+      // === COMPARATIF ===
+      {
+        id: 'features-comparison',
+        name: 'Comparatif',
+        preview: 'comparison',
+        defaultContent: {
+          layout: 'comparison',
+          title: 'Pourquoi nous choisir',
+          subtitle: 'La différence est claire',
+          leftColumn: {
+            title: 'Les autres',
+            type: 'negative',
+            items: [
+              'Frais cachés',
+              'Support limité',
+              'Fonctionnalités basiques',
+              'Mises à jour payantes'
+            ]
+          },
+          rightColumn: {
+            title: 'Notre solution',
+            type: 'positive',
+            items: [
+              'Tarification transparente',
+              'Support 24/7 inclus',
+              'Toutes les fonctionnalités',
+              'Mises à jour gratuites'
+            ]
+          }
+        },
+        defaultStyle: {
+          alignment: 'center',
+          maxWidth: '900px',
+          backgroundColor: '#ffffff',
+          textColor: '#171717',
+          backgroundType: 'color',
+          verticalSpacing: 'large',
+          horizontalSpacing: 'medium'
+        }
+      },
+      
+      // === STATS + FEATURES ===
+      {
+        id: 'features-stats',
+        name: 'Stats & Features',
+        preview: 'stats',
+        defaultContent: {
+          layout: 'stats',
+          title: 'Des résultats qui parlent',
+          stats: [
+            { value: '99.9%', label: 'Uptime garanti' },
+            { value: '< 100ms', label: 'Temps de réponse' },
+            { value: '10M+', label: 'Utilisateurs actifs' },
+            { value: '150+', label: 'Pays desservis' }
+          ],
+          features: [
+            { icon: 'zap', title: 'Ultra-rapide', description: 'Infrastructure optimisée' },
+            { icon: 'shield', title: 'Sécurisé', description: 'Chiffrement de bout en bout' }
+          ]
+        },
+        defaultStyle: {
+          alignment: 'center',
+          maxWidth: '1100px',
+          backgroundColor: '#0f172a',
+          textColor: '#f8fafc',
+          backgroundType: 'color',
+          verticalSpacing: 'large',
+          horizontalSpacing: 'medium'
+        }
+      },
+      
+      // === ALTERNATING (Zigzag) ===
+      {
+        id: 'features-alternating',
+        name: 'Alterné Image/Texte',
+        preview: 'alternating',
+        defaultContent: {
+          layout: 'alternating',
+          items: [
+            {
+              title: 'Fonctionnalité puissante',
+              description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore.',
+              image: 'https://images.unsplash.com/photo-1551434678-e076c223a692?w=600',
+              button: { text: 'En savoir plus', url: '#' }
+            },
+            {
+              title: 'Interface intuitive',
+              description: 'Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo.',
+              image: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=600',
+              button: { text: 'Découvrir', url: '#' }
+            },
+            {
+              title: 'Support dédié',
+              description: 'Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla.',
+              image: 'https://images.unsplash.com/photo-1553877522-43269d4ea984?w=600',
+              button: { text: 'Contacter', url: '#' }
+            }
           ]
         },
         defaultStyle: {
           alignment: 'left',
-          maxWidth: '700px',
+          maxWidth: '1200px',
           backgroundColor: '#ffffff',
-          textColor: '#404040',
-          padding: { top: 60, bottom: 60 }
+          textColor: '#171717',
+          backgroundType: 'color',
+          verticalSpacing: 'large',
+          horizontalSpacing: 'medium'
+        }
+      },
+      
+      // === FEATURE SHOWCASE ===
+      {
+        id: 'features-showcase',
+        name: 'Feature Vedette',
+        preview: 'showcase',
+        defaultContent: {
+          layout: 'showcase',
+          badge: 'NOUVEAU',
+          title: 'La fonctionnalité qui change tout',
+          description: 'Découvrez notre dernière innovation qui va révolutionner votre façon de travailler. Une interface repensée, des performances améliorées.',
+          image: 'https://images.unsplash.com/photo-1551434678-e076c223a692?w=800',
+          features: [
+            'Intégration native',
+            'Performance x10',
+            'Sécurité renforcée'
+          ],
+          button: { text: 'Essayer maintenant', url: '#' }
+        },
+        defaultStyle: {
+          alignment: 'center',
+          maxWidth: '1100px',
+          backgroundColor: '#fafafa',
+          textColor: '#171717',
+          backgroundType: 'color',
+          verticalSpacing: 'large',
+          horizontalSpacing: 'medium'
+        }
+      },
+      
+      // === LISTES COMPACTES ===
+      {
+        id: 'features-checklist',
+        name: 'Checklist',
+        preview: 'checklist',
+        defaultContent: {
+          title: 'Tout est inclus',
+          subtitle: 'Pas de frais cachés, tout est compris',
+          columns: 2,
+          items: [
+            'Accès illimité',
+            'Support prioritaire',
+            'Mises à jour automatiques',
+            'Sauvegarde quotidienne',
+            'API complète',
+            'Documentation détaillée',
+            'Formation incluse',
+            'Certificat SSL'
+          ]
+        },
+        defaultStyle: {
+          alignment: 'center',
+          maxWidth: '800px',
+          backgroundColor: '#ffffff',
+          textColor: '#171717',
+          backgroundType: 'color',
+          verticalSpacing: 'medium',
+          horizontalSpacing: 'medium'
         }
       },
       {
         id: 'features-icons-row',
         name: 'Icônes en ligne',
-        preview: 'icons',
+        preview: 'icons-row',
         defaultContent: {
           items: [
             { icon: 'truck', title: 'Livraison express', description: '' },
@@ -545,7 +828,107 @@ export const BLOCK_DEFINITIONS: BlockDefinition[] = [
           maxWidth: '1000px',
           backgroundColor: '#fafafa',
           textColor: '#525252',
-          padding: { top: 40, bottom: 40 }
+          backgroundType: 'color',
+          verticalSpacing: 'small',
+          horizontalSpacing: 'medium'
+        }
+      },
+      
+      // === TABS FEATURES ===
+      {
+        id: 'features-tabs',
+        name: 'Onglets',
+        preview: 'tabs',
+        defaultContent: {
+          layout: 'tabs',
+          title: 'Explorer nos fonctionnalités',
+          tabs: [
+            {
+              id: 'tab1',
+              label: 'Performance',
+              icon: 'zap',
+              title: 'Vitesse incomparable',
+              description: 'Notre infrastructure est optimisée pour offrir les meilleures performances du marché.',
+              image: 'https://images.unsplash.com/photo-1551434678-e076c223a692?w=600',
+              features: ['CDN global', 'Cache intelligent', 'Compression automatique']
+            },
+            {
+              id: 'tab2',
+              label: 'Sécurité',
+              icon: 'shield',
+              title: 'Protection maximale',
+              description: 'Vos données sont protégées par les standards de sécurité les plus stricts.',
+              image: 'https://images.unsplash.com/photo-1563986768609-322da13575f3?w=600',
+              features: ['Chiffrement AES-256', 'Authentification 2FA', 'Audit de sécurité']
+            },
+            {
+              id: 'tab3',
+              label: 'Intégrations',
+              icon: 'layers',
+              title: 'Connecté à tout',
+              description: 'Intégrez facilement avec vos outils préférés grâce à notre API.',
+              image: 'https://images.unsplash.com/photo-1558494949-ef010cbdcc31?w=600',
+              features: ['API REST', 'Webhooks', '500+ intégrations']
+            }
+          ]
+        },
+        defaultStyle: {
+          alignment: 'center',
+          maxWidth: '1100px',
+          backgroundColor: '#ffffff',
+          textColor: '#171717',
+          backgroundType: 'color',
+          verticalSpacing: 'large',
+          horizontalSpacing: 'medium'
+        }
+      },
+      
+      // === CENTERED MINIMAL ===
+      {
+        id: 'features-centered',
+        name: 'Centré Minimal',
+        preview: 'centered',
+        defaultContent: {
+          title: 'Simple. Puissant. Efficace.',
+          description: 'Tout ce dont vous avez besoin, rien de superflu.',
+          items: [
+            { icon: 'zap', title: 'Rapide', description: 'Performance optimale' },
+            { icon: 'shield', title: 'Sûr', description: 'Sécurité intégrée' },
+            { icon: 'star', title: 'Pro', description: 'Qualité premium' }
+          ]
+        },
+        defaultStyle: {
+          alignment: 'center',
+          maxWidth: '900px',
+          backgroundColor: '#0a0a0a',
+          textColor: '#fafafa',
+          backgroundType: 'color',
+          verticalSpacing: 'large',
+          horizontalSpacing: 'medium'
+        }
+      },
+      
+      // === ICON LARGE ===
+      {
+        id: 'features-icons-large',
+        name: 'Grandes Icônes',
+        preview: 'icons-large',
+        defaultContent: {
+          title: 'Pourquoi nous',
+          items: [
+            { icon: 'truck', title: 'Livraison', description: 'Express en 24h dans toute la France' },
+            { icon: 'refresh', title: 'Retours', description: '30 jours pour changer d\'avis' },
+            { icon: 'headphones', title: 'Support', description: 'Équipe dédiée disponible 24/7' }
+          ]
+        },
+        defaultStyle: {
+          alignment: 'center',
+          maxWidth: '1200px',
+          backgroundColor: '#ffffff',
+          textColor: '#171717',
+          backgroundType: 'color',
+          verticalSpacing: 'large',
+          horizontalSpacing: 'medium'
         }
       }
     ]

@@ -467,33 +467,397 @@
       
     </template>
     
-    <!-- Features -->
+    <!-- ==================== FEATURES ==================== -->
     <template v-else-if="section.type === 'features'">
-      <div :style="{ maxWidth: section.style?.maxWidth || '1280px', margin: '0 auto', padding: '0 1rem' }">
-        <div :style="{ textAlign: section.style?.alignment || 'center' }" class="mb-8">
-          <h2 class="mb-2" :style="getTitleStyle">
-            {{ section.content?.title || 'Nos avantages' }}
+      
+      <!-- FEATURES: Layout Bento Grid -->
+      <template v-if="section.content?.layout === 'bento'">
+        <div :style="{ maxWidth: section.style?.maxWidth || '1200px', margin: '0 auto', padding: '0 1rem' }">
+          <h2 v-if="section.content?.title" class="text-3xl md:text-4xl font-bold text-center mb-12" :style="{ color: section.style?.textColor }">
+            {{ section.content.title }}
           </h2>
-          <p v-if="section.content?.subtitle" :style="getSubtitleStyle">
-            {{ section.content.subtitle }}
-          </p>
-        </div>
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div 
-            v-for="(item, index) in (section.content?.items || [])" 
-            :key="index"
-            class="p-6 rounded-lg bg-white/10"
-          >
-            <div class="w-12 h-12 mb-4 rounded-xl flex items-center justify-center" :style="{ backgroundColor: section.style?.textColor + '10' }">
-              <svg class="w-6 h-6" :style="{ color: section.style?.textColor }" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" :d="getIconPath(item.icon)" />
-              </svg>
+          <div class="grid grid-cols-2 md:grid-cols-4 gap-4 auto-rows-[200px]">
+            <div 
+              v-for="(item, index) in (section.content?.items || [])" 
+              :key="index"
+              class="rounded-2xl p-6 flex flex-col justify-end transition-transform hover:scale-[1.02]"
+              :class="[
+                item.size === 'large' ? 'col-span-2 row-span-2' : '',
+                item.size === 'medium' ? 'col-span-2' : '',
+                item.size === 'small' ? 'col-span-1' : ''
+              ]"
+              :style="{ backgroundColor: section.style?.textColor + '10' }"
+            >
+              <div class="w-10 h-10 rounded-lg mb-4 flex items-center justify-center" :style="{ backgroundColor: section.style?.textColor + '20' }">
+                <svg class="w-5 h-5" :style="{ color: section.style?.textColor }" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" :d="getIconPath(item.icon)" />
+                </svg>
+              </div>
+              <h3 class="text-lg font-semibold mb-1" :style="{ color: section.style?.textColor }">{{ item.title }}</h3>
+              <p class="text-sm opacity-70" :style="{ color: section.style?.textColor }">{{ item.description }}</p>
             </div>
-            <h3 class="text-lg font-semibold mb-2" :style="{ color: section.style?.textColor }">{{ item.title }}</h3>
-            <p class="opacity-80" :style="{ color: section.style?.textColor }">{{ item.description }}</p>
           </div>
         </div>
-      </div>
+      </template>
+      
+      <!-- FEATURES: Layout Timeline -->
+      <template v-else-if="section.content?.layout === 'timeline'">
+        <div :style="{ maxWidth: section.style?.maxWidth || '800px', margin: '0 auto', padding: '0 1rem' }">
+          <div class="text-center mb-12">
+            <h2 class="text-3xl md:text-4xl font-bold mb-4" :style="{ color: section.style?.textColor }">
+              {{ section.content?.title || 'Comment \u00e7a marche' }}
+            </h2>
+            <p v-if="section.content?.subtitle" class="text-lg opacity-70" :style="{ color: section.style?.textColor }">
+              {{ section.content.subtitle }}
+            </p>
+          </div>
+          <div class="relative">
+            <div class="absolute left-8 top-0 bottom-0 w-0.5" :style="{ backgroundColor: section.style?.textColor + '20' }"></div>
+            <div class="space-y-8">
+              <div 
+                v-for="(item, index) in (section.content?.items || [])" 
+                :key="index"
+                class="relative flex gap-6 items-start"
+              >
+                <div 
+                  class="w-16 h-16 rounded-full flex items-center justify-center text-2xl font-bold flex-shrink-0 z-10"
+                  :style="{ backgroundColor: section.style?.textColor, color: section.style?.backgroundColor || '#ffffff' }"
+                >
+                  {{ item.step || index + 1 }}
+                </div>
+                <div class="pt-3">
+                  <h3 class="text-xl font-semibold mb-2" :style="{ color: section.style?.textColor }">{{ item.title }}</h3>
+                  <p class="opacity-70" :style="{ color: section.style?.textColor }">{{ item.description }}</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </template>
+      
+      <!-- FEATURES: Layout Process Horizontal -->
+      <template v-else-if="section.content?.layout === 'process'">
+        <div :style="{ maxWidth: section.style?.maxWidth || '1200px', margin: '0 auto', padding: '0 1rem' }">
+          <h2 v-if="section.content?.title" class="text-3xl md:text-4xl font-bold text-center mb-12" :style="{ color: section.style?.textColor }">
+            {{ section.content.title }}
+          </h2>
+          <div class="grid grid-cols-2 md:grid-cols-4 gap-6 relative">
+            <div class="hidden md:block absolute top-12 left-[12%] right-[12%] h-0.5" :style="{ backgroundColor: section.style?.textColor + '20' }"></div>
+            <div 
+              v-for="(item, index) in (section.content?.items || [])" 
+              :key="index"
+              class="text-center relative"
+            >
+              <div 
+                class="w-24 h-24 rounded-full mx-auto mb-4 flex items-center justify-center relative z-10"
+                :style="{ backgroundColor: section.style?.textColor + '10' }"
+              >
+                <span class="text-3xl font-bold" :style="{ color: section.style?.textColor }">{{ item.step || index + 1 }}</span>
+              </div>
+              <h3 class="text-lg font-semibold mb-2" :style="{ color: section.style?.textColor }">{{ item.title }}</h3>
+              <p class="text-sm opacity-70" :style="{ color: section.style?.textColor }">{{ item.description }}</p>
+            </div>
+          </div>
+        </div>
+      </template>
+      
+      <!-- FEATURES: Layout Comparison -->
+      <template v-else-if="section.content?.layout === 'comparison'">
+        <div :style="{ maxWidth: section.style?.maxWidth || '900px', margin: '0 auto', padding: '0 1rem' }">
+          <div class="text-center mb-12">
+            <h2 class="text-3xl md:text-4xl font-bold mb-4" :style="{ color: section.style?.textColor }">
+              {{ section.content?.title || 'Comparatif' }}
+            </h2>
+            <p v-if="section.content?.subtitle" class="text-lg opacity-70" :style="{ color: section.style?.textColor }">
+              {{ section.content.subtitle }}
+            </p>
+          </div>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div class="p-8 rounded-2xl" :style="{ backgroundColor: '#fee2e2' }">
+              <h3 class="text-xl font-bold mb-6 text-red-700">{{ section.content?.leftColumn?.title || 'Les autres' }}</h3>
+              <ul class="space-y-4">
+                <li v-for="(item, idx) in (section.content?.leftColumn?.items || [])" :key="idx" class="flex items-start gap-3">
+                  <svg class="w-5 h-5 text-red-500 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" />
+                  </svg>
+                  <span class="text-red-800">{{ item }}</span>
+                </li>
+              </ul>
+            </div>
+            <div class="p-8 rounded-2xl" :style="{ backgroundColor: '#dcfce7' }">
+              <h3 class="text-xl font-bold mb-6 text-green-700">{{ section.content?.rightColumn?.title || 'Notre solution' }}</h3>
+              <ul class="space-y-4">
+                <li v-for="(item, idx) in (section.content?.rightColumn?.items || [])" :key="idx" class="flex items-start gap-3">
+                  <svg class="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
+                  </svg>
+                  <span class="text-green-800">{{ item }}</span>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </template>
+      
+      <!-- FEATURES: Layout Stats -->
+      <template v-else-if="section.content?.layout === 'stats'">
+        <div :style="{ maxWidth: section.style?.maxWidth || '1100px', margin: '0 auto', padding: '0 1rem' }">
+          <h2 v-if="section.content?.title" class="text-3xl md:text-4xl font-bold text-center mb-12" :style="{ color: section.style?.textColor }">
+            {{ section.content.title }}
+          </h2>
+          <div class="grid grid-cols-2 md:grid-cols-4 gap-8 mb-12">
+            <div v-for="(stat, idx) in (section.content?.stats || [])" :key="idx" class="text-center">
+              <div class="text-4xl md:text-5xl font-bold mb-2" :style="{ color: section.style?.textColor }">{{ stat.value }}</div>
+              <div class="text-sm opacity-70" :style="{ color: section.style?.textColor }">{{ stat.label }}</div>
+            </div>
+          </div>
+          <div v-if="section.content?.features" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div 
+              v-for="(item, idx) in section.content.features" 
+              :key="idx"
+              class="flex gap-4 p-6 rounded-xl"
+              :style="{ backgroundColor: section.style?.textColor + '10' }"
+            >
+              <div class="w-12 h-12 rounded-lg flex items-center justify-center flex-shrink-0" :style="{ backgroundColor: section.style?.textColor + '20' }">
+                <svg class="w-6 h-6" :style="{ color: section.style?.textColor }" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" :d="getIconPath(item.icon)" />
+                </svg>
+              </div>
+              <div>
+                <h3 class="font-semibold mb-1" :style="{ color: section.style?.textColor }">{{ item.title }}</h3>
+                <p class="text-sm opacity-70" :style="{ color: section.style?.textColor }">{{ item.description }}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </template>
+      
+      <!-- FEATURES: Layout Alternating (Zigzag) -->
+      <template v-else-if="section.content?.layout === 'alternating'">
+        <div :style="{ maxWidth: section.style?.maxWidth || '1200px', margin: '0 auto', padding: '0 1rem' }">
+          <div class="space-y-20">
+            <div 
+              v-for="(item, index) in (section.content?.items || [])" 
+              :key="index"
+              class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center"
+            >
+              <div :class="index % 2 === 1 ? 'lg:order-2' : ''">
+                <h3 class="text-2xl md:text-3xl font-bold mb-4" :style="{ color: section.style?.textColor }">
+                  {{ item.title }}
+                </h3>
+                <p class="text-lg opacity-80 mb-6" :style="{ color: section.style?.textColor }">
+                  {{ item.description }}
+                </p>
+                <a 
+                  v-if="item.button"
+                  :href="item.button.url || '#'"
+                  class="inline-flex items-center gap-2 font-semibold transition-all hover:gap-3"
+                  :style="{ color: section.style?.textColor }"
+                >
+                  {{ item.button.text }}
+                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                  </svg>
+                </a>
+              </div>
+              <div :class="index % 2 === 1 ? 'lg:order-1' : ''">
+                <img 
+                  v-if="item.image"
+                  :src="item.image" 
+                  :alt="item.title" 
+                  class="w-full rounded-2xl shadow-xl"
+                />
+                <div v-else class="aspect-video bg-gray-100 rounded-2xl flex items-center justify-center">
+                  <svg class="w-16 h-16 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                  </svg>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </template>
+      
+      <!-- FEATURES: Layout Showcase -->
+      <template v-else-if="section.content?.layout === 'showcase'">
+        <div :style="{ maxWidth: section.style?.maxWidth || '1100px', margin: '0 auto', padding: '0 1rem' }">
+          <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+            <div>
+              <span 
+                v-if="section.content?.badge" 
+                class="inline-block px-3 py-1 text-sm font-semibold rounded-full mb-4"
+                :style="{ backgroundColor: section.style?.textColor + '15', color: section.style?.textColor }"
+              >
+                {{ section.content.badge }}
+              </span>
+              <h2 class="text-3xl md:text-4xl font-bold mb-4" :style="{ color: section.style?.textColor }">
+                {{ section.content?.title }}
+              </h2>
+              <p class="text-lg opacity-80 mb-8" :style="{ color: section.style?.textColor }">
+                {{ section.content?.description }}
+              </p>
+              <ul v-if="section.content?.features" class="space-y-3 mb-8">
+                <li 
+                  v-for="(feature, idx) in section.content.features" 
+                  :key="idx"
+                  class="flex items-center gap-3"
+                  :style="{ color: section.style?.textColor }"
+                >
+                  <svg class="w-5 h-5 text-green-500 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
+                  </svg>
+                  {{ feature }}
+                </li>
+              </ul>
+              <a 
+                v-if="section.content?.button"
+                :href="section.content.button.url || '#'"
+                class="inline-block px-6 py-3 rounded-lg font-semibold transition-all hover:scale-105"
+                :style="getButtonStyle"
+              >
+                {{ section.content.button.text }}
+              </a>
+            </div>
+            <div>
+              <img 
+                v-if="section.content?.image"
+                :src="section.content.image" 
+                alt="" 
+                class="w-full rounded-2xl shadow-2xl"
+              />
+              <div v-else class="aspect-video bg-gray-100 rounded-2xl flex items-center justify-center">
+                <svg class="w-20 h-20 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                </svg>
+              </div>
+            </div>
+          </div>
+        </div>
+      </template>
+      
+      <!-- FEATURES: Layout Tabs -->
+      <template v-else-if="section.content?.layout === 'tabs'">
+        <div :style="{ maxWidth: section.style?.maxWidth || '1100px', margin: '0 auto', padding: '0 1rem' }">
+          <h2 v-if="section.content?.title" class="text-3xl md:text-4xl font-bold text-center mb-10" :style="{ color: section.style?.textColor }">
+            {{ section.content.title }}
+          </h2>
+          <div class="flex justify-center gap-2 mb-10">
+            <button 
+              v-for="(tab, idx) in (section.content?.tabs || [])" 
+              :key="idx"
+              @click="activeTab = Number(idx)"
+              class="px-6 py-3 rounded-lg font-medium transition-all"
+              :style="activeTab === Number(idx) 
+                ? { backgroundColor: section.style?.textColor, color: section.style?.backgroundColor || '#ffffff' }
+                : { backgroundColor: section.style?.textColor + '10', color: section.style?.textColor }"
+            >
+              {{ tab.label }}
+            </button>
+          </div>
+          <div v-if="section.content?.tabs?.[activeTab]" class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+            <div>
+              <h3 class="text-2xl font-bold mb-4" :style="{ color: section.style?.textColor }">
+                {{ section.content.tabs[activeTab].title }}
+              </h3>
+              <p class="text-lg opacity-80 mb-6" :style="{ color: section.style?.textColor }">
+                {{ section.content.tabs[activeTab].description }}
+              </p>
+              <ul v-if="section.content.tabs[activeTab].features" class="space-y-3">
+                <li 
+                  v-for="(feature, fidx) in section.content.tabs[activeTab].features" 
+                  :key="fidx"
+                  class="flex items-center gap-3"
+                  :style="{ color: section.style?.textColor }"
+                >
+                  <svg class="w-5 h-5 text-green-500 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
+                  </svg>
+                  {{ feature }}
+                </li>
+              </ul>
+            </div>
+            <div>
+              <img 
+                v-if="section.content.tabs[activeTab].image"
+                :src="section.content.tabs[activeTab].image" 
+                :alt="section.content.tabs[activeTab].title" 
+                class="w-full rounded-2xl shadow-xl"
+              />
+            </div>
+          </div>
+        </div>
+      </template>
+      
+      <!-- FEATURES: Layout Checklist -->
+      <template v-else-if="section.content?.items && typeof section.content.items[0] === 'string'">
+        <div :style="{ maxWidth: section.style?.maxWidth || '800px', margin: '0 auto', padding: '0 1rem' }">
+          <div class="text-center mb-10">
+            <h2 v-if="section.content?.title" class="text-3xl font-bold mb-3" :style="{ color: section.style?.textColor }">
+              {{ section.content.title }}
+            </h2>
+            <p v-if="section.content?.subtitle" class="opacity-70" :style="{ color: section.style?.textColor }">
+              {{ section.content.subtitle }}
+            </p>
+          </div>
+          <div 
+            class="grid gap-4"
+            :style="{ gridTemplateColumns: `repeat(${section.content?.columns || 2}, 1fr)` }"
+          >
+            <div 
+              v-for="(item, idx) in (section.content?.items || [])" 
+              :key="idx"
+              class="flex items-center gap-3 p-4 rounded-lg"
+              :style="{ backgroundColor: section.style?.textColor + '05' }"
+            >
+              <svg class="w-5 h-5 text-green-500 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
+              </svg>
+              <span :style="{ color: section.style?.textColor }">{{ item }}</span>
+            </div>
+          </div>
+        </div>
+      </template>
+      
+      <!-- FEATURES: Layout par d\u00e9faut (Grille) -->
+      <template v-else>
+        <div :style="{ maxWidth: section.style?.maxWidth || '1280px', margin: '0 auto', padding: '0 1rem' }">
+          <div :style="{ textAlign: section.style?.alignment || 'center' }" class="mb-10">
+            <h2 v-if="section.content?.title" class="text-3xl md:text-4xl font-bold mb-3" :style="getTitleStyle">
+              {{ section.content.title }}
+            </h2>
+            <p v-if="section.content?.subtitle" :style="getSubtitleStyle">
+              {{ section.content.subtitle }}
+            </p>
+          </div>
+          <div 
+            class="grid grid-cols-1 gap-8"
+            :class="[
+              (section.content?.columns || 3) === 2 ? 'md:grid-cols-2' : '',
+              (section.content?.columns || 3) === 3 ? 'md:grid-cols-3' : '',
+              (section.content?.columns || 3) === 4 ? 'md:grid-cols-4' : ''
+            ]"
+          >
+            <div 
+              v-for="(item, index) in (section.content?.items || [])" 
+              :key="index"
+              class="p-6 rounded-xl transition-all hover:shadow-lg"
+              :style="{ backgroundColor: section.style?.textColor + '08' }"
+            >
+              <div 
+                class="w-14 h-14 mb-5 rounded-xl flex items-center justify-center"
+                :style="{ backgroundColor: section.style?.textColor + '15' }"
+              >
+                <svg class="w-7 h-7" :style="{ color: section.style?.textColor }" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" :d="getIconPath(item.icon)" />
+                </svg>
+              </div>
+              <h3 class="text-xl font-semibold mb-2" :style="{ color: section.style?.textColor }">{{ item.title }}</h3>
+              <p class="opacity-70" :style="{ color: section.style?.textColor }">{{ item.description }}</p>
+            </div>
+          </div>
+        </div>
+      </template>
+      
     </template>
     
     <!-- Testimonials -->
@@ -960,6 +1324,9 @@ const countdownHours = ref('00')
 const countdownMinutes = ref('00')
 const countdownSeconds = ref('00')
 let countdownInterval: ReturnType<typeof setInterval> | null = null
+
+// Active tab for tabbed content
+const activeTab = ref(0)
 
 const updateCountdown = () => {
   const launchDate = props.section.content?.launchDate

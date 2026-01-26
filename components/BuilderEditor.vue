@@ -244,22 +244,298 @@
             <template v-else-if="section.type === 'features'">
               <InputField label="Titre" :value="section.content?.title" @update="updateContent('title', $event)" />
               <InputField label="Sous-titre" :value="section.content?.subtitle" @update="updateContent('subtitle', $event)" />
-              <div class="mt-4">
-                <div class="flex items-center justify-between mb-3">
-                  <span class="field-label">Caractéristiques</span>
-                  <button @click="addFeatureItem" class="text-xs text-primary hover:text-primary/80 font-medium">+ Ajouter</button>
+              
+              <!-- Options spécifiques par layout -->
+              
+              <!-- Timeline -->
+              <template v-if="section.content?.layout === 'timeline'">
+                <div class="mt-4">
+                  <div class="flex items-center justify-between mb-3">
+                    <span class="field-label">Étapes</span>
+                    <button @click="addTimelineStep" class="text-xs text-primary hover:text-primary/80 font-medium">+ Ajouter</button>
+                  </div>
+                  <div class="space-y-3">
+                    <div 
+                      v-for="(item, index) in (section.content?.items || [])" 
+                      :key="index"
+                      class="p-3 bg-neutral-800/50 rounded-lg border border-neutral-700"
+                    >
+                      <div class="flex items-center justify-between mb-2">
+                        <span class="text-xs text-neutral-400">Étape {{ item.step || index + 1 }}</span>
+                        <button @click="removeFeatureItem(index)" class="text-neutral-500 hover:text-red-400">
+                          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+                        </button>
+                      </div>
+                      <InputField label="Titre" :value="item.title" @update="updateFeatureItem(Number(index), 'title', $event)" />
+                      <InputField label="Description" :value="item.description" @update="updateFeatureItem(Number(index), 'description', $event)" multiline :rows="2" />
+                    </div>
+                  </div>
                 </div>
-                <div class="space-y-2">
-                  <FeatureItem 
-                    v-for="(item, index) in (section.content?.items || [])" 
-                    :key="index"
-                    :item="item"
-                    :index="index"
-                    @update="updateFeatureItem"
-                    @remove="removeFeatureItem(index)"
-                  />
+              </template>
+              
+              <!-- Process horizontal -->
+              <template v-else-if="section.content?.layout === 'process'">
+                <div class="mt-4">
+                  <div class="flex items-center justify-between mb-3">
+                    <span class="field-label">Étapes du processus</span>
+                    <button @click="addProcessStep" class="text-xs text-primary hover:text-primary/80 font-medium">+ Ajouter</button>
+                  </div>
+                  <div class="space-y-3">
+                    <div 
+                      v-for="(item, index) in (section.content?.items || [])" 
+                      :key="index"
+                      class="p-3 bg-neutral-800/50 rounded-lg border border-neutral-700"
+                    >
+                      <div class="flex items-center justify-between mb-2">
+                        <span class="text-xs text-neutral-400">Processus {{ index + 1 }}</span>
+                        <button @click="removeFeatureItem(index)" class="text-neutral-500 hover:text-red-400">
+                          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+                        </button>
+                      </div>
+                      <InputField label="Titre" :value="item.title" @update="updateFeatureItem(Number(index), 'title', $event)" />
+                      <InputField label="Description" :value="item.description" @update="updateFeatureItem(Number(index), 'description', $event)" />
+                    </div>
+                  </div>
                 </div>
-              </div>
+              </template>
+              
+              <!-- Comparison -->
+              <template v-else-if="section.content?.layout === 'comparison'">
+                <div class="mt-4 space-y-4">
+                  <div class="p-3 bg-red-900/20 rounded-lg border border-red-800/30">
+                    <InputField label="Titre colonne gauche" :value="section.content?.leftColumn?.title" @update="updateComparisonColumn('left', 'title', $event)" />
+                    <div class="mt-3">
+                      <div class="flex items-center justify-between mb-2">
+                        <span class="field-label text-xs">Éléments négatifs</span>
+                        <button @click="addComparisonItem('left')" class="text-xs text-primary hover:text-primary/80">+ Ajouter</button>
+                      </div>
+                      <div class="space-y-2">
+                        <div v-for="(item, idx) in (section.content?.leftColumn?.items || [])" :key="idx" class="flex items-center gap-2">
+                          <InputField :value="item" @update="updateComparisonItem('left', Number(idx), $event)" class="flex-1" />
+                          <button @click="removeComparisonItem('left', Number(idx))" class="text-neutral-500 hover:text-red-400">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="p-3 bg-green-900/20 rounded-lg border border-green-800/30">
+                    <InputField label="Titre colonne droite" :value="section.content?.rightColumn?.title" @update="updateComparisonColumn('right', 'title', $event)" />
+                    <div class="mt-3">
+                      <div class="flex items-center justify-between mb-2">
+                        <span class="field-label text-xs">Éléments positifs</span>
+                        <button @click="addComparisonItem('right')" class="text-xs text-primary hover:text-primary/80">+ Ajouter</button>
+                      </div>
+                      <div class="space-y-2">
+                        <div v-for="(item, idx) in (section.content?.rightColumn?.items || [])" :key="idx" class="flex items-center gap-2">
+                          <InputField :value="item" @update="updateComparisonItem('right', Number(idx), $event)" class="flex-1" />
+                          <button @click="removeComparisonItem('right', Number(idx))" class="text-neutral-500 hover:text-red-400">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </template>
+              
+              <!-- Stats -->
+              <template v-else-if="section.content?.layout === 'stats'">
+                <div class="mt-4">
+                  <div class="flex items-center justify-between mb-3">
+                    <span class="field-label">Statistiques</span>
+                    <button @click="addStat" class="text-xs text-primary hover:text-primary/80 font-medium">+ Ajouter</button>
+                  </div>
+                  <div class="space-y-2">
+                    <div v-for="(stat, idx) in (section.content?.stats || [])" :key="idx" class="flex items-center gap-2 p-2 bg-neutral-800/50 rounded">
+                      <InputField :value="stat.value" @update="updateStat(Number(idx), 'value', $event)" placeholder="Valeur" class="w-24" />
+                      <InputField :value="stat.label" @update="updateStat(Number(idx), 'label', $event)" placeholder="Label" class="flex-1" />
+                      <button @click="removeStat(Number(idx))" class="text-neutral-500 hover:text-red-400">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+                <div class="mt-4">
+                  <div class="flex items-center justify-between mb-3">
+                    <span class="field-label">Features associées</span>
+                    <button @click="addStatsFeature" class="text-xs text-primary hover:text-primary/80 font-medium">+ Ajouter</button>
+                  </div>
+                  <div class="space-y-2">
+                    <FeatureItem 
+                      v-for="(item, index) in (section.content?.features || [])" 
+                      :key="index"
+                      :item="item"
+                      :index="index"
+                      @update="updateStatsFeature"
+                      @remove="removeStatsFeature(index)"
+                    />
+                  </div>
+                </div>
+              </template>
+              
+              <!-- Alternating -->
+              <template v-else-if="section.content?.layout === 'alternating'">
+                <div class="mt-4">
+                  <div class="flex items-center justify-between mb-3">
+                    <span class="field-label">Sections alternées</span>
+                    <button @click="addAlternatingItem" class="text-xs text-primary hover:text-primary/80 font-medium">+ Ajouter</button>
+                  </div>
+                  <div class="space-y-3">
+                    <div 
+                      v-for="(item, index) in (section.content?.items || [])" 
+                      :key="index"
+                      class="p-3 bg-neutral-800/50 rounded-lg border border-neutral-700"
+                    >
+                      <div class="flex items-center justify-between mb-2">
+                        <span class="text-xs text-neutral-400">Section {{ index + 1 }} ({{ Number(index) % 2 === 0 ? 'Image droite' : 'Image gauche' }})</span>
+                        <button @click="removeAlternatingItem(index)" class="text-neutral-500 hover:text-red-400">
+                          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+                        </button>
+                      </div>
+                      <InputField label="Titre" :value="item.title" @update="updateAlternatingItem(Number(index), 'title', $event)" />
+                      <InputField label="Description" :value="item.description" @update="updateAlternatingItem(Number(index), 'description', $event)" multiline :rows="2" />
+                      <InputField label="Image URL" :value="item.image" @update="updateAlternatingItem(Number(index), 'image', $event)" placeholder="https://..." />
+                      <div class="grid grid-cols-2 gap-2 mt-2">
+                        <InputField label="Bouton texte" :value="item.button?.text" @update="updateAlternatingItemButton(Number(index), 'text', $event)" />
+                        <InputField label="Bouton URL" :value="item.button?.url" @update="updateAlternatingItemButton(Number(index), 'url', $event)" />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </template>
+              
+              <!-- Showcase -->
+              <template v-else-if="section.content?.layout === 'showcase'">
+                <InputField label="Badge" :value="section.content?.badge" @update="updateContent('badge', $event)" placeholder="NOUVEAU" />
+                <InputField label="Description" :value="section.content?.description" @update="updateContent('description', $event)" multiline :rows="3" />
+                <InputField label="Image URL" :value="section.content?.image" @update="updateContent('image', $event)" placeholder="https://..." />
+                <div class="mt-4">
+                  <div class="flex items-center justify-between mb-3">
+                    <span class="field-label">Points clés</span>
+                    <button @click="addShowcaseFeature" class="text-xs text-primary hover:text-primary/80 font-medium">+ Ajouter</button>
+                  </div>
+                  <div class="space-y-2">
+                    <div v-for="(feature, idx) in (section.content?.features || [])" :key="idx" class="flex items-center gap-2">
+                      <InputField :value="feature" @update="updateShowcaseFeature(Number(idx), $event)" class="flex-1" />
+                      <button @click="removeShowcaseFeature(Number(idx))" class="text-neutral-500 hover:text-red-400">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </template>
+              
+              <!-- Tabs -->
+              <template v-else-if="section.content?.layout === 'tabs'">
+                <div class="mt-4">
+                  <div class="flex items-center justify-between mb-3">
+                    <span class="field-label">Onglets</span>
+                    <button @click="addTab" class="text-xs text-primary hover:text-primary/80 font-medium">+ Ajouter</button>
+                  </div>
+                  <div class="space-y-3">
+                    <div 
+                      v-for="(tab, index) in (section.content?.tabs || [])" 
+                      :key="index"
+                      class="p-3 bg-neutral-800/50 rounded-lg border border-neutral-700"
+                    >
+                      <div class="flex items-center justify-between mb-2">
+                        <span class="text-xs text-neutral-400">Onglet {{ index + 1 }}</span>
+                        <button @click="removeTab(index)" class="text-neutral-500 hover:text-red-400">
+                          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+                        </button>
+                      </div>
+                      <InputField label="Label onglet" :value="tab.label" @update="updateTab(Number(index), 'label', $event)" />
+                      <InputField label="Titre" :value="tab.title" @update="updateTab(Number(index), 'title', $event)" />
+                      <InputField label="Description" :value="tab.description" @update="updateTab(Number(index), 'description', $event)" multiline :rows="2" />
+                      <InputField label="Image URL" :value="tab.image" @update="updateTab(Number(index), 'image', $event)" placeholder="https://..." />
+                    </div>
+                  </div>
+                </div>
+              </template>
+              
+              <!-- Bento Grid -->
+              <template v-else-if="section.content?.layout === 'bento'">
+                <div class="mt-4">
+                  <div class="flex items-center justify-between mb-3">
+                    <span class="field-label">Éléments Bento</span>
+                    <button @click="addBentoItem" class="text-xs text-primary hover:text-primary/80 font-medium">+ Ajouter</button>
+                  </div>
+                  <div class="space-y-3">
+                    <div 
+                      v-for="(item, index) in (section.content?.items || [])" 
+                      :key="index"
+                      class="p-3 bg-neutral-800/50 rounded-lg border border-neutral-700"
+                    >
+                      <div class="flex items-center justify-between mb-2">
+                        <span class="text-xs text-neutral-400">Cellule {{ index + 1 }}</span>
+                        <button @click="removeFeatureItem(index)" class="text-neutral-500 hover:text-red-400">
+                          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+                        </button>
+                      </div>
+                      <SelectField 
+                        label="Taille" 
+                        :options="bentoSizeOptions" 
+                        :value="item.size || 'small'" 
+                        @update="updateFeatureItem(Number(index), 'size', $event)" 
+                      />
+                      <InputField label="Titre" :value="item.title" @update="updateFeatureItem(Number(index), 'title', $event)" />
+                      <InputField label="Description" :value="item.description" @update="updateFeatureItem(Number(index), 'description', $event)" />
+                      <SelectField label="Icône" :options="iconOptions" :value="item.icon || 'check'" @update="updateFeatureItem(Number(index), 'icon', $event)" />
+                    </div>
+                  </div>
+                </div>
+              </template>
+              
+              <!-- Checklist (string items) -->
+              <template v-else-if="section.content?.items && typeof section.content.items[0] === 'string'">
+                <SelectField 
+                  label="Colonnes" 
+                  :options="columnsOptions" 
+                  :value="String(section.content?.columns || 2)" 
+                  @update="updateContent('columns', Number($event))" 
+                />
+                <div class="mt-4">
+                  <div class="flex items-center justify-between mb-3">
+                    <span class="field-label">Éléments de la liste</span>
+                    <button @click="addChecklistItem" class="text-xs text-primary hover:text-primary/80 font-medium">+ Ajouter</button>
+                  </div>
+                  <div class="space-y-2">
+                    <div v-for="(item, idx) in (section.content?.items || [])" :key="idx" class="flex items-center gap-2">
+                      <InputField :value="item" @update="updateChecklistItem(Number(idx), $event)" class="flex-1" />
+                      <button @click="removeChecklistItem(Number(idx))" class="text-neutral-500 hover:text-red-400">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </template>
+              
+              <!-- Default: Grid (object items) -->
+              <template v-else>
+                <SelectField 
+                  label="Colonnes" 
+                  :options="columnsOptions" 
+                  :value="String(section.content?.columns || 3)" 
+                  @update="updateContent('columns', Number($event))" 
+                />
+                <div class="mt-4">
+                  <div class="flex items-center justify-between mb-3">
+                    <span class="field-label">Caractéristiques</span>
+                    <button @click="addFeatureItem" class="text-xs text-primary hover:text-primary/80 font-medium">+ Ajouter</button>
+                  </div>
+                  <div class="space-y-2">
+                    <FeatureItem 
+                      v-for="(item, index) in (section.content?.items || [])" 
+                      :key="index"
+                      :item="item"
+                      :index="index"
+                      @update="updateFeatureItem"
+                      @remove="removeFeatureItem(index)"
+                    />
+                  </div>
+                </div>
+              </template>
             </template>
 
             <!-- Testimonials -->
@@ -1096,6 +1372,202 @@ const handleLaunchDateChange = (event: Event) => {
   const target = event.target as HTMLInputElement
   emit('update:content', { launchDate: new Date(target.value).toISOString() })
 }
+
+// === FEATURES HANDLERS ===
+
+// Timeline/Process steps
+const addTimelineStep = () => {
+  const items = [...(props.section.content?.items || [])]
+  items.push({ step: items.length + 1, title: 'Nouvelle \u00e9tape', description: 'Description de l\'\u00e9tape' })
+  emit('update:content', { items })
+}
+
+const addProcessStep = () => {
+  const items = [...(props.section.content?.items || [])]
+  items.push({ step: items.length + 1, title: 'Processus', description: 'Description' })
+  emit('update:content', { items })
+}
+
+// Comparison
+const updateComparisonColumn = (side: 'left' | 'right', key: string, value: any) => {
+  const columnKey = side === 'left' ? 'leftColumn' : 'rightColumn'
+  const currentColumn = props.section.content?.[columnKey] || {}
+  emit('update:content', { [columnKey]: { ...currentColumn, [key]: value } })
+}
+
+const addComparisonItem = (side: 'left' | 'right') => {
+  const columnKey = side === 'left' ? 'leftColumn' : 'rightColumn'
+  const currentColumn = props.section.content?.[columnKey] || { items: [] }
+  const items = [...(currentColumn.items || [])]
+  items.push('Nouvel \u00e9l\u00e9ment')
+  emit('update:content', { [columnKey]: { ...currentColumn, items } })
+}
+
+const updateComparisonItem = (side: 'left' | 'right', index: number, value: string) => {
+  const columnKey = side === 'left' ? 'leftColumn' : 'rightColumn'
+  const currentColumn = props.section.content?.[columnKey] || { items: [] }
+  const items = [...(currentColumn.items || [])]
+  items[index] = value
+  emit('update:content', { [columnKey]: { ...currentColumn, items } })
+}
+
+const removeComparisonItem = (side: 'left' | 'right', index: number) => {
+  const columnKey = side === 'left' ? 'leftColumn' : 'rightColumn'
+  const currentColumn = props.section.content?.[columnKey] || { items: [] }
+  const items = [...(currentColumn.items || [])]
+  items.splice(index, 1)
+  emit('update:content', { [columnKey]: { ...currentColumn, items } })
+}
+
+// Stats Features (for stats layout)
+const addStatsFeature = () => {
+  const features = [...(props.section.content?.features || [])]
+  features.push({ icon: 'check', title: 'Feature', description: 'Description' })
+  emit('update:content', { features })
+}
+
+const updateStatsFeature = (index: number, key: string, value: string) => {
+  const features = [...(props.section.content?.features || [])]
+  features[index] = { ...features[index], [key]: value }
+  emit('update:content', { features })
+}
+
+const removeStatsFeature = (index: number) => {
+  const features = [...(props.section.content?.features || [])]
+  features.splice(index, 1)
+  emit('update:content', { features })
+}
+
+// Alternating items
+const addAlternatingItem = () => {
+  const items = [...(props.section.content?.items || [])]
+  items.push({ 
+    title: 'Nouvelle section', 
+    description: 'Description de la section',
+    image: '',
+    button: { text: 'En savoir plus', url: '#' }
+  })
+  emit('update:content', { items })
+}
+
+const updateAlternatingItem = (index: number, key: string, value: any) => {
+  const items = [...(props.section.content?.items || [])]
+  items[index] = { ...items[index], [key]: value }
+  emit('update:content', { items })
+}
+
+const updateAlternatingItemButton = (index: number, key: string, value: any) => {
+  const items = [...(props.section.content?.items || [])]
+  const currentButton = items[index]?.button || {}
+  items[index] = { ...items[index], button: { ...currentButton, [key]: value } }
+  emit('update:content', { items })
+}
+
+const removeAlternatingItem = (index: number) => {
+  const items = [...(props.section.content?.items || [])]
+  items.splice(index, 1)
+  emit('update:content', { items })
+}
+
+// Showcase features (string array)
+const addShowcaseFeature = () => {
+  const features = [...(props.section.content?.features || [])]
+  features.push('Nouvelle fonctionnalit\u00e9')
+  emit('update:content', { features })
+}
+
+const updateShowcaseFeature = (index: number, value: string) => {
+  const features = [...(props.section.content?.features || [])]
+  features[index] = value
+  emit('update:content', { features })
+}
+
+const removeShowcaseFeature = (index: number) => {
+  const features = [...(props.section.content?.features || [])]
+  features.splice(index, 1)
+  emit('update:content', { features })
+}
+
+// Tabs
+const addTab = () => {
+  const tabs = [...(props.section.content?.tabs || [])]
+  tabs.push({ 
+    id: `tab${tabs.length + 1}`,
+    label: 'Nouvel onglet',
+    title: 'Titre',
+    description: 'Description de l\'onglet',
+    image: '',
+    features: []
+  })
+  emit('update:content', { tabs })
+}
+
+const updateTab = (index: number, key: string, value: any) => {
+  const tabs = [...(props.section.content?.tabs || [])]
+  tabs[index] = { ...tabs[index], [key]: value }
+  emit('update:content', { tabs })
+}
+
+const removeTab = (index: number) => {
+  const tabs = [...(props.section.content?.tabs || [])]
+  tabs.splice(index, 1)
+  emit('update:content', { tabs })
+}
+
+// Bento Grid
+const addBentoItem = () => {
+  const items = [...(props.section.content?.items || [])]
+  items.push({ icon: 'zap', title: 'Nouveau', description: 'Description', size: 'small' })
+  emit('update:content', { items })
+}
+
+// Checklist (string items)
+const addChecklistItem = () => {
+  const items = [...(props.section.content?.items || [])]
+  items.push('Nouvel \u00e9l\u00e9ment')
+  emit('update:content', { items })
+}
+
+const updateChecklistItem = (index: number, value: string) => {
+  const items = [...(props.section.content?.items || [])]
+  items[index] = value
+  emit('update:content', { items })
+}
+
+const removeChecklistItem = (index: number) => {
+  const items = [...(props.section.content?.items || [])]
+  items.splice(index, 1)
+  emit('update:content', { items })
+}
+
+// Bento size options
+const bentoSizeOptions = [
+  { value: 'small', label: 'Petit (1x1)' },
+  { value: 'medium', label: 'Moyen (2x1)' },
+  { value: 'large', label: 'Grand (2x2)' }
+]
+
+// Icon options for features
+const iconOptions = [
+  { value: 'zap', label: 'Éclair' },
+  { value: 'shield', label: 'Bouclier' },
+  { value: 'star', label: 'Étoile' },
+  { value: 'check', label: 'Check' },
+  { value: 'box', label: 'Bo\u00eete' },
+  { value: 'layers', label: 'Calques' },
+  { value: 'globe', label: 'Globe' },
+  { value: 'settings', label: 'Param\u00e8tres' },
+  { value: 'truck', label: 'Camion' },
+  { value: 'refresh', label: 'Rafra\u00eechir' },
+  { value: 'lock', label: 'Cadenas' },
+  { value: 'headphones', label: 'Casque' },
+  { value: 'search', label: 'Recherche' },
+  { value: 'heart', label: 'Coeur' },
+  { value: 'clock', label: 'Horloge' },
+  { value: 'mail', label: 'Email' },
+  { value: 'phone', label: 'T\u00e9l\u00e9phone' },
+  { value: 'user', label: 'Utilisateur' }
+]
 
 // Image position options
 const imagePositionOptions = [
