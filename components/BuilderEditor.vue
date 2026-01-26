@@ -217,7 +217,7 @@
               :value="section.content?.button?.target || '_self'"
               @update="updateButton('target', $event)"
             />
-            <div class="grid grid-cols-2 gap-2">
+            <div class="grid grid-cols-2">
               <ColorPickerField 
                 label="Fond"
                 :value="section.content?.button?.color || '#10B981'"
@@ -229,7 +229,7 @@
                 @update="updateButton('textColor', $event)"
               />
             </div>
-            <div class="grid grid-cols-2 gap-2">
+            <div class="grid grid-cols-2">
               <SelectField 
                 label="Taille"
                 :options="buttonSizeOptions"
@@ -318,15 +318,15 @@
               @update="updateStyle('height', $event)"
             />
             
-            <div class="grid grid-cols-2 gap-2">
+            <div class="grid grid-cols-2">
               <SelectField 
-                label="Espacement V"
+                label="Espacement vertical"
                 :options="spacingOptions"
                 :value="section.style?.verticalSpacing || 'large'"
                 @update="updateStyle('verticalSpacing', $event)"
               />
               <SelectField 
-                label="Espacement H"
+                label="Espacement horizontal"
                 :options="spacingOptions"
                 :value="section.style?.horizontalSpacing || 'medium'"
                 @update="updateStyle('horizontalSpacing', $event)"
@@ -352,15 +352,15 @@
               :value="section.typography?.titleFont || 'system'"
               @update="updateTypography('titleFont', $event)"
             />
-            <div class="grid grid-cols-2 gap-2">
+            <div class="grid grid-cols-2">
               <SelectField 
-                label="Taille"
+                label="Taille titre"
                 :options="titleSizeOptions"
                 :value="section.typography?.titleSize || 'medium'"
                 @update="updateTypography('titleSize', $event)"
               />
               <SelectField 
-                label="Poids"
+                label="Poids titre"
                 :options="weightOptions"
                 :value="section.typography?.titleWeight || '700'"
                 @update="updateTypography('titleWeight', $event)"
@@ -372,15 +372,15 @@
               :showAuto="true"
               @update="updateTypography('titleColor', $event)"
             />
-            <div class="grid grid-cols-2 gap-2">
+            <div class="grid grid-cols-2">
               <SelectField 
-                label="Lettres"
+                label="Espacement lettres"
                 :options="letterSpacingOptions"
                 :value="section.typography?.titleLetterSpacing || 'normal'"
                 @update="updateTypography('titleLetterSpacing', $event)"
               />
               <SelectField 
-                label="Transform"
+                label="Transformation"
                 :options="transformOptions"
                 :value="section.typography?.titleTransform || 'none'"
                 @update="updateTypography('titleTransform', $event)"
@@ -402,9 +402,9 @@
                 :value="section.typography?.subtitleFont || 'same'"
                 @update="updateTypography('subtitleFont', $event)"
               />
-              <div class="grid grid-cols-2 gap-2">
+              <div class="grid grid-cols-2">
                 <SelectField 
-                  label="Taille"
+                  label="Taille sous-titre"
                   :options="subtitleSizeOptions"
                   :value="section.typography?.subtitleSize || 'medium'"
                   @update="updateTypography('subtitleSize', $event)"
@@ -445,9 +445,9 @@
               :value="section.animation?.type || 'none'"
               @update="updateAnimation('type', $event)"
             />
-            <div class="grid grid-cols-2 gap-2">
+            <div class="grid grid-cols-2">
               <NumberField 
-                label="Durée"
+                label="Durée animation"
                 :value="section.animation?.duration || 500"
                 :min="0"
                 :max="3000"
@@ -456,7 +456,7 @@
                 @update="updateAnimation('duration', $event)"
               />
               <NumberField 
-                label="Délai"
+                label="Délai animation"
                 :value="section.animation?.delay || 0"
                 :min="0"
                 :max="2000"
@@ -484,15 +484,15 @@
         </template>
         <template #content>
           <div class="accordion-content">
-            <div class="grid grid-cols-2 gap-2">
+            <div class="grid grid-cols-2">
               <SelectField 
-                label="Gap éléments"
+                label="Espacement éléments"
                 :options="elementSpacingOptions"
                 :value="section.advanced?.elementSpacing || 'medium'"
                 @update="updateAdvanced('elementSpacing', $event)"
               />
               <SelectField 
-                label="Align. V"
+                label="Alignement vertical"
                 :options="verticalAlignOptions"
                 :value="section.advanced?.verticalAlign || 'center'"
                 @update="updateAdvanced('verticalAlign', $event)"
@@ -1131,39 +1131,40 @@ const SpacerIcon = createIcon('M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v
   padding: 10px 12px;
   font-size: 13px;
   line-height: 1.4;
-  color: #333333;
+  color: #1a1a1a;
   background-color: #ffffff;
-  border: 1px solid #e0e0e0;
+  border: 1px solid #d1d5db;
   border-radius: 4px;
   transition: border-color 150ms;
   outline: none;
 }
 
 .input-field:hover {
-  border-color: #cccccc;
+  border-color: #9ca3af;
 }
 
 .input-field:focus {
-  border-color: #4a90e2;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
 }
 
 .input-field::placeholder {
-  color: #aaaaaa;
+  color: #9ca3af;
 }
 
 /* Select - Style LeekPay */
 .select-field {
   width: 100%;
-  padding: 10px 12px;
+  padding: 10px 32px 10px 12px;
   font-size: 13px;
   line-height: 1.4;
-  color: #333333;
+  color: #1a1a1a;
   background-color: #ffffff;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3E%3Cpath stroke='%23666666' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3E%3C/svg%3E");
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3E%3Cpath stroke='%234b5563' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3E%3C/svg%3E");
   background-position: right 10px center;
   background-repeat: no-repeat;
   background-size: 16px;
-  border: 1px solid #e0e0e0;
+  border: 1px solid #d1d5db;
   border-radius: 4px;
   transition: border-color 150ms;
   outline: none;
@@ -1173,11 +1174,12 @@ const SpacerIcon = createIcon('M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v
 }
 
 .select-field:hover {
-  border-color: #cccccc;
+  border-color: #9ca3af;
 }
 
 .select-field:focus {
-  border-color: #4a90e2;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
 }
 
 /* Number input */
@@ -1192,9 +1194,9 @@ const SpacerIcon = createIcon('M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v
   padding: 10px 36px 10px 12px;
   font-size: 13px;
   font-variant-numeric: tabular-nums;
-  color: #333333;
+  color: #1a1a1a;
   background-color: #ffffff;
-  border: 1px solid #e0e0e0;
+  border: 1px solid #d1d5db;
   border-radius: 4px;
   transition: border-color 150ms;
   outline: none;
@@ -1209,11 +1211,12 @@ const SpacerIcon = createIcon('M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v
 }
 
 .number-field:hover {
-  border-color: #cccccc;
+  border-color: #9ca3af;
 }
 
 .number-field:focus {
-  border-color: #4a90e2;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
 }
 
 .number-field-suffix {
@@ -1235,45 +1238,49 @@ const SpacerIcon = createIcon('M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v
 }
 
 .color-swatch {
-  width: 40px;
+  width: 48px;
   height: 40px;
-  padding: 0;
-  border: 1px solid #e0e0e0;
+  padding: 4px;
+  border: 1px solid #d1d5db;
   border-radius: 4px;
   cursor: pointer;
-  background: transparent;
+  background: white;
+  flex-shrink: 0;
 }
 
 .color-swatch::-webkit-color-swatch-wrapper {
-  padding: 3px;
+  padding: 0;
 }
 
 .color-swatch::-webkit-color-swatch {
   border: none;
   border-radius: 2px;
+  box-shadow: inset 0 0 0 1px rgba(0,0,0,0.1);
 }
 
 .color-hex-input {
   flex: 1;
   padding: 10px 12px;
-  font-size: 13px;
+  font-size: 12px;
   font-family: 'SF Mono', 'Monaco', 'Inconsolata', 'Consolas', monospace;
-  font-weight: 400;
-  color: #333333;
+  font-weight: 500;
+  color: #1a1a1a;
   background: #ffffff;
-  border: 1px solid #e0e0e0;
+  border: 1px solid #d1d5db;
   border-radius: 4px;
   outline: none;
   text-transform: uppercase;
+  letter-spacing: 0.5px;
   transition: border-color 150ms;
 }
 
 .color-hex-input:hover {
-  border-color: #cccccc;
+  border-color: #9ca3af;
 }
 
 .color-hex-input:focus {
-  border-color: #4a90e2;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
 }
 
 /* Checkbox - Native simple (pas toggle) */
@@ -1414,20 +1421,21 @@ const SpacerIcon = createIcon('M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v
   width: 100%;
   padding: 8px 10px;
   font-size: 13px;
-  color: #333333;
+  color: #1a1a1a;
   background: #ffffff;
-  border: 1px solid #e0e0e0;
+  border: 1px solid #d1d5db;
   border-radius: 3px;
   outline: none;
   transition: border-color 150ms;
 }
 
 .item-card-input:focus {
-  border-color: #4a90e2;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1);
 }
 
 .item-card-input::placeholder {
-  color: #aaaaaa;
+  color: #9ca3af;
 }
 
 .item-delete-btn {
@@ -1455,7 +1463,6 @@ const SpacerIcon = createIcon('M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v
 .mb-2 { margin-bottom: 8px; }
 .mt-3 { margin-top: 16px; }
 .pt-3 { padding-top: 16px; }
-.gap-2 { gap: 10px; }
 .space-y-2 > * + * { margin-top: 8px; }
 
 /* Flex utilities */
@@ -1472,6 +1479,7 @@ const SpacerIcon = createIcon('M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v
 .grid.grid-cols-2 {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
 }
 
 /* Borders */
