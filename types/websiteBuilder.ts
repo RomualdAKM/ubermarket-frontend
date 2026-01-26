@@ -10,13 +10,14 @@ export const BLOCK_DEFINITIONS: BlockDefinition[] = [
     icon: 'heroicons:rectangle-group',
     description: 'Section d\'en-tête principale',
     templates: [
+      // === TEMPLATES CENTRÉS ===
       {
         id: 'hero-minimal',
         name: 'Minimaliste',
         preview: 'minimal',
         defaultContent: {
-          title: 'Titre principal',
-          subtitle: 'Une phrase d\'accroche claire et concise',
+          title: 'Simplicité élégante',
+          subtitle: 'Une approche épurée pour un impact maximal',
           button: {
             text: 'Découvrir',
             url: '#',
@@ -28,7 +29,9 @@ export const BLOCK_DEFINITIONS: BlockDefinition[] = [
           maxWidth: '720px',
           backgroundColor: '#ffffff',
           textColor: '#171717',
-          padding: { top: 120, bottom: 120 }
+          backgroundType: 'color',
+          verticalSpacing: 'large',
+          horizontalSpacing: 'medium'
         }
       },
       {
@@ -36,12 +39,14 @@ export const BLOCK_DEFINITIONS: BlockDefinition[] = [
         name: 'Impact',
         preview: 'bold',
         defaultContent: {
-          title: 'TITRE ACCROCHEUR',
-          subtitle: 'Description percutante de votre offre unique',
+          title: 'FAITES LA DIFFÉRENCE',
+          subtitle: 'Osez vous démarquer avec une présence remarquable',
           button: {
             text: 'COMMENCER',
             url: '#',
-            style: 'primary'
+            style: 'primary',
+            color: '#ffffff',
+            textColor: '#0a0a0a'
           }
         },
         defaultStyle: {
@@ -49,50 +54,408 @@ export const BLOCK_DEFINITIONS: BlockDefinition[] = [
           maxWidth: '900px',
           backgroundColor: '#0a0a0a',
           textColor: '#fafafa',
-          padding: { top: 140, bottom: 140 }
+          backgroundType: 'color',
+          verticalSpacing: 'large',
+          horizontalSpacing: 'medium'
+        },
+        defaultTypography: {
+          titleSize: 'xlarge',
+          titleWeight: '800',
+          titleLetterSpacing: 'wide',
+          titleTransform: 'uppercase'
         }
       },
       {
-        id: 'hero-gradient',
-        name: 'Dégradé',
-        preview: 'gradient',
+        id: 'hero-gradient-animated',
+        name: 'Gradient Animé',
+        preview: 'gradient-animated',
         defaultContent: {
-          title: 'Votre Vision',
+          title: 'Innovation Continue',
           subtitle: 'Transformez vos idées en réalité',
           button: {
             text: 'Explorer',
             url: '#',
-            style: 'outline'
+            style: 'outline',
+            color: 'transparent',
+            textColor: '#ffffff'
           }
         },
         defaultStyle: {
           alignment: 'center',
           maxWidth: '800px',
-          backgroundColor: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+          backgroundType: 'gradient',
+          backgroundGradient: 'linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%)',
           textColor: '#ffffff',
-          padding: { top: 100, bottom: 100 }
+          verticalSpacing: 'large',
+          horizontalSpacing: 'medium'
         }
       },
       {
-        id: 'hero-split',
-        name: 'Deux colonnes',
-        preview: 'split',
+        id: 'hero-editorial',
+        name: 'Éditorial',
+        preview: 'editorial',
         defaultContent: {
-          title: 'Titre élégant',
-          subtitle: 'Description détaillée de votre produit ou service avec une mise en page soignée',
+          title: 'L\'Art de Créer',
+          subtitle: 'Une vision unique pour des projets d\'exception',
+          badge: 'NOUVEAU',
+          button: {
+            text: 'Lire la suite',
+            url: '#',
+            style: 'link'
+          }
+        },
+        defaultStyle: {
+          alignment: 'center',
+          maxWidth: '1000px',
+          backgroundColor: '#fafafa',
+          textColor: '#171717',
+          backgroundType: 'color',
+          verticalSpacing: 'large',
+          horizontalSpacing: 'large'
+        },
+        defaultTypography: {
+          titleFont: 'playfair',
+          titleSize: 'xlarge',
+          titleWeight: '600',
+          titleLineHeight: 'tight'
+        }
+      },
+      
+      // === TEMPLATES AVEC IMAGE ===
+      {
+        id: 'hero-image-overlay',
+        name: 'Image + Overlay',
+        preview: 'image-overlay',
+        defaultContent: {
+          title: 'Explorez l\'Impossible',
+          subtitle: 'Repoussez les limites de votre imagination',
+          button: {
+            text: 'Découvrir',
+            url: '#',
+            style: 'primary',
+            color: '#ffffff',
+            textColor: '#0a0a0a'
+          }
+        },
+        defaultStyle: {
+          alignment: 'center',
+          maxWidth: '900px',
+          backgroundType: 'image',
+          backgroundImage: 'https://images.unsplash.com/photo-1557683316-973673baf926?w=1920',
+          backgroundOverlay: 60,
+          textColor: '#ffffff',
+          height: 'large',
+          verticalSpacing: 'large',
+          horizontalSpacing: 'medium'
+        }
+      },
+      {
+        id: 'hero-split-image',
+        name: 'Split Image',
+        preview: 'split-image',
+        defaultContent: {
+          layout: 'split',
+          title: 'Votre Succès Commence Ici',
+          subtitle: 'Nous combinons expertise et innovation pour transformer vos ambitions en réalisations concrètes.',
+          image: 'https://images.unsplash.com/photo-1551434678-e076c223a692?w=800',
+          imagePosition: 'right',
           button: {
             text: 'En savoir plus',
             url: '#',
             style: 'primary'
           },
-          image: ''
+          secondaryButton: {
+            text: 'Nous contacter',
+            url: '#contact',
+            style: 'outline'
+          }
         },
         defaultStyle: {
           alignment: 'left',
+          maxWidth: '1400px',
+          backgroundColor: '#ffffff',
+          textColor: '#171717',
+          backgroundType: 'color',
+          verticalSpacing: 'none',
+          horizontalSpacing: 'none'
+        }
+      },
+      {
+        id: 'hero-product-showcase',
+        name: 'Produit Vedette',
+        preview: 'product-showcase',
+        defaultContent: {
+          layout: 'product',
+          badge: 'BEST-SELLER',
+          title: 'Le Produit Révolutionnaire',
+          subtitle: 'Découvrez ce qui fait de nous le choix numéro 1',
+          price: '149\u20ac',
+          originalPrice: '199\u20ac',
+          image: 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=800',
+          features: ['Livraison gratuite', 'Garantie 2 ans', 'Retours faciles'],
+          button: {
+            text: 'Ajouter au panier',
+            url: '#',
+            style: 'primary'
+          }
+        },
+        defaultStyle: {
+          alignment: 'center',
           maxWidth: '1200px',
-          backgroundColor: '#fafafa',
-          textColor: '#262626',
-          padding: { top: 80, bottom: 80 }
+          backgroundColor: '#f8fafc',
+          textColor: '#0f172a',
+          backgroundType: 'color',
+          verticalSpacing: 'large',
+          horizontalSpacing: 'medium'
+        }
+      },
+      
+      // === TEMPLATES SLIDER ===
+      {
+        id: 'hero-slider',
+        name: 'Slider',
+        preview: 'slider',
+        defaultContent: {
+          layout: 'slider',
+          autoplay: true,
+          autoplaySpeed: 5000,
+          showArrows: true,
+          showDots: true,
+          slides: [
+            {
+              title: 'Slide 1 - Innovation',
+              subtitle: 'Découvrez nos dernières nouveautés',
+              image: 'https://images.unsplash.com/photo-1557683316-973673baf926?w=1920',
+              button: { text: 'Découvrir', url: '#' }
+            },
+            {
+              title: 'Slide 2 - Qualité',
+              subtitle: 'L\'excellence à chaque étape',
+              image: 'https://images.unsplash.com/photo-1497215728101-856f4ea42174?w=1920',
+              button: { text: 'Voir plus', url: '#' }
+            },
+            {
+              title: 'Slide 3 - Service',
+              subtitle: 'Un accompagnement personnalisé',
+              image: 'https://images.unsplash.com/photo-1551434678-e076c223a692?w=1920',
+              button: { text: 'Contacter', url: '#' }
+            }
+          ]
+        },
+        defaultStyle: {
+          alignment: 'center',
+          maxWidth: '100%',
+          backgroundType: 'image',
+          backgroundOverlay: 50,
+          textColor: '#ffffff',
+          height: 'large',
+          verticalSpacing: 'none',
+          horizontalSpacing: 'none'
+        }
+      },
+      {
+        id: 'hero-slider-minimal',
+        name: 'Slider Minimaliste',
+        preview: 'slider-minimal',
+        defaultContent: {
+          layout: 'slider',
+          autoplay: true,
+          autoplaySpeed: 4000,
+          showArrows: false,
+          showDots: true,
+          transition: 'fade',
+          slides: [
+            {
+              title: 'Première Offre',
+              subtitle: 'Profitez de -30% sur la collection',
+              backgroundColor: '#0a0a0a'
+            },
+            {
+              title: 'Deuxième Offre',
+              subtitle: 'Livraison gratuite dès 50\u20ac',
+              backgroundColor: '#1e3a5f'
+            },
+            {
+              title: 'Troisième Offre',
+              subtitle: 'Nouveautés disponibles',
+              backgroundColor: '#3d1f5c'
+            }
+          ]
+        },
+        defaultStyle: {
+          alignment: 'center',
+          maxWidth: '100%',
+          backgroundColor: '#0a0a0a',
+          textColor: '#ffffff',
+          backgroundType: 'color',
+          height: 'medium',
+          verticalSpacing: 'none',
+          horizontalSpacing: 'medium'
+        }
+      },
+      {
+        id: 'hero-slider-cards',
+        name: 'Slider Cartes',
+        preview: 'slider-cards',
+        defaultContent: {
+          layout: 'slider-cards',
+          title: 'Nos Collections',
+          autoplay: false,
+          showArrows: true,
+          cards: [
+            {
+              title: 'Collection Été',
+              subtitle: 'À partir de 29\u20ac',
+              image: 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=600',
+              url: '#'
+            },
+            {
+              title: 'Collection Hiver',
+              subtitle: 'À partir de 49\u20ac',
+              image: 'https://images.unsplash.com/photo-1560472354-b33ff0c44a43?w=600',
+              url: '#'
+            },
+            {
+              title: 'Accessoires',
+              subtitle: 'À partir de 15\u20ac',
+              image: 'https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=600',
+              url: '#'
+            },
+            {
+              title: 'Nouveautés',
+              subtitle: 'Découvrir',
+              image: 'https://images.unsplash.com/photo-1491553895911-0055uj989e7a?w=600',
+              url: '#'
+            }
+          ]
+        },
+        defaultStyle: {
+          alignment: 'left',
+          maxWidth: '1400px',
+          backgroundColor: '#ffffff',
+          textColor: '#171717',
+          backgroundType: 'color',
+          verticalSpacing: 'large',
+          horizontalSpacing: 'medium'
+        }
+      },
+      
+      // === TEMPLATES AVANCÉS ===
+      {
+        id: 'hero-video-background',
+        name: 'Vidéo Background',
+        preview: 'video-bg',
+        defaultContent: {
+          layout: 'video',
+          title: 'Vivez l\'Expérience',
+          subtitle: 'Une immersion totale dans notre univers',
+          videoUrl: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
+          videoPoster: 'https://images.unsplash.com/photo-1557683316-973673baf926?w=1920',
+          button: {
+            text: 'En savoir plus',
+            url: '#',
+            style: 'outline',
+            color: 'transparent',
+            textColor: '#ffffff'
+          }
+        },
+        defaultStyle: {
+          alignment: 'center',
+          maxWidth: '900px',
+          backgroundType: 'video',
+          backgroundOverlay: 50,
+          textColor: '#ffffff',
+          height: 'full',
+          verticalSpacing: 'large',
+          horizontalSpacing: 'medium'
+        }
+      },
+      {
+        id: 'hero-stats',
+        name: 'Héro + Stats',
+        preview: 'stats',
+        defaultContent: {
+          title: 'Ils Nous Font Confiance',
+          subtitle: 'Des résultats qui parlent d\'eux-mêmes',
+          stats: [
+            { value: '10K+', label: 'Clients satisfaits' },
+            { value: '50M\u20ac', label: 'De ventes' },
+            { value: '99%', label: 'Satisfaction' },
+            { value: '24/7', label: 'Support' }
+          ],
+          button: {
+            text: 'Rejoindre',
+            url: '#',
+            style: 'primary'
+          }
+        },
+        defaultStyle: {
+          alignment: 'center',
+          maxWidth: '1100px',
+          backgroundColor: '#0f172a',
+          textColor: '#f8fafc',
+          backgroundType: 'color',
+          verticalSpacing: 'large',
+          horizontalSpacing: 'medium'
+        }
+      },
+      {
+        id: 'hero-dual-cta',
+        name: 'Double Action',
+        preview: 'dual-cta',
+        defaultContent: {
+          title: 'Créez Votre Espace',
+          subtitle: 'Choisissez votre voie vers le succès',
+          leftCta: {
+            icon: 'store',
+            title: 'Pour les Vendeurs',
+            description: 'Lancez votre boutique en quelques clics',
+            button: { text: 'Commencer à vendre', url: '#' }
+          },
+          rightCta: {
+            icon: 'shopping',
+            title: 'Pour les Acheteurs',
+            description: 'Découvrez des produits uniques',
+            button: { text: 'Explorer', url: '#' }
+          }
+        },
+        defaultStyle: {
+          alignment: 'center',
+          maxWidth: '1200px',
+          backgroundColor: '#ffffff',
+          textColor: '#171717',
+          backgroundType: 'color',
+          verticalSpacing: 'large',
+          horizontalSpacing: 'medium'
+        }
+      },
+      {
+        id: 'hero-countdown',
+        name: 'Lancement',
+        preview: 'countdown',
+        defaultContent: {
+          badge: 'COMING SOON',
+          title: 'Quelque Chose d\'Incroyable Arrive',
+          subtitle: 'Soyez les premiers informés',
+          launchDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
+          showCountdown: true,
+          emailCapture: true,
+          placeholder: 'Votre email',
+          button: {
+            text: 'Me notifier',
+            url: '#',
+            style: 'primary'
+          }
+        },
+        defaultStyle: {
+          alignment: 'center',
+          maxWidth: '700px',
+          backgroundType: 'gradient',
+          backgroundGradient: 'linear-gradient(135deg, #1e1e1e 0%, #2d2d2d 100%)',
+          textColor: '#ffffff',
+          height: 'large',
+          verticalSpacing: 'large',
+          horizontalSpacing: 'medium'
         }
       }
     ]

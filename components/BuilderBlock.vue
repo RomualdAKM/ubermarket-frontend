@@ -6,42 +6,465 @@
   >
     <!-- Background overlay pour images -->
     <div 
-      v-if="section.style?.backgroundType === 'image' && section.style?.backgroundOverlay" 
-      class="absolute inset-0 pointer-events-none"
+      v-if="(section.style?.backgroundType === 'image' || section.style?.backgroundType === 'video') && section.style?.backgroundOverlay" 
+      class="absolute inset-0 pointer-events-none z-[1]"
       :style="{ backgroundColor: `rgba(0, 0, 0, ${(section.style.backgroundOverlay || 0) / 100})` }"
     ></div>
     
     <!-- Contenu de la section avec z-index relatif -->
     <div class="relative z-10">
-    <!-- Hero -->
+    
+    <!-- ==================== HERO ==================== -->
     <template v-if="section.type === 'hero'">
-      <div :style="{ maxWidth: section.style?.maxWidth || '1024px', margin: '0 auto', padding: '0 1rem' }">
-        <div :style="{ textAlign: section.style?.alignment || 'center' }">
-          <h1 
-            class="mb-4"
-            :style="getTitleStyle"
+      
+      <!-- HERO: Layout Slider -->
+      <template v-if="section.content?.layout === 'slider'">
+        <div class="hero-slider relative overflow-hidden" :style="{ minHeight: getHeroHeight }">
+          <!-- Slides -->
+          <div 
+            class="flex transition-transform duration-500 ease-out h-full"
+            :style="{ transform: `translateX(-${currentSlide * 100}%)` }"
           >
-            {{ section.content?.title || 'Titre principal' }}
-          </h1>
-          <p 
-            class="mb-6"
-            :style="getSubtitleStyle"
+            <div 
+              v-for="(slide, index) in (section.content?.slides || [])"
+              :key="index"
+              class="w-full flex-shrink-0 relative flex items-center justify-center"
+              :style="{ 
+                minHeight: getHeroHeight,
+                backgroundImage: slide.image ? `url(${slide.image})` : 'none',
+                backgroundSize: 'cover',
+                backgroundPosition: 'center',
+                backgroundColor: slide.backgroundColor || '#0a0a0a'
+              }"
+            >
+              <div 
+                v-if="slide.image" 
+                class="absolute inset-0" 
+                :style="{ backgroundColor: `rgba(0,0,0,${(section.style?.backgroundOverlay || 50) / 100})` }"
+              ></div>
+              <div class="relative z-10 text-center px-4" :style="{ maxWidth: section.style?.maxWidth || '900px' }">
+                <h2 class="text-4xl md:text-5xl lg:text-6xl font-bold mb-4" :style="{ color: section.style?.textColor || '#ffffff' }">
+                  {{ slide.title }}
+                </h2>
+                <p class="text-lg md:text-xl mb-8 opacity-90" :style="{ color: section.style?.textColor || '#ffffff' }">
+                  {{ slide.subtitle }}
+                </p>
+                <a
+                  v-if="slide.button"
+                  :href="slide.button.url || '#'"
+                  class="inline-block px-8 py-3 rounded-lg font-semibold transition-all hover:scale-105"
+                  :style="getButtonStyle"
+                >
+                  {{ slide.button.text }}
+                </a>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Navigation Arrows -->
+          <template v-if="section.content?.showArrows !== false && (section.content?.slides?.length || 0) > 1">
+            <button 
+              @click="prevSlide" 
+              class="absolute left-4 top-1/2 -translate-y-1/2 w-12 h-12 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center text-white hover:bg-white/30 transition-all z-20"
+            >
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+              </svg>
+            </button>
+            <button 
+              @click="nextSlide" 
+              class="absolute right-4 top-1/2 -translate-y-1/2 w-12 h-12 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center text-white hover:bg-white/30 transition-all z-20"
+            >
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+              </svg>
+            </button>
+          </template>
+          
+          <!-- Dots -->
+          <div v-if="section.content?.showDots !== false && (section.content?.slides?.length || 0) > 1" class="absolute bottom-6 left-1/2 -translate-x-1/2 flex gap-2 z-20">
+            <button 
+              v-for="(slide, idx) in (section.content?.slides || [])" 
+              :key="idx"
+              @click="currentSlide = Number(idx)"
+              class="w-3 h-3 rounded-full transition-all"
+              :class="currentSlide === Number(idx) ? 'bg-white w-8' : 'bg-white/50 hover:bg-white/70'"
+            ></button>
+          </div>
+        </div>
+      </template>
+      
+      <!-- HERO: Layout Split Image -->
+      <template v-else-if="section.content?.layout === 'split'">
+        <div 
+          class="grid grid-cols-1 lg:grid-cols-2 min-h-[500px]"
+          :class="section.content?.imagePosition === 'left' ? 'lg:flex-row-reverse' : ''"
+        >
+          <div class="flex flex-col justify-center p-8 lg:p-16" :style="{ backgroundColor: section.style?.backgroundColor }">
+            <h1 class="text-3xl md:text-4xl lg:text-5xl font-bold mb-6" :style="getTitleStyle">
+              {{ section.content?.title || 'Titre' }}
+            </h1>
+            <p class="text-lg mb-8 opacity-80" :style="getSubtitleStyle">
+              {{ section.content?.subtitle || 'Sous-titre' }}
+            </p>
+            <div class="flex flex-wrap gap-4">
+              <a
+                v-if="section.content?.button"
+                :href="section.content.button.url || '#'"
+                class="inline-block px-6 py-3 rounded-lg font-semibold transition-all hover:scale-105"
+                :style="getButtonStyle"
+              >
+                {{ section.content.button.text }}
+              </a>
+              <a
+                v-if="section.content?.secondaryButton"
+                :href="section.content.secondaryButton.url || '#'"
+                class="inline-block px-6 py-3 rounded-lg font-semibold transition-all border-2 hover:scale-105"
+                :style="{ borderColor: section.style?.textColor, color: section.style?.textColor }"
+              >
+                {{ section.content.secondaryButton.text }}
+              </a>
+            </div>
+          </div>
+          <div 
+            class="relative min-h-[300px] lg:min-h-full bg-gray-100"
+            :class="section.content?.imagePosition === 'left' ? 'order-first' : ''"
           >
-            {{ section.content?.subtitle || 'Sous-titre' }}
-          </p>
-          <div v-if="section.content?.button" :style="{ textAlign: section.content.button.alignment || 'center' }">
+            <img 
+              v-if="section.content?.image"
+              :src="section.content.image" 
+              alt="" 
+              class="absolute inset-0 w-full h-full object-cover"
+            />
+            <div v-else class="absolute inset-0 flex items-center justify-center text-gray-400">
+              <svg class="w-20 h-20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+              </svg>
+            </div>
+          </div>
+        </div>
+      </template>
+      
+      <!-- HERO: Layout Product Showcase -->
+      <template v-else-if="section.content?.layout === 'product'">
+        <div :style="{ maxWidth: section.style?.maxWidth || '1200px', margin: '0 auto', padding: '0 1.5rem' }">
+          <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+            <div class="relative">
+              <img 
+                v-if="section.content?.image"
+                :src="section.content.image" 
+                alt="" 
+                class="w-full h-auto rounded-2xl shadow-2xl"
+              />
+              <div v-else class="aspect-square bg-gray-100 rounded-2xl flex items-center justify-center">
+                <svg class="w-24 h-24 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                </svg>
+              </div>
+            </div>
+            <div>
+              <span 
+                v-if="section.content?.badge" 
+                class="inline-block px-3 py-1 text-sm font-semibold rounded-full mb-4"
+                :style="{ backgroundColor: section.style?.textColor + '15', color: section.style?.textColor }"
+              >
+                {{ section.content.badge }}
+              </span>
+              <h1 class="text-3xl md:text-4xl font-bold mb-4" :style="getTitleStyle">
+                {{ section.content?.title || 'Produit' }}
+              </h1>
+              <p class="text-lg mb-6 opacity-80" :style="getSubtitleStyle">
+                {{ section.content?.subtitle }}
+              </p>
+              <div class="flex items-baseline gap-3 mb-6">
+                <span class="text-4xl font-bold" :style="{ color: section.style?.textColor }">
+                  {{ section.content?.price }}
+                </span>
+                <span v-if="section.content?.originalPrice" class="text-xl line-through opacity-50" :style="{ color: section.style?.textColor }">
+                  {{ section.content?.originalPrice }}
+                </span>
+              </div>
+              <ul v-if="section.content?.features" class="space-y-2 mb-8">
+                <li 
+                  v-for="(feature, i) in section.content.features" 
+                  :key="i"
+                  class="flex items-center gap-2"
+                  :style="{ color: section.style?.textColor }"
+                >
+                  <svg class="w-5 h-5 text-green-500 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
+                  </svg>
+                  {{ feature }}
+                </li>
+              </ul>
+              <a
+                v-if="section.content?.button"
+                :href="section.content.button.url || '#'"
+                class="inline-block px-8 py-4 rounded-xl font-bold text-lg transition-all hover:scale-105 hover:shadow-xl"
+                :style="getButtonStyle"
+              >
+                {{ section.content.button.text }}
+              </a>
+            </div>
+          </div>
+        </div>
+      </template>
+      
+      <!-- HERO: Layout Stats -->
+      <template v-else-if="section.content?.stats">
+        <div :style="{ maxWidth: section.style?.maxWidth || '1100px', margin: '0 auto', padding: '0 1rem' }">
+          <div class="text-center mb-12">
+            <h1 class="text-4xl md:text-5xl font-bold mb-4" :style="getTitleStyle">
+              {{ section.content?.title || 'Titre' }}
+            </h1>
+            <p v-if="section.content?.subtitle" class="text-xl opacity-80" :style="getSubtitleStyle">
+              {{ section.content.subtitle }}
+            </p>
+          </div>
+          <div class="grid grid-cols-2 md:grid-cols-4 gap-8 mb-12">
+            <div 
+              v-for="(stat, index) in section.content.stats" 
+              :key="index"
+              class="text-center"
+            >
+              <div class="text-4xl md:text-5xl font-bold mb-2" :style="{ color: section.style?.textColor }">
+                {{ stat.value }}
+              </div>
+              <div class="text-sm opacity-70" :style="{ color: section.style?.textColor }">
+                {{ stat.label }}
+              </div>
+            </div>
+          </div>
+          <div v-if="section.content?.button" class="text-center">
             <a
               :href="section.content.button.url || '#'"
-              :target="section.content.button.target || '_self'"
-              class="inline-block rounded-lg font-semibold transition-all"
-              :class="getButtonClasses"
+              class="inline-block px-8 py-3 rounded-lg font-semibold transition-all hover:scale-105"
               :style="getButtonStyle"
             >
-              {{ section.content.button.text || 'Bouton' }}
+              {{ section.content.button.text }}
             </a>
           </div>
         </div>
-      </div>
+      </template>
+      
+      <!-- HERO: Layout Dual CTA -->
+      <template v-else-if="section.content?.leftCta && section.content?.rightCta">
+        <div :style="{ maxWidth: section.style?.maxWidth || '1200px', margin: '0 auto', padding: '0 1rem' }">
+          <div class="text-center mb-12">
+            <h1 class="text-4xl md:text-5xl font-bold mb-4" :style="getTitleStyle">
+              {{ section.content?.title || 'Titre' }}
+            </h1>
+            <p v-if="section.content?.subtitle" class="text-xl opacity-80" :style="getSubtitleStyle">
+              {{ section.content.subtitle }}
+            </p>
+          </div>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div 
+              class="p-8 rounded-2xl border-2 transition-all hover:shadow-xl hover:-translate-y-1"
+              :style="{ borderColor: section.style?.textColor + '20', backgroundColor: section.style?.textColor + '05' }"
+            >
+              <div class="w-16 h-16 rounded-xl mb-6 flex items-center justify-center" :style="{ backgroundColor: section.style?.textColor + '15' }">
+                <svg class="w-8 h-8" :style="{ color: section.style?.textColor }" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                </svg>
+              </div>
+              <h3 class="text-2xl font-bold mb-3" :style="{ color: section.style?.textColor }">
+                {{ section.content.leftCta.title }}
+              </h3>
+              <p class="mb-6 opacity-70" :style="{ color: section.style?.textColor }">
+                {{ section.content.leftCta.description }}
+              </p>
+              <a
+                :href="section.content.leftCta.button?.url || '#'"
+                class="inline-block px-6 py-3 rounded-lg font-semibold transition-all hover:scale-105"
+                :style="getButtonStyle"
+              >
+                {{ section.content.leftCta.button?.text || 'Action' }}
+              </a>
+            </div>
+            <div 
+              class="p-8 rounded-2xl border-2 transition-all hover:shadow-xl hover:-translate-y-1"
+              :style="{ borderColor: section.style?.textColor + '20', backgroundColor: section.style?.textColor + '05' }"
+            >
+              <div class="w-16 h-16 rounded-xl mb-6 flex items-center justify-center" :style="{ backgroundColor: section.style?.textColor + '15' }">
+                <svg class="w-8 h-8" :style="{ color: section.style?.textColor }" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+                </svg>
+              </div>
+              <h3 class="text-2xl font-bold mb-3" :style="{ color: section.style?.textColor }">
+                {{ section.content.rightCta.title }}
+              </h3>
+              <p class="mb-6 opacity-70" :style="{ color: section.style?.textColor }">
+                {{ section.content.rightCta.description }}
+              </p>
+              <a
+                :href="section.content.rightCta.button?.url || '#'"
+                class="inline-block px-6 py-3 rounded-lg font-semibold border-2 transition-all hover:scale-105"
+                :style="{ borderColor: section.style?.textColor, color: section.style?.textColor }"
+              >
+                {{ section.content.rightCta.button?.text || 'Action' }}
+              </a>
+            </div>
+          </div>
+        </div>
+      </template>
+      
+      <!-- HERO: Layout Slider Cards -->
+      <template v-else-if="section.content?.layout === 'slider-cards'">
+        <div :style="{ maxWidth: section.style?.maxWidth || '1400px', margin: '0 auto', padding: '0 1rem' }">
+          <h2 v-if="section.content?.title" class="text-3xl font-bold mb-8" :style="{ color: section.style?.textColor }">
+            {{ section.content.title }}
+          </h2>
+          <div class="relative">
+            <div class="flex gap-6 overflow-x-auto pb-4 snap-x snap-mandatory scrollbar-hide">
+              <a 
+                v-for="(card, index) in (section.content?.cards || [])" 
+                :key="index"
+                :href="card.url || '#'"
+                class="flex-shrink-0 w-72 snap-start group"
+              >
+                <div class="relative h-80 rounded-2xl overflow-hidden mb-4">
+                  <img 
+                    v-if="card.image"
+                    :src="card.image" 
+                    :alt="card.title" 
+                    class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                  />
+                  <div v-else class="w-full h-full bg-gray-200 flex items-center justify-center">
+                    <svg class="w-16 h-16 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                    </svg>
+                  </div>
+                  <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
+                  <div class="absolute bottom-4 left-4 right-4">
+                    <h3 class="text-xl font-bold text-white">{{ card.title }}</h3>
+                    <p class="text-white/80">{{ card.subtitle }}</p>
+                  </div>
+                </div>
+              </a>
+            </div>
+            <button 
+              v-if="section.content?.showArrows"
+              class="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-4 w-12 h-12 rounded-full bg-white shadow-lg flex items-center justify-center hover:scale-110 transition-all"
+              :style="{ color: section.style?.textColor }"
+            >
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+              </svg>
+            </button>
+            <button 
+              v-if="section.content?.showArrows"
+              class="absolute right-0 top-1/2 -translate-y-1/2 translate-x-4 w-12 h-12 rounded-full bg-white shadow-lg flex items-center justify-center hover:scale-110 transition-all"
+              :style="{ color: section.style?.textColor }"
+            >
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+              </svg>
+            </button>
+          </div>
+        </div>
+      </template>
+      
+      <!-- HERO: Layout Countdown/Launch -->
+      <template v-else-if="section.content?.showCountdown">
+        <div :style="{ maxWidth: section.style?.maxWidth || '700px', margin: '0 auto', padding: '0 1rem' }" class="text-center">
+          <span 
+            v-if="section.content?.badge" 
+            class="inline-block px-4 py-1 text-sm font-bold rounded-full mb-6 tracking-wider"
+            :style="{ backgroundColor: section.style?.textColor + '20', color: section.style?.textColor }"
+          >
+            {{ section.content.badge }}
+          </span>
+          <h1 class="text-4xl md:text-5xl font-bold mb-4" :style="getTitleStyle">
+            {{ section.content?.title || 'Titre' }}
+          </h1>
+          <p v-if="section.content?.subtitle" class="text-xl mb-10 opacity-80" :style="getSubtitleStyle">
+            {{ section.content.subtitle }}
+          </p>
+          <div class="flex justify-center gap-4 md:gap-8 mb-10">
+            <div class="text-center">
+              <div class="text-4xl md:text-5xl font-bold" :style="{ color: section.style?.textColor }">{{ countdownDays }}</div>
+              <div class="text-xs uppercase tracking-wider opacity-60" :style="{ color: section.style?.textColor }">Jours</div>
+            </div>
+            <div class="text-2xl font-bold opacity-30" :style="{ color: section.style?.textColor }">:</div>
+            <div class="text-center">
+              <div class="text-4xl md:text-5xl font-bold" :style="{ color: section.style?.textColor }">{{ countdownHours }}</div>
+              <div class="text-xs uppercase tracking-wider opacity-60" :style="{ color: section.style?.textColor }">Heures</div>
+            </div>
+            <div class="text-2xl font-bold opacity-30" :style="{ color: section.style?.textColor }">:</div>
+            <div class="text-center">
+              <div class="text-4xl md:text-5xl font-bold" :style="{ color: section.style?.textColor }">{{ countdownMinutes }}</div>
+              <div class="text-xs uppercase tracking-wider opacity-60" :style="{ color: section.style?.textColor }">Minutes</div>
+            </div>
+            <div class="text-2xl font-bold opacity-30" :style="{ color: section.style?.textColor }">:</div>
+            <div class="text-center">
+              <div class="text-4xl md:text-5xl font-bold" :style="{ color: section.style?.textColor }">{{ countdownSeconds }}</div>
+              <div class="text-xs uppercase tracking-wider opacity-60" :style="{ color: section.style?.textColor }">Secondes</div>
+            </div>
+          </div>
+          <div v-if="section.content?.emailCapture" class="flex gap-3 max-w-md mx-auto">
+            <input 
+              type="email" 
+              :placeholder="section.content?.placeholder || 'Votre email'" 
+              class="flex-1 px-4 py-3 rounded-lg border-0 bg-white/10 backdrop-blur-sm"
+              :style="{ color: section.style?.textColor }"
+            />
+            <button 
+              class="px-6 py-3 rounded-lg font-semibold transition-all hover:scale-105"
+              :style="getButtonStyle"
+            >
+              {{ section.content?.button?.text || 'Notifier' }}
+            </button>
+          </div>
+        </div>
+      </template>
+      
+      <!-- HERO: Layout par défaut (centré) -->
+      <template v-else>
+        <div :style="{ maxWidth: section.style?.maxWidth || '1024px', margin: '0 auto', padding: '0 1rem' }">
+          <div :style="{ textAlign: section.style?.alignment || 'center' }">
+            <span 
+              v-if="section.content?.badge" 
+              class="inline-block px-4 py-1 text-sm font-semibold rounded-full mb-6"
+              :style="{ backgroundColor: section.style?.textColor + '15', color: section.style?.textColor }"
+            >
+              {{ section.content.badge }}
+            </span>
+            <h1 
+              class="mb-4"
+              :style="getTitleStyle"
+            >
+              {{ section.content?.title || 'Titre principal' }}
+            </h1>
+            <p 
+              class="mb-8"
+              :style="getSubtitleStyle"
+            >
+              {{ section.content?.subtitle || 'Sous-titre' }}
+            </p>
+            <div v-if="section.content?.button" class="flex flex-wrap gap-4" :style="{ justifyContent: section.style?.alignment === 'left' ? 'flex-start' : section.style?.alignment === 'right' ? 'flex-end' : 'center' }">
+              <a
+                :href="section.content.button.url || '#'"
+                :target="section.content.button.target || '_self'"
+                class="inline-block rounded-lg font-semibold transition-all hover:scale-105 hover:shadow-lg"
+                :class="getButtonClasses"
+                :style="getButtonStyle"
+              >
+                {{ section.content.button.text || 'Bouton' }}
+              </a>
+              <a
+                v-if="section.content?.secondaryButton"
+                :href="section.content.secondaryButton.url || '#'"
+                class="inline-block px-6 py-3 rounded-lg font-semibold transition-all border-2 hover:scale-105"
+                :style="{ borderColor: section.style?.textColor, color: section.style?.textColor }"
+              >
+                {{ section.content.secondaryButton.text }}
+              </a>
+            </div>
+          </div>
+        </div>
+      </template>
+      
     </template>
     
     <!-- Features -->
@@ -435,7 +858,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, ref, onMounted, onUnmounted } from 'vue'
 
 // Type local
 interface PageSection {
@@ -450,7 +873,7 @@ interface PageSection {
     backgroundColor?: string
     textColor?: string
     backgroundImage?: string
-    backgroundType?: 'color' | 'gradient' | 'image'
+    backgroundType?: 'color' | 'gradient' | 'image' | 'video'
     backgroundGradient?: string
     backgroundOverlay?: number
     height?: 'auto' | 'small' | 'medium' | 'large' | 'full'
@@ -491,6 +914,82 @@ interface PageSection {
 const props = defineProps<{
   section: PageSection
 }>()
+
+// Slider state
+const currentSlide = ref(0)
+let slideInterval: ReturnType<typeof setInterval> | null = null
+
+// Slider navigation
+const prevSlide = () => {
+  const slides = props.section.content?.slides || []
+  currentSlide.value = currentSlide.value === 0 ? slides.length - 1 : currentSlide.value - 1
+}
+
+const nextSlide = () => {
+  const slides = props.section.content?.slides || []
+  currentSlide.value = (currentSlide.value + 1) % slides.length
+}
+
+// Autoplay slider
+onMounted(() => {
+  if (props.section.content?.layout === 'slider' && props.section.content?.autoplay) {
+    const speed = props.section.content?.autoplaySpeed || 5000
+    slideInterval = setInterval(nextSlide, speed)
+  }
+})
+
+onUnmounted(() => {
+  if (slideInterval) clearInterval(slideInterval)
+})
+
+// Hero height
+const getHeroHeight = computed(() => {
+  const heightMap: Record<string, string> = {
+    'auto': 'auto',
+    'small': '400px',
+    'medium': '550px',
+    'large': '700px',
+    'full': '100vh'
+  }
+  return heightMap[props.section.style?.height || 'large'] || '700px'
+})
+
+// Countdown
+const countdownDays = ref('00')
+const countdownHours = ref('00')
+const countdownMinutes = ref('00')
+const countdownSeconds = ref('00')
+let countdownInterval: ReturnType<typeof setInterval> | null = null
+
+const updateCountdown = () => {
+  const launchDate = props.section.content?.launchDate
+  if (!launchDate) return
+  
+  const target = new Date(launchDate).getTime()
+  const now = Date.now()
+  const diff = Math.max(0, target - now)
+  
+  const days = Math.floor(diff / (1000 * 60 * 60 * 24))
+  const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60))
+  const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60))
+  const seconds = Math.floor((diff % (1000 * 60)) / 1000)
+  
+  countdownDays.value = String(days).padStart(2, '0')
+  countdownHours.value = String(hours).padStart(2, '0')
+  countdownMinutes.value = String(minutes).padStart(2, '0')
+  countdownSeconds.value = String(seconds).padStart(2, '0')
+}
+
+onMounted(() => {
+  if (props.section.content?.showCountdown) {
+    updateCountdown()
+    countdownInterval = setInterval(updateCountdown, 1000)
+  }
+})
+
+onUnmounted(() => {
+  if (countdownInterval) clearInterval(countdownInterval)
+})
 
 // Style calculé de la section
 const sectionStyle = computed(() => {

@@ -27,14 +27,211 @@
           <div class="accordion-content">
             <!-- Hero -->
             <template v-if="section.type === 'hero'">
+              <!-- Options communes -->
               <InputField label="Titre" :value="section.content?.title" @update="updateContent('title', $event)" />
               <InputField label="Sous-titre" :value="section.content?.subtitle" @update="updateContent('subtitle', $event)" multiline />
-              <SegmentedControl 
-                label="Alignement du contenu"
-                :options="alignmentOptions"
-                :value="section.style?.alignment || 'center'"
-                @update="updateStyle('alignment', $event)"
+              
+              <!-- Badge (pour certains templates) -->
+              <InputField 
+                v-if="['hero-editorial', 'hero-product-showcase', 'hero-countdown'].includes(section.template)"
+                label="Badge"
+                :value="section.content?.badge" 
+                @update="updateContent('badge', $event)" 
+                placeholder="NOUVEAU, BEST-SELLER..."
               />
+              
+              <!-- Options Slider -->
+              <template v-if="section.content?.layout === 'slider' || section.template?.includes('slider')">
+                <div class="section-divider mt-4 mb-3">
+                  <span class="text-xs font-semibold text-neutral-500 uppercase tracking-wide">Configuration Slider</span>
+                </div>
+                <div class="flex items-center justify-between mb-3">
+                  <span class="field-label">Slides</span>
+                  <button @click="addSlide" class="text-xs text-primary hover:text-primary/80 font-medium">+ Ajouter</button>
+                </div>
+                <div class="space-y-3">
+                  <div 
+                    v-for="(slide, index) in (section.content?.slides || [])" 
+                    :key="index"
+                    class="p-3 bg-neutral-50 rounded-lg border border-neutral-200"
+                  >
+                    <div class="flex items-center justify-between mb-2">
+                      <span class="text-xs font-semibold text-neutral-600">Slide {{ index + 1 }}</span>
+                      <button @click="removeSlide(index)" class="text-xs text-red-500 hover:text-red-600">Supprimer</button>
+                    </div>
+                    <InputField label="Titre" :value="slide.title" @update="updateSlide(index, 'title', $event)" />
+                    <InputField label="Sous-titre" :value="slide.subtitle" @update="updateSlide(index, 'subtitle', $event)" />
+                    <InputField label="Image URL" :value="slide.image" @update="updateSlide(index, 'image', $event)" placeholder="https://..." />
+                    <div class="grid grid-cols-2 gap-2">
+                      <InputField label="Texte bouton" :value="slide.button?.text" @update="updateSlideButton(index, 'text', $event)" />
+                      <InputField label="URL bouton" :value="slide.button?.url" @update="updateSlideButton(index, 'url', $event)" />
+                    </div>
+                  </div>
+                </div>
+                <div class="grid grid-cols-2 gap-3 mt-4">
+                  <CheckboxField 
+                    label="Lecture auto"
+                    :value="section.content?.autoplay || false"
+                    @update="updateContent('autoplay', $event)"
+                  />
+                  <CheckboxField 
+                    label="Afficher flèches"
+                    :value="section.content?.showArrows !== false"
+                    @update="updateContent('showArrows', $event)"
+                  />
+                </div>
+                <div class="grid grid-cols-2 gap-3">
+                  <CheckboxField 
+                    label="Afficher points"
+                    :value="section.content?.showDots !== false"
+                    @update="updateContent('showDots', $event)"
+                  />
+                  <NumberField 
+                    v-if="section.content?.autoplay"
+                    label="Intervalle (ms)"
+                    :value="section.content?.autoplaySpeed || 5000"
+                    @update="updateContent('autoplaySpeed', $event)"
+                    :min="1000"
+                    :max="10000"
+                    :step="500"
+                  />
+                </div>
+              </template>
+              
+              <!-- Options Split Image -->
+              <template v-else-if="section.content?.layout === 'split' || section.template === 'hero-split-image'">
+                <div class="section-divider mt-4 mb-3">
+                  <span class="text-xs font-semibold text-neutral-500 uppercase tracking-wide">Image</span>
+                </div>
+                <InputField label="URL de l'image" :value="section.content?.image" @update="updateContent('image', $event)" placeholder="https://..." />
+                <SelectField 
+                  label="Position de l'image"
+                  :options="imagePositionOptions"
+                  :value="section.content?.imagePosition || 'right'"
+                  @update="updateContent('imagePosition', $event)"
+                />
+                <div class="section-divider mt-4 mb-3">
+                  <span class="text-xs font-semibold text-neutral-500 uppercase tracking-wide">Bouton secondaire</span>
+                </div>
+                <InputField label="Texte" :value="section.content?.secondaryButton?.text" @update="updateSecondaryButton('text', $event)" placeholder="Optionnel" />
+                <InputField label="URL" :value="section.content?.secondaryButton?.url" @update="updateSecondaryButton('url', $event)" />
+              </template>
+              
+              <!-- Options Product Showcase -->
+              <template v-else-if="section.content?.layout === 'product' || section.template === 'hero-product-showcase'">
+                <div class="section-divider mt-4 mb-3">
+                  <span class="text-xs font-semibold text-neutral-500 uppercase tracking-wide">Produit</span>
+                </div>
+                <InputField label="Image produit" :value="section.content?.image" @update="updateContent('image', $event)" placeholder="https://..." />
+                <div class="grid grid-cols-2 gap-3">
+                  <InputField label="Prix" :value="section.content?.price" @update="updateContent('price', $event)" placeholder="149\u20ac" />
+                  <InputField label="Prix barr\u00e9" :value="section.content?.originalPrice" @update="updateContent('originalPrice', $event)" placeholder="199\u20ac" />
+                </div>
+                <div class="mt-3">
+                  <div class="flex items-center justify-between mb-2">
+                    <span class="field-label">Caract\u00e9ristiques</span>
+                    <button @click="addProductFeature" class="text-xs text-primary hover:text-primary/80 font-medium">+ Ajouter</button>
+                  </div>
+                  <div class="space-y-2">
+                    <div v-for="(feature, idx) in (section.content?.features || [])" :key="idx" class="flex gap-2">
+                      <InputField 
+                        :value="feature"
+                        @update="updateProductFeature(idx, $event)"
+                        placeholder="Avantage..."
+                      />
+                      <button @click="removeProductFeature(idx)" class="text-red-500 hover:text-red-600 px-2">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </template>
+              
+              <!-- Options Stats -->
+              <template v-else-if="section.content?.stats">
+                <div class="section-divider mt-4 mb-3">
+                  <span class="text-xs font-semibold text-neutral-500 uppercase tracking-wide">Statistiques</span>
+                </div>
+                <div class="flex items-center justify-between mb-2">
+                  <span class="field-label">Stats</span>
+                  <button @click="addStat" class="text-xs text-primary hover:text-primary/80 font-medium">+ Ajouter</button>
+                </div>
+                <div class="space-y-2">
+                  <div v-for="(stat, idx) in (section.content?.stats || [])" :key="idx" class="p-3 bg-neutral-50 rounded-lg border border-neutral-200">
+                    <div class="flex justify-between mb-2">
+                      <span class="text-xs text-neutral-500">Stat {{ idx + 1 }}</span>
+                      <button @click="removeStat(idx)" class="text-xs text-red-500">Supprimer</button>
+                    </div>
+                    <div class="grid grid-cols-2 gap-2">
+                      <InputField label="Valeur" :value="stat.value" @update="updateStat(idx, 'value', $event)" placeholder="10K+" />
+                      <InputField label="Label" :value="stat.label" @update="updateStat(idx, 'label', $event)" placeholder="Clients" />
+                    </div>
+                  </div>
+                </div>
+              </template>
+              
+              <!-- Options Dual CTA -->
+              <template v-else-if="section.content?.leftCta && section.content?.rightCta">
+                <div class="section-divider mt-4 mb-3">
+                  <span class="text-xs font-semibold text-neutral-500 uppercase tracking-wide">CTA Gauche</span>
+                </div>
+                <InputField label="Titre" :value="section.content?.leftCta?.title" @update="updateLeftCta('title', $event)" />
+                <InputField label="Description" :value="section.content?.leftCta?.description" @update="updateLeftCta('description', $event)" multiline />
+                <InputField label="Texte bouton" :value="section.content?.leftCta?.button?.text" @update="updateLeftCtaButton('text', $event)" />
+                <InputField label="URL" :value="section.content?.leftCta?.button?.url" @update="updateLeftCtaButton('url', $event)" />
+                
+                <div class="section-divider mt-4 mb-3">
+                  <span class="text-xs font-semibold text-neutral-500 uppercase tracking-wide">CTA Droite</span>
+                </div>
+                <InputField label="Titre" :value="section.content?.rightCta?.title" @update="updateRightCta('title', $event)" />
+                <InputField label="Description" :value="section.content?.rightCta?.description" @update="updateRightCta('description', $event)" multiline />
+                <InputField label="Texte bouton" :value="section.content?.rightCta?.button?.text" @update="updateRightCtaButton('text', $event)" />
+                <InputField label="URL" :value="section.content?.rightCta?.button?.url" @update="updateRightCtaButton('url', $event)" />
+              </template>
+              
+              <!-- Options Countdown -->
+              <template v-else-if="section.content?.showCountdown || section.template === 'hero-countdown'">
+                <div class="section-divider mt-4 mb-3">
+                  <span class="text-xs font-semibold text-neutral-500 uppercase tracking-wide">Compte \u00e0 rebours</span>
+                </div>
+                <div class="mb-3">
+                  <span class="field-label mb-2 block">Date de lancement</span>
+                  <input 
+                    type="datetime-local"
+                    :value="formatDateTimeLocal(section.content?.launchDate)"
+                    @change="handleLaunchDateChange"
+                    class="input-field"
+                  />
+                </div>
+                <CheckboxField 
+                  label="Afficher compte \u00e0 rebours"
+                  :value="section.content?.showCountdown !== false"
+                  @update="updateContent('showCountdown', $event)"
+                />
+                <CheckboxField 
+                  label="Capture email"
+                  :value="section.content?.emailCapture || false"
+                  @update="updateContent('emailCapture', $event)"
+                />
+                <InputField 
+                  v-if="section.content?.emailCapture"
+                  label="Placeholder email"
+                  :value="section.content?.placeholder" 
+                  @update="updateContent('placeholder', $event)" 
+                  placeholder="Votre email"
+                />
+              </template>
+              
+              <!-- Options par d\u00e9faut (templates centr\u00e9s) -->
+              <template v-else>
+                <SegmentedControl 
+                  label="Alignement du contenu"
+                  :options="alignmentOptions"
+                  :value="section.style?.alignment || 'center'"
+                  @update="updateStyle('alignment', $event)"
+                />
+              </template>
+              
               <SelectField 
                 label="Largeur max contenu"
                 :options="widthOptions"
@@ -793,6 +990,118 @@ const removeFaqItem = (index: number) => {
   items.splice(index, 1)
   emit('update:content', { items })
 }
+
+// === HERO HANDLERS ===
+
+// Slider handlers
+const addSlide = () => {
+  const slides = [...(props.section.content?.slides || [])]
+  slides.push({
+    title: 'Nouveau slide',
+    subtitle: 'Description du slide',
+    image: '',
+    button: { text: 'Action', url: '#' }
+  })
+  emit('update:content', { slides })
+}
+
+const updateSlide = (index: number, key: string, value: any) => {
+  const slides = [...(props.section.content?.slides || [])]
+  slides[index] = { ...slides[index], [key]: value }
+  emit('update:content', { slides })
+}
+
+const updateSlideButton = (index: number, key: string, value: any) => {
+  const slides = [...(props.section.content?.slides || [])]
+  const currentButton = slides[index]?.button || {}
+  slides[index] = { ...slides[index], button: { ...currentButton, [key]: value } }
+  emit('update:content', { slides })
+}
+
+const removeSlide = (index: number) => {
+  const slides = [...(props.section.content?.slides || [])]
+  slides.splice(index, 1)
+  emit('update:content', { slides })
+}
+
+// Secondary button handler
+const updateSecondaryButton = (key: string, value: any) => {
+  const currentButton = props.section.content?.secondaryButton || {}
+  emit('update:content', { secondaryButton: { ...currentButton, [key]: value } })
+}
+
+// Product features handlers
+const addProductFeature = () => {
+  const features = [...(props.section.content?.features || [])]
+  features.push('Nouvelle fonctionnalit\u00e9')
+  emit('update:content', { features })
+}
+
+const updateProductFeature = (index: number, value: string) => {
+  const features = [...(props.section.content?.features || [])]
+  features[index] = value
+  emit('update:content', { features })
+}
+
+const removeProductFeature = (index: number) => {
+  const features = [...(props.section.content?.features || [])]
+  features.splice(index, 1)
+  emit('update:content', { features })
+}
+
+// Stats handlers
+const addStat = () => {
+  const stats = [...(props.section.content?.stats || [])]
+  stats.push({ value: '100+', label: 'Label' })
+  emit('update:content', { stats })
+}
+
+const updateStat = (index: number, key: string, value: string) => {
+  const stats = [...(props.section.content?.stats || [])]
+  stats[index] = { ...stats[index], [key]: value }
+  emit('update:content', { stats })
+}
+
+const removeStat = (index: number) => {
+  const stats = [...(props.section.content?.stats || [])]
+  stats.splice(index, 1)
+  emit('update:content', { stats })
+}
+
+// Dual CTA handlers
+const updateLeftCta = (key: string, value: any) => {
+  const currentCta = props.section.content?.leftCta || {}
+  emit('update:content', { leftCta: { ...currentCta, [key]: value } })
+}
+
+const updateLeftCtaButton = (key: string, value: any) => {
+  const currentCta = props.section.content?.leftCta || {}
+  const currentButton = currentCta.button || {}
+  emit('update:content', { leftCta: { ...currentCta, button: { ...currentButton, [key]: value } } })
+}
+
+const updateRightCta = (key: string, value: any) => {
+  const currentCta = props.section.content?.rightCta || {}
+  emit('update:content', { rightCta: { ...currentCta, [key]: value } })
+}
+
+const updateRightCtaButton = (key: string, value: any) => {
+  const currentCta = props.section.content?.rightCta || {}
+  const currentButton = currentCta.button || {}
+  emit('update:content', { rightCta: { ...currentCta, button: { ...currentButton, [key]: value } } })
+}
+
+// Countdown handler
+const handleLaunchDateChange = (event: Event) => {
+  const target = event.target as HTMLInputElement
+  emit('update:content', { launchDate: new Date(target.value).toISOString() })
+}
+
+// Image position options
+const imagePositionOptions = [
+  { value: 'left', label: 'Gauche' },
+  { value: 'right', label: 'Droite' }
+]
 
 // Section labels & icons
 const getSectionLabel = (type: string) => {
