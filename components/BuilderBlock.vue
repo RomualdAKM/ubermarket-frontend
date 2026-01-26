@@ -1557,11 +1557,21 @@
         <div :style="{ maxWidth: section.style?.maxWidth || '800px', margin: '0 auto', padding: '0 1rem' }">
           <h2 v-if="section.content?.title" class="text-3xl font-bold mb-4 text-center" :style="{ color: section.style?.textColor }">{{ section.content.title }}</h2>
           <div class="relative mb-8">
-            <input type="text" :placeholder="section.content?.searchPlaceholder || 'Rechercher...'" class="w-full px-6 py-4 rounded-xl border-2 text-lg" :style="{ borderColor: section.style?.textColor + '20', color: section.style?.textColor }" />
+            <input 
+              v-model="faqSearchQuery"
+              type="text" 
+              :placeholder="section.content?.searchPlaceholder || 'Rechercher une question...'" 
+              class="w-full px-6 py-4 rounded-xl border-2 text-lg bg-transparent focus:outline-none focus:ring-2 transition-all" 
+              :style="{ borderColor: section.style?.textColor + '20', color: section.style?.textColor }" 
+            />
             <svg class="absolute right-4 top-1/2 -translate-y-1/2 w-6 h-6 opacity-40" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
           </div>
+          <div v-if="filteredFaqItems.length === 0" class="text-center py-8 opacity-60" :style="{ color: section.style?.textColor }">
+            <svg class="w-12 h-12 mx-auto mb-4 opacity-40" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+            <p>Aucun résultat trouvé pour "{{ faqSearchQuery }}"</p>
+          </div>
           <div class="space-y-4">
-            <div v-for="(item, index) in (section.content?.items || [])" :key="index" class="border-b pb-4" :style="{ borderColor: section.style?.textColor + '15' }">
+            <div v-for="(item, index) in filteredFaqItems" :key="index" class="border-b pb-4 last:border-b-0" :style="{ borderColor: section.style?.textColor + '15' }">
               <h4 class="font-bold mb-2" :style="{ color: section.style?.textColor }">{{ item.question }}</h4>
               <p class="opacity-70" :style="{ color: section.style?.textColor }">{{ item.answer }}</p>
             </div>
@@ -1638,10 +1648,30 @@
       <template v-else>
         <div :style="{ maxWidth: section.style?.maxWidth || '800px', margin: '0 auto', padding: '0 1rem' }">
           <h2 v-if="section.content?.title" class="text-3xl font-bold mb-8" :style="{ color: section.style?.textColor, textAlign: section.style?.alignment }">{{ section.content.title }}</h2>
-          <div class="space-y-4">
-            <div v-for="(item, index) in (section.content?.items || [])" :key="index" class="border border-gray-200 rounded-lg overflow-hidden">
-              <div class="p-4 font-semibold bg-gray-50" :style="{ color: section.style?.textColor }">{{ item.question }}</div>
-              <div class="p-4" :style="{ color: section.style?.textColor }">{{ item.answer }}</div>
+          <div class="space-y-3">
+            <div v-for="(item, index) in (section.content?.items || [])" :key="index" class="border rounded-xl overflow-hidden transition-all" :style="{ borderColor: section.style?.textColor + '20' }">
+              <button 
+                @click="toggleFaqItem(Number(index))" 
+                class="w-full p-5 flex items-center justify-between text-left font-semibold transition-colors cursor-pointer"
+                :style="{ backgroundColor: openFaqItems.has(Number(index)) ? section.style?.textColor + '08' : 'transparent', color: section.style?.textColor }"
+              >
+                <span>{{ item.question }}</span>
+                <svg 
+                  class="w-5 h-5 transition-transform duration-300 flex-shrink-0 ml-4" 
+                  :class="{ 'rotate-180': openFaqItems.has(Number(index)) }"
+                  fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                >
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                </svg>
+              </button>
+              <div 
+                class="overflow-hidden transition-all duration-300"
+                :style="{ maxHeight: openFaqItems.has(Number(index)) ? '500px' : '0px', opacity: openFaqItems.has(Number(index)) ? 1 : 0 }"
+              >
+                <div class="p-5 pt-0" :style="{ color: section.style?.textColor }">
+                  <p class="opacity-80">{{ item.answer }}</p>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -1978,8 +2008,20 @@
             <h2 class="text-3xl md:text-4xl font-bold mb-3" :style="{ color: section.style?.textColor }">{{ section.content?.title }}</h2>
             <p v-if="section.content?.subtitle" class="opacity-70 mb-6" :style="{ color: section.style?.textColor }">{{ section.content.subtitle }}</p>
             <div class="inline-flex items-center gap-3 p-1 rounded-full" :style="{ backgroundColor: section.style?.textColor + '10' }">
-              <button class="px-4 py-2 rounded-full font-medium transition-all" :style="{ backgroundColor: section.content?.billingPeriod !== 'yearly' ? section.style?.textColor : 'transparent', color: section.content?.billingPeriod !== 'yearly' ? '#ffffff' : section.style?.textColor }">Mensuel</button>
-              <button class="px-4 py-2 rounded-full font-medium transition-all" :style="{ backgroundColor: section.content?.billingPeriod === 'yearly' ? section.style?.textColor : 'transparent', color: section.content?.billingPeriod === 'yearly' ? '#ffffff' : section.style?.textColor }">Annuel <span class="text-xs bg-green-500 text-white px-2 py-0.5 rounded-full ml-1">-{{ section.content?.discount || 20 }}%</span></button>
+              <button 
+                @click="selectedBillingPeriod = 'monthly'" 
+                class="px-4 py-2 rounded-full font-medium transition-all cursor-pointer" 
+                :style="{ backgroundColor: selectedBillingPeriod !== 'yearly' ? section.style?.textColor : 'transparent', color: selectedBillingPeriod !== 'yearly' ? '#ffffff' : section.style?.textColor }"
+              >
+                Mensuel
+              </button>
+              <button 
+                @click="selectedBillingPeriod = 'yearly'" 
+                class="px-4 py-2 rounded-full font-medium transition-all cursor-pointer" 
+                :style="{ backgroundColor: selectedBillingPeriod === 'yearly' ? section.style?.textColor : 'transparent', color: selectedBillingPeriod === 'yearly' ? '#ffffff' : section.style?.textColor }"
+              >
+                Annuel <span class="text-xs bg-green-500 text-white px-2 py-0.5 rounded-full ml-1">-{{ section.content?.discount || 20 }}%</span>
+              </button>
             </div>
           </div>
           <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -1987,8 +2029,8 @@
               <span v-if="plan.badge" class="inline-block px-3 py-1 text-xs font-bold rounded-full mb-4 bg-primary text-white">{{ plan.badge }}</span>
               <h3 class="text-xl font-bold mb-4" :style="{ color: section.style?.textColor }">{{ plan.name }}</h3>
               <div class="mb-6">
-                <span class="text-4xl font-bold" :style="{ color: section.style?.textColor }">{{ section.content?.billingPeriod === 'yearly' ? plan.yearlyPrice : plan.monthlyPrice }}{{ plan.currency }}</span>
-                <span class="opacity-60" :style="{ color: section.style?.textColor }">{{ section.content?.billingPeriod === 'yearly' ? '/an' : '/mois' }}</span>
+                <span class="text-4xl font-bold" :style="{ color: section.style?.textColor }">{{ selectedBillingPeriod === 'yearly' ? plan.yearlyPrice : plan.monthlyPrice }}{{ plan.currency }}</span>
+                <span class="opacity-60" :style="{ color: section.style?.textColor }">{{ selectedBillingPeriod === 'yearly' ? '/an' : '/mois' }}</span>
               </div>
               <ul class="space-y-3 mb-8">
                 <li v-for="(feat, fi) in plan.features" :key="fi" class="flex items-center gap-2" :style="{ color: section.style?.textColor }">
@@ -2330,12 +2372,47 @@
         <div :style="{ maxWidth: section.style?.maxWidth || '1200px', margin: '0 auto', padding: '0 1rem' }">
           <h2 v-if="section.content?.title" class="text-3xl font-bold mb-8 text-center" :style="{ color: section.style?.textColor }">{{ section.content.title }}</h2>
           <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-            <div v-for="(image, index) in (section.content?.images || [])" :key="index" class="aspect-square rounded-lg overflow-hidden bg-gray-100 cursor-pointer hover:ring-2 hover:ring-primary transition-all">
-              <img v-if="image.src" :src="image.src" :alt="image.alt" class="w-full h-full object-cover" />
+            <div 
+              v-for="(image, index) in (section.content?.images || [])" 
+              :key="index" 
+              @click="openLightbox(Number(index))"
+              class="aspect-square rounded-lg overflow-hidden bg-gray-100 cursor-pointer hover:ring-2 hover:ring-primary transition-all group"
+            >
+              <img v-if="image.src" :src="image.src" :alt="image.alt" class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105" />
+              <div class="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors flex items-center justify-center">
+                <svg class="w-8 h-8 text-white opacity-0 group-hover:opacity-100 transition-opacity" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7" /></svg>
+              </div>
             </div>
           </div>
           <p class="text-center text-sm opacity-60 mt-4" :style="{ color: section.style?.textColor }">Cliquez sur une image pour l'agrandir</p>
         </div>
+        
+        <!-- Lightbox Modal -->
+        <Teleport to="body">
+          <div v-if="lightboxOpen" class="fixed inset-0 z-[9999] bg-black/95 flex items-center justify-center" @click.self="closeLightbox">
+            <button @click="closeLightbox" class="absolute top-4 right-4 w-12 h-12 bg-white/10 rounded-full flex items-center justify-center text-white hover:bg-white/20 transition-colors z-10">
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+            </button>
+            <button @click="lightboxPrev" class="absolute left-4 top-1/2 -translate-y-1/2 w-12 h-12 bg-white/10 rounded-full flex items-center justify-center text-white hover:bg-white/20 transition-colors">
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" /></svg>
+            </button>
+            <button @click="lightboxNext" class="absolute right-4 top-1/2 -translate-y-1/2 w-12 h-12 bg-white/10 rounded-full flex items-center justify-center text-white hover:bg-white/20 transition-colors">
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" /></svg>
+            </button>
+            <div class="max-w-5xl max-h-[90vh] px-16">
+              <img 
+                v-if="section.content?.images?.[lightboxIndex]?.src" 
+                :src="section.content.images[lightboxIndex].src" 
+                :alt="section.content.images[lightboxIndex].alt || 'Image'" 
+                class="max-w-full max-h-[85vh] object-contain rounded-lg shadow-2xl"
+              />
+              <p v-if="section.content?.images?.[lightboxIndex]?.caption" class="text-white text-center mt-4 opacity-80">{{ section.content.images[lightboxIndex].caption }}</p>
+            </div>
+            <div class="absolute bottom-4 left-1/2 -translate-x-1/2 text-white/60 text-sm">
+              {{ lightboxIndex + 1 }} / {{ section.content?.images?.length || 0 }}
+            </div>
+          </div>
+        </Teleport>
       </template>
       
       <!-- GALLERY: Default (Grid) -->
@@ -2895,6 +2972,65 @@ let countdownInterval: ReturnType<typeof setInterval> | null = null
 
 // Active tab for tabbed content
 const activeTab = ref(0)
+
+// FAQ Accordion - open items tracking
+const openFaqItems = ref<Set<number>>(new Set([0])) // First item open by default
+
+const toggleFaqItem = (index: number) => {
+  const newSet = new Set(openFaqItems.value)
+  if (newSet.has(index)) {
+    newSet.delete(index)
+  } else {
+    newSet.add(index)
+  }
+  openFaqItems.value = newSet
+}
+
+// FAQ Search query
+const faqSearchQuery = ref('')
+
+const filteredFaqItems = computed(() => {
+  const items = props.section.content?.items || []
+  if (!faqSearchQuery.value.trim()) return items
+  const query = faqSearchQuery.value.toLowerCase()
+  return items.filter((item: any) => 
+    item.question?.toLowerCase().includes(query) || 
+    item.answer?.toLowerCase().includes(query)
+  )
+})
+
+// Gallery Lightbox
+const lightboxOpen = ref(false)
+const lightboxIndex = ref(0)
+
+const openLightbox = (index: number) => {
+  lightboxIndex.value = index
+  lightboxOpen.value = true
+}
+
+const closeLightbox = () => {
+  lightboxOpen.value = false
+}
+
+const lightboxPrev = () => {
+  const images = props.section.content?.images || []
+  lightboxIndex.value = lightboxIndex.value === 0 ? images.length - 1 : lightboxIndex.value - 1
+}
+
+const lightboxNext = () => {
+  const images = props.section.content?.images || []
+  lightboxIndex.value = (lightboxIndex.value + 1) % images.length
+}
+
+// Pricing billing period toggle
+const selectedBillingPeriod = ref<'monthly' | 'yearly'>('monthly')
+
+// Initialize billing period from section content
+onMounted(() => {
+  if (props.section.content?.billingPeriod) {
+    selectedBillingPeriod.value = props.section.content.billingPeriod as 'monthly' | 'yearly'
+  }
+})
 
 const updateCountdown = () => {
   const launchDate = props.section.content?.launchDate
