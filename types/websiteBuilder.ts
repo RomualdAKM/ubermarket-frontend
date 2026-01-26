@@ -1358,102 +1358,142 @@ export const BLOCK_DEFINITIONS: BlockDefinition[] = [
     icon: 'heroicons:currency-euro',
     description: 'Présentation des prix',
     templates: [
+      // === OFFRE UNIQUE ===
       {
         id: 'pricing-single',
-        name: 'Offre unique',
+        name: 'Offre Unique',
         preview: 'single',
         defaultContent: {
-          title: 'Notre offre',
+          layout: 'single',
+          badge: 'OFFRE SPÉCIALE',
+          title: 'Formule Tout Inclus',
           price: '49',
           currency: '€',
           period: '/mois',
-          description: 'Tout ce dont vous avez besoin',
+          description: 'Tout ce dont vous avez besoin pour réussir',
           features: [
-            'Accès complet',
-            'Support prioritaire',
-            'Mises à jour incluses'
+            'Accès complet à la plateforme',
+            'Support prioritaire 24/7',
+            'Mises à jour automatiques',
+            'Stockage illimité',
+            'Exports illimités'
           ],
-          button: {
-            text: 'Commencer',
-            url: '#'
-          }
+          button: { text: 'Commencer maintenant', url: '#' },
+          guarantee: 'Satisfait ou remboursé 30 jours'
         },
         defaultStyle: {
           alignment: 'center',
-          maxWidth: '400px',
+          maxWidth: '450px',
           backgroundColor: '#ffffff',
           textColor: '#171717',
-          padding: { top: 60, bottom: 60 }
+          backgroundType: 'color',
+          verticalSpacing: 'large',
+          horizontalSpacing: 'medium'
         }
       },
+      
+      // === TROIS FORMULES (CLASSIQUE) ===
       {
         id: 'pricing-three-tiers',
-        name: 'Trois formules',
-        preview: 'tiers',
+        name: 'Trois Formules',
+        preview: 'three-tiers',
         defaultContent: {
+          layout: 'tiers',
           title: 'Choisissez votre formule',
           subtitle: 'Sans engagement, annulez à tout moment',
+          showToggle: false,
           plans: [
             {
               name: 'Starter',
+              description: 'Pour démarrer',
               price: '19',
               currency: '€',
               period: '/mois',
-              features: ['Fonctionnalité A', 'Fonctionnalité B'],
+              features: [
+                { text: '1 utilisateur', included: true },
+                { text: '5 projets', included: true },
+                { text: 'Support email', included: true },
+                { text: 'Fonctions avancées', included: false },
+                { text: 'API Access', included: false }
+              ],
               highlighted: false,
-              button: { text: 'Choisir', url: '#' }
+              button: { text: 'Démarrer', url: '#', style: 'outline' }
             },
             {
               name: 'Pro',
+              description: 'Le plus populaire',
               price: '49',
               currency: '€',
               period: '/mois',
-              features: ['Tout de Starter', 'Fonctionnalité C', 'Fonctionnalité D'],
+              features: [
+                { text: '5 utilisateurs', included: true },
+                { text: 'Projets illimités', included: true },
+                { text: 'Support prioritaire', included: true },
+                { text: 'Fonctions avancées', included: true },
+                { text: 'API Access', included: true }
+              ],
               highlighted: true,
-              badge: 'Populaire',
-              button: { text: 'Choisir', url: '#' }
+              badge: 'POPULAIRE',
+              button: { text: 'Choisir Pro', url: '#', style: 'primary' }
             },
             {
               name: 'Enterprise',
-              price: '99',
+              description: 'Pour les grandes équipes',
+              price: '149',
               currency: '€',
               period: '/mois',
-              features: ['Tout de Pro', 'Fonctionnalité E', 'Support dédié'],
+              features: [
+                { text: 'Utilisateurs illimités', included: true },
+                { text: 'Projets illimités', included: true },
+                { text: 'Support dédié 24/7', included: true },
+                { text: 'Fonctions avancées', included: true },
+                { text: 'API + Webhooks', included: true }
+              ],
               highlighted: false,
-              button: { text: 'Contacter', url: '#' }
+              button: { text: 'Contacter', url: '#', style: 'outline' }
             }
           ]
         },
         defaultStyle: {
           alignment: 'center',
-          maxWidth: '1100px',
+          maxWidth: '1200px',
           backgroundColor: '#fafafa',
           textColor: '#171717',
-          padding: { top: 80, bottom: 80 }
+          backgroundType: 'color',
+          verticalSpacing: 'large',
+          horizontalSpacing: 'medium'
         }
       },
+      
+      // === DEUX COLONNES ===
       {
-        id: 'pricing-comparison',
-        name: 'Comparatif',
-        preview: 'comparison',
+        id: 'pricing-two-columns',
+        name: 'Deux Colonnes',
+        preview: 'two-columns',
         defaultContent: {
-          title: 'Comparez nos offres',
+          layout: 'two-columns',
+          title: 'Simple et transparent',
+          subtitle: 'Pas de frais cachés',
           plans: [
             {
               name: 'Gratuit',
+              description: 'Pour tester',
               price: '0',
               currency: '€',
               period: '',
-              features: ['1 projet', 'Support email'],
-              highlighted: false
+              features: ['1 projet', 'Fonctions de base', 'Support communauté'],
+              button: { text: 'Commencer gratuit', url: '#', style: 'outline' }
             },
             {
               name: 'Premium',
+              description: 'Pour grandir',
               price: '29',
               currency: '€',
               period: '/mois',
-              features: ['Projets illimités', 'Support prioritaire', 'Fonctionnalités avancées'],
-              highlighted: true
+              features: ['Projets illimités', 'Toutes les fonctions', 'Support prioritaire', 'Export PDF'],
+              highlighted: true,
+              badge: 'RECOMMANDÉ',
+              button: { text: 'Passer Premium', url: '#', style: 'primary' }
             }
           ]
         },
@@ -1461,8 +1501,323 @@ export const BLOCK_DEFINITIONS: BlockDefinition[] = [
           alignment: 'center',
           maxWidth: '900px',
           backgroundColor: '#ffffff',
-          textColor: '#262626',
-          padding: { top: 80, bottom: 80 }
+          textColor: '#171717',
+          backgroundType: 'color',
+          verticalSpacing: 'large',
+          horizontalSpacing: 'medium'
+        }
+      },
+      
+      // === TABLEAU COMPARATIF ===
+      {
+        id: 'pricing-table',
+        name: 'Tableau Comparatif',
+        preview: 'table',
+        defaultContent: {
+          layout: 'table',
+          title: 'Comparez nos offres',
+          subtitle: 'Trouvez la formule adaptée à vos besoins',
+          features: [
+            { name: 'Utilisateurs', starter: '1', pro: '10', enterprise: 'Illimité' },
+            { name: 'Stockage', starter: '5 GB', pro: '100 GB', enterprise: 'Illimité' },
+            { name: 'Projets', starter: '3', pro: '50', enterprise: 'Illimité' },
+            { name: 'Support', starter: 'Email', pro: 'Prioritaire', enterprise: 'Dédié 24/7' },
+            { name: 'API', starter: false, pro: true, enterprise: true },
+            { name: 'SSO', starter: false, pro: false, enterprise: true }
+          ],
+          plans: [
+            { name: 'Starter', price: '19', currency: '€', period: '/mois', button: { text: 'Choisir', url: '#' } },
+            { name: 'Pro', price: '49', currency: '€', period: '/mois', highlighted: true, badge: 'POPULAIRE', button: { text: 'Choisir', url: '#' } },
+            { name: 'Enterprise', price: '149', currency: '€', period: '/mois', button: { text: 'Contacter', url: '#' } }
+          ]
+        },
+        defaultStyle: {
+          alignment: 'center',
+          maxWidth: '1100px',
+          backgroundColor: '#ffffff',
+          textColor: '#171717',
+          backgroundType: 'color',
+          verticalSpacing: 'large',
+          horizontalSpacing: 'medium'
+        }
+      },
+      
+      // === CARTES MINIMALISTES ===
+      {
+        id: 'pricing-minimal',
+        name: 'Minimaliste',
+        preview: 'minimal',
+        defaultContent: {
+          layout: 'minimal',
+          title: 'Tarifs simples',
+          plans: [
+            { name: 'Basic', price: '9', currency: '€', period: '/mois', description: 'Essentiel', button: { text: 'Choisir', url: '#' } },
+            { name: 'Pro', price: '29', currency: '€', period: '/mois', description: 'Avancé', highlighted: true, button: { text: 'Choisir', url: '#' } },
+            { name: 'Team', price: '79', currency: '€', period: '/mois', description: 'Équipe', button: { text: 'Choisir', url: '#' } }
+          ]
+        },
+        defaultStyle: {
+          alignment: 'center',
+          maxWidth: '1000px',
+          backgroundColor: '#fafafa',
+          textColor: '#171717',
+          backgroundType: 'color',
+          verticalSpacing: 'large',
+          horizontalSpacing: 'medium'
+        }
+      },
+      
+      // === AVEC TOGGLE MENSUEL/ANNUEL ===
+      {
+        id: 'pricing-toggle',
+        name: 'Avec Toggle',
+        preview: 'toggle',
+        defaultContent: {
+          layout: 'toggle',
+          title: 'Tarifs flexibles',
+          subtitle: 'Économisez 20% avec le paiement annuel',
+          showToggle: true,
+          billingPeriod: 'monthly',
+          discount: 20,
+          plans: [
+            {
+              name: 'Starter',
+              monthlyPrice: '19',
+              yearlyPrice: '182',
+              currency: '€',
+              features: ['5 projets', 'Support email', '10 GB stockage'],
+              button: { text: 'Démarrer', url: '#' }
+            },
+            {
+              name: 'Business',
+              monthlyPrice: '49',
+              yearlyPrice: '470',
+              currency: '€',
+              features: ['Projets illimités', 'Support prioritaire', '100 GB stockage', 'API Access'],
+              highlighted: true,
+              badge: 'MEILLEURE OFFRE',
+              button: { text: 'Choisir', url: '#' }
+            },
+            {
+              name: 'Enterprise',
+              monthlyPrice: '99',
+              yearlyPrice: '950',
+              currency: '€',
+              features: ['Tout illimité', 'Support dédié', 'Stockage illimité', 'SSO & SAML'],
+              button: { text: 'Contacter', url: '#' }
+            }
+          ]
+        },
+        defaultStyle: {
+          alignment: 'center',
+          maxWidth: '1200px',
+          backgroundColor: '#ffffff',
+          textColor: '#171717',
+          backgroundType: 'color',
+          verticalSpacing: 'large',
+          horizontalSpacing: 'medium'
+        }
+      },
+      
+      // === FOCUS POPULAIRE ===
+      {
+        id: 'pricing-highlighted',
+        name: 'Focus Populaire',
+        preview: 'highlighted',
+        defaultContent: {
+          layout: 'highlighted',
+          title: 'L\'offre préférée de nos clients',
+          mainPlan: {
+            name: 'Pro',
+            badge: 'BEST-SELLER',
+            price: '49',
+            currency: '€',
+            period: '/mois',
+            description: 'Parfait pour les professionnels et petites équipes',
+            features: [
+              'Projets illimités',
+              'Jusqu\'à 10 utilisateurs',
+              'Support prioritaire',
+              'Toutes les intégrations',
+              'Rapports avancés',
+              'API complète'
+            ],
+            button: { text: 'Commencer l\'essai gratuit', url: '#' },
+            guarantee: '14 jours d\'essai gratuit'
+          },
+          otherPlansText: 'Voir toutes les formules',
+          otherPlansUrl: '#pricing'
+        },
+        defaultStyle: {
+          alignment: 'center',
+          maxWidth: '600px',
+          backgroundColor: '#fafafa',
+          textColor: '#171717',
+          backgroundType: 'color',
+          verticalSpacing: 'large',
+          horizontalSpacing: 'medium'
+        }
+      },
+      
+      // === GRADIENT MODERNE ===
+      {
+        id: 'pricing-gradient',
+        name: 'Gradient Moderne',
+        preview: 'gradient',
+        defaultContent: {
+          layout: 'gradient',
+          title: 'Investissez dans votre croissance',
+          subtitle: 'Des outils puissants à prix abordable',
+          plans: [
+            {
+              name: 'Starter',
+              price: '29',
+              currency: '€',
+              period: '/mois',
+              features: ['Fonctions essentielles', '5 utilisateurs', 'Support standard'],
+              button: { text: 'Démarrer', url: '#' }
+            },
+            {
+              name: 'Scale',
+              price: '79',
+              currency: '€',
+              period: '/mois',
+              features: ['Toutes les fonctions', '25 utilisateurs', 'Support prioritaire', 'Analytics avancés'],
+              highlighted: true,
+              button: { text: 'Choisir Scale', url: '#' }
+            }
+          ]
+        },
+        defaultStyle: {
+          alignment: 'center',
+          maxWidth: '1000px',
+          backgroundType: 'gradient',
+          backgroundGradient: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+          textColor: '#ffffff',
+          verticalSpacing: 'large',
+          horizontalSpacing: 'medium'
+        }
+      },
+      
+      // === DARK MODE ===
+      {
+        id: 'pricing-dark',
+        name: 'Dark Mode',
+        preview: 'dark',
+        defaultContent: {
+          layout: 'dark',
+          title: 'Plans & Pricing',
+          subtitle: 'Start free, upgrade when ready',
+          plans: [
+            {
+              name: 'Free',
+              price: '0',
+              currency: '€',
+              period: '',
+              features: ['1 project', 'Basic features', 'Community support'],
+              button: { text: 'Get Started', url: '#' }
+            },
+            {
+              name: 'Pro',
+              price: '39',
+              currency: '€',
+              period: '/mo',
+              features: ['Unlimited projects', 'All features', 'Priority support', 'API access'],
+              highlighted: true,
+              badge: 'POPULAR',
+              button: { text: 'Go Pro', url: '#' }
+            },
+            {
+              name: 'Team',
+              price: '99',
+              currency: '€',
+              period: '/mo',
+              features: ['Everything in Pro', 'Team collaboration', 'Admin dashboard', 'SSO'],
+              button: { text: 'Contact Sales', url: '#' }
+            }
+          ]
+        },
+        defaultStyle: {
+          alignment: 'center',
+          maxWidth: '1200px',
+          backgroundColor: '#0a0a0a',
+          textColor: '#fafafa',
+          backgroundType: 'color',
+          verticalSpacing: 'large',
+          horizontalSpacing: 'medium'
+        }
+      },
+      
+      // === ENTERPRISE / B2B ===
+      {
+        id: 'pricing-enterprise',
+        name: 'Enterprise',
+        preview: 'enterprise',
+        defaultContent: {
+          layout: 'enterprise',
+          badge: 'ENTREPRISE',
+          title: 'Solution sur mesure',
+          description: 'Pour les grandes organisations avec des besoins spécifiques',
+          features: [
+            'Déploiement dédié',
+            'SLA garanti 99.99%',
+            'Support dédié 24/7',
+            'Intégrations personnalisées',
+            'Formation équipe',
+            'Audit de sécurité'
+          ],
+          contact: {
+            title: 'Parlons de vos besoins',
+            description: 'Notre équipe vous accompagne dans la mise en place',
+            button: { text: 'Demander un devis', url: '#' },
+            phone: '+33 1 23 45 67 89'
+          },
+          logos: [],
+          logosTitle: 'Ils nous font confiance'
+        },
+        defaultStyle: {
+          alignment: 'center',
+          maxWidth: '1000px',
+          backgroundColor: '#fafafa',
+          textColor: '#171717',
+          backgroundType: 'color',
+          verticalSpacing: 'large',
+          horizontalSpacing: 'medium'
+        }
+      },
+      
+      // === LIFETIME DEAL ===
+      {
+        id: 'pricing-lifetime',
+        name: 'Lifetime Deal',
+        preview: 'lifetime',
+        defaultContent: {
+          layout: 'lifetime',
+          badge: 'OFFRE LIMITÉE',
+          title: 'Accès à vie',
+          subtitle: 'Payez une fois, utilisez pour toujours',
+          originalPrice: '999',
+          price: '299',
+          currency: '€',
+          discount: '70%',
+          features: [
+            'Accès à vie à toutes les fonctions',
+            'Toutes les futures mises à jour',
+            'Support prioritaire',
+            'Pas de frais récurrents'
+          ],
+          button: { text: 'Obtenir l\'accès à vie', url: '#' },
+          spotsLeft: 47,
+          guarantee: 'Garantie satisfait ou remboursé 60 jours'
+        },
+        defaultStyle: {
+          alignment: 'center',
+          maxWidth: '550px',
+          backgroundColor: '#fef3c7',
+          textColor: '#171717',
+          backgroundType: 'color',
+          verticalSpacing: 'large',
+          horizontalSpacing: 'medium'
         }
       }
     ]
@@ -1473,88 +1828,291 @@ export const BLOCK_DEFINITIONS: BlockDefinition[] = [
     icon: 'heroicons:cursor-arrow-rays',
     description: 'Incitation à l\'action',
     templates: [
+      // === SIMPLE CENTRÉ ===
       {
         id: 'cta-simple',
         name: 'Simple',
         preview: 'simple',
         defaultContent: {
-          title: 'Prêt à commencer ?',
-          subtitle: '',
-          button: {
-            text: 'Démarrer maintenant',
-            url: '#',
-            style: 'primary'
-          }
+          layout: 'simple',
+          title: 'Prêt à transformer votre activité ?',
+          subtitle: 'Rejoignez des milliers d\'entreprises qui nous font confiance',
+          button: { text: 'Commencer gratuitement', url: '#', style: 'primary' }
         },
         defaultStyle: {
           alignment: 'center',
-          maxWidth: '600px',
+          maxWidth: '700px',
           backgroundColor: '#171717',
           textColor: '#fafafa',
-          padding: { top: 60, bottom: 60 }
+          backgroundType: 'color',
+          verticalSpacing: 'large',
+          horizontalSpacing: 'medium'
         }
       },
+      
+      // === GRADIENT MODERNE ===
       {
         id: 'cta-gradient',
-        name: 'Dégradé',
+        name: 'Gradient',
         preview: 'gradient',
         defaultContent: {
-          title: 'Rejoignez-nous',
-          subtitle: 'Plus de 10 000 clients satisfaits',
-          button: {
-            text: 'S\'inscrire gratuitement',
-            url: '#',
-            style: 'white'
-          }
+          layout: 'gradient',
+          title: 'Propulsez votre croissance',
+          subtitle: 'Des outils puissants pour des résultats exceptionnels',
+          button: { text: 'Démarrer l\'essai gratuit', url: '#', style: 'white' },
+          secondaryButton: { text: 'Voir la démo', url: '#', style: 'outline-white' }
         },
         defaultStyle: {
           alignment: 'center',
-          maxWidth: '800px',
-          backgroundColor: 'linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%)',
+          maxWidth: '900px',
+          backgroundType: 'gradient',
+          backgroundGradient: 'linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%)',
           textColor: '#ffffff',
-          padding: { top: 80, bottom: 80 }
+          verticalSpacing: 'large',
+          horizontalSpacing: 'medium'
         }
       },
+      
+      // === NEWSLETTER ===
       {
         id: 'cta-newsletter',
         name: 'Newsletter',
         preview: 'newsletter',
         defaultContent: {
+          layout: 'newsletter',
           title: 'Restez informé',
-          subtitle: 'Recevez nos dernières actualités',
-          placeholder: 'Votre email',
-          button: {
-            text: 'S\'abonner',
-            style: 'primary'
-          }
+          subtitle: 'Recevez nos conseils exclusifs et nos dernières actualités',
+          placeholder: 'Entrez votre email',
+          button: { text: 'S\'abonner', style: 'primary' },
+          privacyText: 'En vous inscrivant, vous acceptez notre politique de confidentialité'
         },
         defaultStyle: {
           alignment: 'center',
-          maxWidth: '500px',
-          backgroundColor: '#f5f5f5',
-          textColor: '#262626',
-          padding: { top: 60, bottom: 60 }
+          maxWidth: '550px',
+          backgroundColor: '#fafafa',
+          textColor: '#171717',
+          backgroundType: 'color',
+          verticalSpacing: 'large',
+          horizontalSpacing: 'medium'
         }
       },
+      
+      // === BANDEAU PROMOTIONNEL ===
       {
         id: 'cta-banner',
-        name: 'Bandeau',
+        name: 'Bandeau Promo',
         preview: 'banner',
         defaultContent: {
-          title: 'Offre limitée',
-          subtitle: '-20% avec le code PROMO20',
-          button: {
-            text: 'En profiter',
-            url: '#',
-            style: 'outline'
-          }
+          layout: 'banner',
+          icon: 'gift',
+          title: 'Offre de lancement',
+          subtitle: '-30% sur votre première commande avec le code WELCOME30',
+          button: { text: 'En profiter', url: '#', style: 'white' },
+          dismissible: true
         },
         defaultStyle: {
           alignment: 'center',
           maxWidth: '100%',
           backgroundColor: '#0a0a0a',
           textColor: '#fafafa',
-          padding: { top: 30, bottom: 30 }
+          backgroundType: 'color',
+          verticalSpacing: 'small',
+          horizontalSpacing: 'medium'
+        }
+      },
+      
+      // === SPLIT AVEC IMAGE ===
+      {
+        id: 'cta-split-image',
+        name: 'Split Image',
+        preview: 'split-image',
+        defaultContent: {
+          layout: 'split',
+          title: 'Découvrez notre solution',
+          subtitle: 'Une plateforme complète pour gérer votre activité de A à Z. Simplifiez vos processus et gagnez du temps.',
+          image: 'https://images.unsplash.com/photo-1551434678-e076c223a692?w=800',
+          imagePosition: 'right',
+          button: { text: 'Découvrir', url: '#', style: 'primary' },
+          secondaryButton: { text: 'En savoir plus', url: '#', style: 'outline' },
+          features: ['Facile à utiliser', 'Support 24/7', 'Sécurisé']
+        },
+        defaultStyle: {
+          alignment: 'left',
+          maxWidth: '1200px',
+          backgroundColor: '#ffffff',
+          textColor: '#171717',
+          backgroundType: 'color',
+          verticalSpacing: 'large',
+          horizontalSpacing: 'medium'
+        }
+      },
+      
+      // === AVEC COMPTE À REBOURS ===
+      {
+        id: 'cta-countdown',
+        name: 'Compte à rebours',
+        preview: 'countdown',
+        defaultContent: {
+          layout: 'countdown',
+          badge: 'OFFRE LIMITÉE',
+          title: 'Profitez de notre offre exclusive',
+          subtitle: 'Cette promotion se termine bientôt',
+          endDate: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000).toISOString(),
+          button: { text: 'J\'en profite maintenant', url: '#', style: 'primary' }
+        },
+        defaultStyle: {
+          alignment: 'center',
+          maxWidth: '700px',
+          backgroundColor: '#fef2f2',
+          textColor: '#171717',
+          backgroundType: 'color',
+          verticalSpacing: 'large',
+          horizontalSpacing: 'medium'
+        }
+      },
+      
+      // === MINIMALISTE ===
+      {
+        id: 'cta-minimal',
+        name: 'Minimaliste',
+        preview: 'minimal',
+        defaultContent: {
+          layout: 'minimal',
+          title: 'Commencez maintenant',
+          button: { text: 'Démarrer →', url: '#', style: 'link' }
+        },
+        defaultStyle: {
+          alignment: 'center',
+          maxWidth: '500px',
+          backgroundColor: 'transparent',
+          textColor: '#171717',
+          backgroundType: 'color',
+          verticalSpacing: 'medium',
+          horizontalSpacing: 'medium'
+        }
+      },
+      
+      // === DEUX BOUTONS ===
+      {
+        id: 'cta-dual-buttons',
+        name: 'Deux Actions',
+        preview: 'dual-buttons',
+        defaultContent: {
+          layout: 'dual',
+          title: 'Prêt à vous lancer ?',
+          subtitle: 'Choisissez comment vous souhaitez démarrer',
+          primaryButton: { text: 'Créer un compte', url: '#', style: 'primary' },
+          secondaryButton: { text: 'Voir la démo', url: '#', style: 'outline' }
+        },
+        defaultStyle: {
+          alignment: 'center',
+          maxWidth: '600px',
+          backgroundColor: '#f5f5f5',
+          textColor: '#171717',
+          backgroundType: 'color',
+          verticalSpacing: 'large',
+          horizontalSpacing: 'medium'
+        }
+      },
+      
+      // === CARTE FLOTTANTE ===
+      {
+        id: 'cta-floating-card',
+        name: 'Carte Flottante',
+        preview: 'floating-card',
+        defaultContent: {
+          layout: 'card',
+          icon: 'rocket',
+          title: 'Lancez-vous dès aujourd\'hui',
+          subtitle: 'Pas de carte de crédit requise. Annulez à tout moment.',
+          button: { text: 'Commencer gratuitement', url: '#', style: 'primary' },
+          features: ['14 jours d\'essai gratuit', 'Pas d\'engagement', 'Support inclus']
+        },
+        defaultStyle: {
+          alignment: 'center',
+          maxWidth: '500px',
+          backgroundColor: '#f8fafc',
+          textColor: '#171717',
+          backgroundType: 'color',
+          verticalSpacing: 'large',
+          horizontalSpacing: 'medium'
+        }
+      },
+      
+      // === FULL IMAGE BACKGROUND ===
+      {
+        id: 'cta-image-bg',
+        name: 'Image de Fond',
+        preview: 'image-bg',
+        defaultContent: {
+          layout: 'image-bg',
+          title: 'Rejoignez l\'aventure',
+          subtitle: 'Des milliers de professionnels nous font déjà confiance',
+          button: { text: 'Nous rejoindre', url: '#', style: 'white' }
+        },
+        defaultStyle: {
+          alignment: 'center',
+          maxWidth: '100%',
+          backgroundType: 'image',
+          backgroundImage: 'https://images.unsplash.com/photo-1557683316-973673baf926?w=1920',
+          backgroundOverlay: 70,
+          textColor: '#ffffff',
+          verticalSpacing: 'large',
+          horizontalSpacing: 'medium'
+        }
+      },
+      
+      // === AVEC SOCIAL PROOF ===
+      {
+        id: 'cta-social-proof',
+        name: 'Social Proof',
+        preview: 'social-proof',
+        defaultContent: {
+          layout: 'social-proof',
+          title: 'Rejoignez notre communauté',
+          subtitle: 'Des milliers d\'entreprises grandissent avec nous',
+          stats: [
+            { value: '10K+', label: 'Utilisateurs' },
+            { value: '98%', label: 'Satisfaction' },
+            { value: '24/7', label: 'Support' }
+          ],
+          button: { text: 'Rejoindre maintenant', url: '#', style: 'primary' },
+          avatars: [],
+          avatarsText: '+2,500 personnes cette semaine'
+        },
+        defaultStyle: {
+          alignment: 'center',
+          maxWidth: '900px',
+          backgroundColor: '#0f172a',
+          textColor: '#f8fafc',
+          backgroundType: 'color',
+          verticalSpacing: 'large',
+          horizontalSpacing: 'medium'
+        }
+      },
+      
+      // === APP DOWNLOAD ===
+      {
+        id: 'cta-app-download',
+        name: 'Télécharger App',
+        preview: 'app-download',
+        defaultContent: {
+          layout: 'app-download',
+          title: 'Disponible sur mobile',
+          subtitle: 'Téléchargez notre application et emportez vos projets partout',
+          appStoreUrl: '#',
+          playStoreUrl: '#',
+          qrCode: '',
+          mockupImage: ''
+        },
+        defaultStyle: {
+          alignment: 'center',
+          maxWidth: '1000px',
+          backgroundColor: '#ffffff',
+          textColor: '#171717',
+          backgroundType: 'color',
+          verticalSpacing: 'large',
+          horizontalSpacing: 'medium'
         }
       }
     ]

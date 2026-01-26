@@ -779,6 +779,100 @@
             <template v-else-if="section.type === 'cta'">
               <InputField label="Titre" :value="section.content?.title" @update="updateContent('title', $event)" />
               <InputField label="Sous-titre" :value="section.content?.subtitle" @update="updateContent('subtitle', $event)" />
+              
+              <!-- Newsletter -->
+              <template v-if="section.content?.layout === 'newsletter'">
+                <InputField label="Placeholder email" :value="section.content?.inputPlaceholder" @update="updateContent('inputPlaceholder', $event)" placeholder="Votre email..." />
+                <InputField label="Texte bouton" :value="section.content?.buttonText" @update="updateContent('buttonText', $event)" placeholder="S'abonner" />
+              </template>
+              
+              <!-- Split (avec image) -->
+              <template v-else-if="section.content?.layout === 'split'">
+                <InputField label="URL de l'image" :value="section.content?.image" @update="updateContent('image', $event)" placeholder="https://..." />
+                <SelectField 
+                  label="Position image"
+                  :options="[{value: 'left', label: 'Gauche'}, {value: 'right', label: 'Droite'}]"
+                  :value="section.content?.imagePosition || 'right'"
+                  @update="updateContent('imagePosition', $event)"
+                />
+              </template>
+              
+              <!-- Countdown -->
+              <template v-else-if="section.content?.layout === 'countdown'">
+                <div class="mt-3">
+                  <span class="field-label mb-2 block">Date de fin</span>
+                  <input 
+                    type="datetime-local"
+                    :value="formatDateTimeLocal(section.content?.endDate)"
+                    @change="handleCtaEndDateChange"
+                    class="input-field"
+                  />
+                </div>
+                <InputField label="Texte urgence" :value="section.content?.urgencyText" @update="updateContent('urgencyText', $event)" placeholder="Offre limitée !" />
+              </template>
+              
+              <!-- Dual Buttons -->
+              <template v-else-if="section.content?.layout === 'dual'">
+                <div class="field-group">
+                  <span class="field-group-title">Bouton secondaire</span>
+                  <InputField label="Texte" :value="section.content?.secondaryButton?.text" @update="updateSecondaryButton('text', $event)" placeholder="En savoir plus" />
+                  <InputField label="URL" :value="section.content?.secondaryButton?.url" @update="updateSecondaryButton('url', $event)" placeholder="https://..." />
+                </div>
+              </template>
+              
+              <!-- Card flottante -->
+              <template v-else-if="section.content?.layout === 'card'">
+                <InputField label="Icône (emoji)" :value="section.content?.icon" @update="updateContent('icon', $event)" placeholder="🚀" />
+              </template>
+              
+              <!-- Image Background -->
+              <template v-else-if="section.content?.layout === 'image-bg'">
+                <InputField label="URL image de fond" :value="section.content?.backgroundImage" @update="updateContent('backgroundImage', $event)" placeholder="https://..." />
+                <SliderField 
+                  label="Opacité overlay"
+                  :min="0" :max="100" :step="5"
+                  :value="section.content?.overlayOpacity || 50"
+                  @update="updateContent('overlayOpacity', $event)"
+                />
+              </template>
+              
+              <!-- Social Proof -->
+              <template v-else-if="section.content?.layout === 'social-proof'">
+                <div class="mt-3">
+                  <div class="flex items-center justify-between mb-2">
+                    <span class="field-label">Statistiques</span>
+                    <button @click="addCtaStat" class="text-xs text-primary hover:text-primary/80 font-medium">+ Ajouter</button>
+                  </div>
+                  <div class="space-y-2">
+                    <div v-for="(stat, index) in (section.content?.stats || [])" :key="index" class="bg-neutral-800/50 rounded-lg p-2 border border-neutral-700/50">
+                      <div class="flex items-center justify-between mb-2">
+                        <span class="text-xs text-neutral-400">Stat {{ +index + 1 }}</span>
+                        <button @click="removeCtaStat(+index)" class="text-red-400 hover:text-red-300 text-xs">Supprimer</button>
+                      </div>
+                      <div class="grid grid-cols-2 gap-2">
+                        <InputField label="Valeur" :value="stat.value" @update="updateCtaStat(+index, 'value', $event)" placeholder="10K+" size="sm" />
+                        <InputField label="Label" :value="stat.label" @update="updateCtaStat(+index, 'label', $event)" placeholder="Utilisateurs" size="sm" />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </template>
+              
+              <!-- App Download -->
+              <template v-else-if="section.content?.layout === 'app-download'">
+                <InputField label="Lien App Store" :value="section.content?.appStoreUrl" @update="updateContent('appStoreUrl', $event)" placeholder="https://apps.apple.com/..." />
+                <InputField label="Lien Play Store" :value="section.content?.playStoreUrl" @update="updateContent('playStoreUrl', $event)" placeholder="https://play.google.com/..." />
+                <InputField label="Image mockup" :value="section.content?.mockupImage" @update="updateContent('mockupImage', $event)" placeholder="https://..." />
+              </template>
+              
+              <!-- Banner -->
+              <template v-else-if="section.content?.layout === 'banner'">
+                <CheckboxField 
+                  label="Afficher le bouton fermer"
+                  :value="section.content?.dismissable || false"
+                  @update="updateContent('dismissable', $event)"
+                />
+              </template>
             </template>
 
             <!-- Text -->
@@ -826,11 +920,166 @@
             <!-- Pricing -->
             <template v-else-if="section.type === 'pricing'">
               <InputField label="Titre" :value="section.content?.title" @update="updateContent('title', $event)" />
-              <div class="grid grid-cols-2 gap-3">
-                <InputField label="Prix" :value="section.content?.price" @update="updateContent('price', $event)" placeholder="99€" />
-                <InputField label="Période" :value="section.content?.period" @update="updateContent('period', $event)" placeholder="/mois" />
-              </div>
-              <InputField label="Description" :value="section.content?.description" @update="updateContent('description', $event)" multiline />
+              <InputField label="Sous-titre" :value="section.content?.subtitle" @update="updateContent('subtitle', $event)" />
+              
+              <!-- Single Plan -->
+              <template v-if="section.content?.layout === 'single'">
+                <div class="grid grid-cols-2 gap-3">
+                  <InputField label="Prix" :value="section.content?.price" @update="updateContent('price', $event)" placeholder="99€" />
+                  <InputField label="Période" :value="section.content?.period" @update="updateContent('period', $event)" placeholder="/mois" />
+                </div>
+                <InputField label="Description" :value="section.content?.description" @update="updateContent('description', $event)" multiline />
+                <div class="mt-3">
+                  <div class="flex items-center justify-between mb-2">
+                    <span class="field-label">Fonctionnalités</span>
+                    <button @click="addPricingFeature" class="text-xs text-primary hover:text-primary/80 font-medium">+ Ajouter</button>
+                  </div>
+                  <div class="space-y-1">
+                    <div v-for="(feature, index) in (section.content?.features || [])" :key="index" class="flex items-center gap-2">
+                      <input type="text" :value="feature" @input="handlePricingFeatureInput(+index, $event)" class="input-field flex-1 text-sm" />
+                      <button @click="removePricingFeature(+index)" class="text-red-400 hover:text-red-300 p-1"><TrashIcon class="w-3.5 h-3.5" /></button>
+                    </div>
+                  </div>
+                </div>
+              </template>
+              
+              <!-- Multi Plans (tiers, two-columns, table, highlighted, gradient, dark) -->
+              <template v-else-if="['tiers', 'two-columns', 'table', 'highlighted', 'gradient', 'dark'].includes(section.content?.layout)">
+                <div class="mt-3">
+                  <div class="flex items-center justify-between mb-3">
+                    <span class="field-label">Plans tarifaires</span>
+                    <button @click="addPricingPlan" class="text-xs text-primary hover:text-primary/80 font-medium">+ Ajouter un plan</button>
+                  </div>
+                  <div class="space-y-3">
+                    <div v-for="(plan, index) in (section.content?.plans || [])" :key="index" class="bg-neutral-800/50 rounded-lg p-3 border border-neutral-700/50">
+                      <div class="flex items-center justify-between mb-3">
+                        <span class="text-sm font-medium text-neutral-200">{{ plan.name || 'Plan ' + (+index + 1) }}</span>
+                        <div class="flex items-center gap-2">
+                          <CheckboxField 
+                            label="Populaire"
+                            :value="plan.popular || false"
+                            @update="updatePricingPlan(+index, 'popular', $event)"
+                            size="sm"
+                          />
+                          <button @click="removePricingPlan(+index)" class="text-red-400 hover:text-red-300 p-1"><TrashIcon class="w-3.5 h-3.5" /></button>
+                        </div>
+                      </div>
+                      <div class="space-y-2">
+                        <InputField label="Nom" :value="plan.name" @update="updatePricingPlan(+index, 'name', $event)" placeholder="Starter" size="sm" />
+                        <div class="grid grid-cols-2 gap-2">
+                          <InputField label="Prix" :value="plan.price" @update="updatePricingPlan(+index, 'price', $event)" placeholder="29€" size="sm" />
+                          <InputField label="Période" :value="plan.period" @update="updatePricingPlan(+index, 'period', $event)" placeholder="/mois" size="sm" />
+                        </div>
+                        <InputField label="Description" :value="plan.description" @update="updatePricingPlan(+index, 'description', $event)" placeholder="Pour les petites équipes" size="sm" />
+                        <div class="mt-2">
+                          <div class="flex items-center justify-between mb-1">
+                            <span class="text-xs text-neutral-400">Fonctionnalités</span>
+                            <button @click="addPlanFeature(+index)" class="text-xs text-primary/70 hover:text-primary">+ Ajouter</button>
+                          </div>
+                          <div class="space-y-1">
+                            <div v-for="(feature, fIndex) in (plan.features || [])" :key="fIndex" class="flex items-center gap-1">
+                              <input type="text" :value="feature" @input="handlePlanFeatureInput(+index, +fIndex, $event)" class="input-field flex-1 text-xs py-1" />
+                              <button @click="removePlanFeature(+index, +fIndex)" class="text-red-400/70 hover:text-red-300 p-0.5"><TrashIcon class="w-3 h-3" /></button>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </template>
+              
+              <!-- Toggle (mensuel/annuel) -->
+              <template v-else-if="section.content?.layout === 'toggle'">
+                <div class="grid grid-cols-2 gap-3 mt-3">
+                  <InputField label="Label mensuel" :value="section.content?.monthlyLabel" @update="updateContent('monthlyLabel', $event)" placeholder="Mensuel" />
+                  <InputField label="Label annuel" :value="section.content?.yearlyLabel" @update="updateContent('yearlyLabel', $event)" placeholder="Annuel" />
+                </div>
+                <SliderField 
+                  label="Réduction annuelle (%)"
+                  :min="0" :max="50" :step="5"
+                  :value="section.content?.yearlyDiscount || 20"
+                  @update="updateContent('yearlyDiscount', $event)"
+                />
+                <div class="mt-3">
+                  <div class="flex items-center justify-between mb-3">
+                    <span class="field-label">Plans</span>
+                    <button @click="addPricingPlan" class="text-xs text-primary hover:text-primary/80 font-medium">+ Ajouter</button>
+                  </div>
+                  <div class="space-y-3">
+                    <div v-for="(plan, index) in (section.content?.plans || [])" :key="index" class="bg-neutral-800/50 rounded-lg p-3 border border-neutral-700/50">
+                      <div class="flex items-center justify-between mb-3">
+                        <span class="text-sm font-medium text-neutral-200">{{ plan.name || 'Plan ' + (+index + 1) }}</span>
+                        <button @click="removePricingPlan(+index)" class="text-red-400 hover:text-red-300 p-1"><TrashIcon class="w-3.5 h-3.5" /></button>
+                      </div>
+                      <div class="space-y-2">
+                        <InputField label="Nom" :value="plan.name" @update="updatePricingPlan(+index, 'name', $event)" placeholder="Pro" size="sm" />
+                        <div class="grid grid-cols-2 gap-2">
+                          <InputField label="Prix mensuel" :value="plan.monthlyPrice" @update="updatePricingPlan(+index, 'monthlyPrice', $event)" placeholder="29€" size="sm" />
+                          <InputField label="Prix annuel" :value="plan.yearlyPrice" @update="updatePricingPlan(+index, 'yearlyPrice', $event)" placeholder="290€" size="sm" />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </template>
+              
+              <!-- Minimal -->
+              <template v-else-if="section.content?.layout === 'minimal'">
+                <div class="grid grid-cols-2 gap-3">
+                  <InputField label="Prix" :value="section.content?.price" @update="updateContent('price', $event)" placeholder="19€" />
+                  <InputField label="Période" :value="section.content?.period" @update="updateContent('period', $event)" placeholder="/mois" />
+                </div>
+              </template>
+              
+              <!-- Enterprise -->
+              <template v-else-if="section.content?.layout === 'enterprise'">
+                <InputField label="Texte prix" :value="section.content?.priceText" @update="updateContent('priceText', $event)" placeholder="Sur mesure" />
+                <InputField label="Description" :value="section.content?.description" @update="updateContent('description', $event)" multiline />
+                <div class="mt-3">
+                  <div class="flex items-center justify-between mb-2">
+                    <span class="field-label">Avantages</span>
+                    <button @click="addPricingFeature" class="text-xs text-primary hover:text-primary/80 font-medium">+ Ajouter</button>
+                  </div>
+                  <div class="space-y-1">
+                    <div v-for="(feature, index) in (section.content?.features || [])" :key="index" class="flex items-center gap-2">
+                      <input type="text" :value="feature" @input="handlePricingFeatureInput(+index, $event)" class="input-field flex-1 text-sm" />
+                      <button @click="removePricingFeature(+index)" class="text-red-400 hover:text-red-300 p-1"><TrashIcon class="w-3.5 h-3.5" /></button>
+                    </div>
+                  </div>
+                </div>
+              </template>
+              
+              <!-- Lifetime -->
+              <template v-else-if="section.content?.layout === 'lifetime'">
+                <div class="grid grid-cols-2 gap-3">
+                  <InputField label="Prix lifetime" :value="section.content?.price" @update="updateContent('price', $event)" placeholder="299€" />
+                  <InputField label="Prix barré" :value="section.content?.originalPrice" @update="updateContent('originalPrice', $event)" placeholder="599€" />
+                </div>
+                <InputField label="Badge" :value="section.content?.badge" @update="updateContent('badge', $event)" placeholder="-50%" />
+                <InputField label="Description" :value="section.content?.description" @update="updateContent('description', $event)" multiline />
+                <div class="mt-3">
+                  <div class="flex items-center justify-between mb-2">
+                    <span class="field-label">Inclus</span>
+                    <button @click="addPricingFeature" class="text-xs text-primary hover:text-primary/80 font-medium">+ Ajouter</button>
+                  </div>
+                  <div class="space-y-1">
+                    <div v-for="(feature, index) in (section.content?.features || [])" :key="index" class="flex items-center gap-2">
+                      <input type="text" :value="feature" @input="handlePricingFeatureInput(+index, $event)" class="input-field flex-1 text-sm" />
+                      <button @click="removePricingFeature(+index)" class="text-red-400 hover:text-red-300 p-1"><TrashIcon class="w-3.5 h-3.5" /></button>
+                    </div>
+                  </div>
+                </div>
+              </template>
+              
+              <!-- Default (ancien format) -->
+              <template v-else>
+                <div class="grid grid-cols-2 gap-3">
+                  <InputField label="Prix" :value="section.content?.price" @update="updateContent('price', $event)" placeholder="99€" />
+                  <InputField label="Période" :value="section.content?.period" @update="updateContent('period', $event)" placeholder="/mois" />
+                </div>
+                <InputField label="Description" :value="section.content?.description" @update="updateContent('description', $event)" multiline />
+              </template>
             </template>
 
             <!-- Gallery -->
@@ -1873,6 +2122,115 @@ const wallColumnsOptions = [
   { value: '3', label: '3 colonnes' },
   { value: '4', label: '4 colonnes' }
 ]
+
+// === PRICING HANDLERS ===
+
+// Single plan features
+const addPricingFeature = () => {
+  const features = [...(props.section.content?.features || [])]
+  features.push('Nouvelle fonctionnalité')
+  emit('update:content', { features })
+}
+
+const updatePricingFeature = (index: number, value: string) => {
+  const features = [...(props.section.content?.features || [])]
+  features[index] = value
+  emit('update:content', { features })
+}
+
+const handlePricingFeatureInput = (index: number, event: Event) => {
+  const value = (event.target as HTMLInputElement).value
+  updatePricingFeature(index, value)
+}
+
+const removePricingFeature = (index: number) => {
+  const features = [...(props.section.content?.features || [])]
+  features.splice(index, 1)
+  emit('update:content', { features })
+}
+
+// Multi-plan management
+const addPricingPlan = () => {
+  const plans = [...(props.section.content?.plans || [])]
+  plans.push({
+    name: 'Nouveau plan',
+    price: '29€',
+    period: '/mois',
+    description: 'Description du plan',
+    features: ['Fonctionnalité 1', 'Fonctionnalité 2'],
+    popular: false
+  })
+  emit('update:content', { plans })
+}
+
+const updatePricingPlan = (index: number, key: string, value: any) => {
+  const plans = [...(props.section.content?.plans || [])]
+  plans[index] = { ...plans[index], [key]: value }
+  emit('update:content', { plans })
+}
+
+const removePricingPlan = (index: number) => {
+  const plans = [...(props.section.content?.plans || [])]
+  plans.splice(index, 1)
+  emit('update:content', { plans })
+}
+
+// Plan features
+const addPlanFeature = (planIndex: number) => {
+  const plans = [...(props.section.content?.plans || [])]
+  const features = [...(plans[planIndex]?.features || [])]
+  features.push('Nouvelle fonctionnalité')
+  plans[planIndex] = { ...plans[planIndex], features }
+  emit('update:content', { plans })
+}
+
+const updatePlanFeature = (planIndex: number, featureIndex: number, value: string) => {
+  const plans = [...(props.section.content?.plans || [])]
+  const features = [...(plans[planIndex]?.features || [])]
+  features[featureIndex] = value
+  plans[planIndex] = { ...plans[planIndex], features }
+  emit('update:content', { plans })
+}
+
+const handlePlanFeatureInput = (planIndex: number, featureIndex: number, event: Event) => {
+  const value = (event.target as HTMLInputElement).value
+  updatePlanFeature(planIndex, featureIndex, value)
+}
+
+const removePlanFeature = (planIndex: number, featureIndex: number) => {
+  const plans = [...(props.section.content?.plans || [])]
+  const features = [...(plans[planIndex]?.features || [])]
+  features.splice(featureIndex, 1)
+  plans[planIndex] = { ...plans[planIndex], features }
+  emit('update:content', { plans })
+}
+
+// === CTA HANDLERS ===
+
+// CTA countdown date
+const handleCtaEndDateChange = (event: Event) => {
+  const target = event.target as HTMLInputElement
+  emit('update:content', { endDate: new Date(target.value).toISOString() })
+}
+
+// CTA Stats (social-proof layout)
+const addCtaStat = () => {
+  const stats = [...(props.section.content?.stats || [])]
+  stats.push({ value: '0', label: 'Label' })
+  emit('update:content', { stats })
+}
+
+const updateCtaStat = (index: number, key: string, value: string) => {
+  const stats = [...(props.section.content?.stats || [])]
+  stats[index] = { ...stats[index], [key]: value }
+  emit('update:content', { stats })
+}
+
+const removeCtaStat = (index: number) => {
+  const stats = [...(props.section.content?.stats || [])]
+  stats.splice(index, 1)
+  emit('update:content', { stats })
+}
 
 // Section labels & icons
 const getSectionLabel = (type: string) => {
