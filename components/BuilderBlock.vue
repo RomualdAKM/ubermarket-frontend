@@ -1918,14 +1918,14 @@
               v-for="(plan, idx) in section.content.plans" 
               :key="idx"
               class="rounded-2xl p-8 transition-all"
-              :class="plan.highlighted ? 'ring-2 ring-primary scale-105 shadow-xl' : ''"
-              :style="{ backgroundColor: plan.highlighted ? '#ffffff' : section.style?.textColor + '08' }"
+              :class="(plan.popular || plan.highlighted) ? 'ring-2 ring-primary scale-105 shadow-xl' : ''"
+              :style="{ backgroundColor: (plan.popular || plan.highlighted) ? '#ffffff' : section.style?.textColor + '08' }"
             >
-              <span v-if="plan.badge" class="inline-block px-3 py-1 text-xs font-bold rounded-full mb-4 bg-primary text-white">{{ plan.badge }}</span>
+              <span v-if="plan.popular || plan.badge" class="inline-block px-3 py-1 text-xs font-bold rounded-full mb-4 bg-primary text-white">{{ plan.badge || 'POPULAIRE' }}</span>
               <h3 class="text-xl font-bold mb-1" :style="{ color: section.style?.textColor }">{{ plan.name }}</h3>
               <p v-if="plan.description" class="text-sm opacity-60 mb-4" :style="{ color: section.style?.textColor }">{{ plan.description }}</p>
               <div class="mb-6">
-                <span class="text-4xl font-bold" :style="{ color: section.style?.textColor }">{{ plan.price }}{{ plan.currency }}</span>
+                <span class="text-4xl font-bold" :style="{ color: section.style?.textColor }">{{ plan.price }}</span>
                 <span class="opacity-60" :style="{ color: section.style?.textColor }">{{ plan.period }}</span>
               </div>
               <ul class="space-y-3 mb-8">
@@ -1936,7 +1936,7 @@
                 </li>
               </ul>
               <a v-if="plan.button" :href="plan.button.url || '#'" class="block w-full py-3 rounded-lg font-semibold text-center transition-all"
-                :style="plan.highlighted ? getButtonStyle : { backgroundColor: section.style?.textColor + '10', color: section.style?.textColor }">
+                :style="(plan.popular || plan.highlighted) ? getButtonStyle : { backgroundColor: section.style?.textColor + '10', color: section.style?.textColor }">
                 {{ plan.button.text }}
               </a>
             </div>
@@ -1956,23 +1956,24 @@
               v-for="(plan, idx) in section.content.plans" 
               :key="idx"
               class="rounded-2xl p-8 border-2 transition-all"
-              :style="{ borderColor: plan.highlighted ? '#10B981' : section.style?.textColor + '20', backgroundColor: plan.highlighted ? '#f0fdf4' : 'transparent' }"
+              :style="{ borderColor: (plan.popular || plan.highlighted) ? '#10B981' : section.style?.textColor + '20', backgroundColor: (plan.popular || plan.highlighted) ? '#f0fdf4' : 'transparent' }"
             >
-              <span v-if="plan.badge" class="inline-block px-3 py-1 text-xs font-bold rounded-full mb-4 bg-green-500 text-white">{{ plan.badge }}</span>
+              <span v-if="plan.popular || plan.badge" class="inline-block px-3 py-1 text-xs font-bold rounded-full mb-4 bg-green-500 text-white">{{ plan.badge || 'POPULAIRE' }}</span>
               <h3 class="text-2xl font-bold mb-1" :style="{ color: section.style?.textColor }">{{ plan.name }}</h3>
               <p v-if="plan.description" class="text-sm opacity-60 mb-4" :style="{ color: section.style?.textColor }">{{ plan.description }}</p>
               <div class="mb-6">
-                <span class="text-5xl font-bold" :style="{ color: section.style?.textColor }">{{ plan.price }}{{ plan.currency }}</span>
+                <span class="text-5xl font-bold" :style="{ color: section.style?.textColor }">{{ plan.price }}</span>
                 <span class="opacity-60" :style="{ color: section.style?.textColor }">{{ plan.period }}</span>
               </div>
               <ul class="space-y-3 mb-8">
                 <li v-for="(feat, fi) in plan.features" :key="fi" class="flex items-center gap-2" :style="{ color: section.style?.textColor }">
-                  <svg class="w-5 h-5 text-green-500 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" /></svg>
-                  <span>{{ feat }}</span>
+                  <svg v-if="typeof feat === 'object' ? feat.included : true" class="w-5 h-5 text-green-500 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" /></svg>
+                  <svg v-else class="w-5 h-5 text-gray-300 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" /></svg>
+                  <span :class="typeof feat === 'object' && !feat.included ? 'opacity-40' : ''">{{ typeof feat === 'object' ? feat.text : feat }}</span>
                 </li>
               </ul>
               <a v-if="plan.button" :href="plan.button.url || '#'" class="block w-full py-3 rounded-lg font-semibold text-center transition-all"
-                :style="plan.highlighted ? getButtonStyle : { backgroundColor: section.style?.textColor + '10', color: section.style?.textColor }">
+                :style="(plan.popular || plan.highlighted) ? getButtonStyle : { backgroundColor: section.style?.textColor + '10', color: section.style?.textColor }">
                 {{ plan.button.text }}
               </a>
             </div>
@@ -1989,13 +1990,13 @@
               v-for="(plan, idx) in section.content.plans" 
               :key="idx"
               class="w-64 p-6 rounded-xl text-center transition-all"
-              :class="plan.highlighted ? 'ring-2 ring-primary shadow-lg' : ''"
+              :class="(plan.popular || plan.highlighted) ? 'ring-2 ring-primary shadow-lg' : ''"
               :style="{ backgroundColor: section.style?.textColor + '08' }"
             >
               <h3 class="text-lg font-bold mb-1" :style="{ color: section.style?.textColor }">{{ plan.name }}</h3>
               <p v-if="plan.description" class="text-sm opacity-60 mb-4" :style="{ color: section.style?.textColor }">{{ plan.description }}</p>
-              <div class="text-3xl font-bold mb-4" :style="{ color: section.style?.textColor }">{{ plan.price }}{{ plan.currency }}<span class="text-base font-normal opacity-60">{{ plan.period }}</span></div>
-              <a v-if="plan.button" :href="plan.button.url || '#'" class="block w-full py-2 rounded-lg font-semibold transition-all" :style="plan.highlighted ? getButtonStyle : { backgroundColor: 'transparent', border: '1px solid ' + section.style?.textColor + '30', color: section.style?.textColor }">{{ plan.button.text }}</a>
+              <div class="text-3xl font-bold mb-4" :style="{ color: section.style?.textColor }">{{ plan.price }}<span class="text-base font-normal opacity-60">{{ plan.period }}</span></div>
+              <a v-if="plan.button" :href="plan.button.url || '#'" class="block w-full py-2 rounded-lg font-semibold transition-all" :style="(plan.popular || plan.highlighted) ? getButtonStyle : { backgroundColor: 'transparent', border: '1px solid ' + section.style?.textColor + '30', color: section.style?.textColor }">{{ plan.button.text }}</a>
             </div>
           </div>
         </div>
@@ -2025,20 +2026,21 @@
             </div>
           </div>
           <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <div v-for="(plan, idx) in section.content.plans" :key="idx" class="rounded-2xl p-8" :class="plan.highlighted ? 'ring-2 ring-primary shadow-xl' : ''" :style="{ backgroundColor: plan.highlighted ? '#ffffff' : section.style?.textColor + '08' }">
-              <span v-if="plan.badge" class="inline-block px-3 py-1 text-xs font-bold rounded-full mb-4 bg-primary text-white">{{ plan.badge }}</span>
+            <div v-for="(plan, idx) in section.content.plans" :key="idx" class="rounded-2xl p-8" :class="(plan.popular || plan.highlighted) ? 'ring-2 ring-primary shadow-xl' : ''" :style="{ backgroundColor: (plan.popular || plan.highlighted) ? '#ffffff' : section.style?.textColor + '08' }">
+              <span v-if="plan.popular || plan.badge" class="inline-block px-3 py-1 text-xs font-bold rounded-full mb-4 bg-primary text-white">{{ plan.badge || 'POPULAIRE' }}</span>
               <h3 class="text-xl font-bold mb-4" :style="{ color: section.style?.textColor }">{{ plan.name }}</h3>
               <div class="mb-6">
-                <span class="text-4xl font-bold" :style="{ color: section.style?.textColor }">{{ selectedBillingPeriod === 'yearly' ? plan.yearlyPrice : plan.monthlyPrice }}{{ plan.currency }}</span>
+                <span class="text-4xl font-bold" :style="{ color: section.style?.textColor }">{{ selectedBillingPeriod === 'yearly' ? plan.yearlyPrice : plan.monthlyPrice }}</span>
                 <span class="opacity-60" :style="{ color: section.style?.textColor }">{{ selectedBillingPeriod === 'yearly' ? '/an' : '/mois' }}</span>
               </div>
               <ul class="space-y-3 mb-8">
                 <li v-for="(feat, fi) in plan.features" :key="fi" class="flex items-center gap-2" :style="{ color: section.style?.textColor }">
-                  <svg class="w-5 h-5 text-green-500 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" /></svg>
-                  <span>{{ feat }}</span>
+                  <svg v-if="typeof feat === 'object' ? feat.included : true" class="w-5 h-5 text-green-500 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" /></svg>
+                  <svg v-else class="w-5 h-5 text-gray-300 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" /></svg>
+                  <span :class="typeof feat === 'object' && !feat.included ? 'opacity-40' : ''">{{ typeof feat === 'object' ? feat.text : feat }}</span>
                 </li>
               </ul>
-              <a v-if="plan.button" :href="plan.button.url || '#'" class="block w-full py-3 rounded-lg font-semibold text-center transition-all" :style="plan.highlighted ? getButtonStyle : { backgroundColor: section.style?.textColor + '10', color: section.style?.textColor }">{{ plan.button.text }}</a>
+              <a v-if="plan.button" :href="plan.button.url || '#'" class="block w-full py-3 rounded-lg font-semibold text-center transition-all" :style="(plan.popular || plan.highlighted) ? getButtonStyle : { backgroundColor: section.style?.textColor + '10', color: section.style?.textColor }">{{ plan.button.text }}</a>
             </div>
           </div>
         </div>
@@ -2079,17 +2081,18 @@
             <p v-if="section.content?.subtitle" class="opacity-70" :style="{ color: section.style?.textColor }">{{ section.content.subtitle }}</p>
           </div>
           <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div v-for="(plan, idx) in section.content.plans" :key="idx" class="rounded-2xl p-8 border transition-all" :style="{ borderColor: plan.highlighted ? '#10B981' : 'rgba(255,255,255,0.1)', backgroundColor: plan.highlighted ? 'rgba(16,185,129,0.1)' : 'rgba(255,255,255,0.05)' }">
-              <span v-if="plan.badge" class="inline-block px-3 py-1 text-xs font-bold rounded-full mb-4 bg-green-500 text-white">{{ plan.badge }}</span>
+            <div v-for="(plan, idx) in section.content.plans" :key="idx" class="rounded-2xl p-8 border transition-all" :style="{ borderColor: (plan.popular || plan.highlighted) ? '#10B981' : 'rgba(255,255,255,0.1)', backgroundColor: (plan.popular || plan.highlighted) ? 'rgba(16,185,129,0.1)' : 'rgba(255,255,255,0.05)' }">
+              <span v-if="plan.popular || plan.badge" class="inline-block px-3 py-1 text-xs font-bold rounded-full mb-4 bg-green-500 text-white">{{ plan.badge || 'POPULAIRE' }}</span>
               <h3 class="text-xl font-bold mb-1" :style="{ color: section.style?.textColor }">{{ plan.name }}</h3>
-              <div class="my-6"><span class="text-4xl font-bold" :style="{ color: section.style?.textColor }">{{ plan.price }}{{ plan.currency }}</span><span class="opacity-60" :style="{ color: section.style?.textColor }">{{ plan.period }}</span></div>
+              <div class="my-6"><span class="text-4xl font-bold" :style="{ color: section.style?.textColor }">{{ plan.price }}</span><span class="opacity-60" :style="{ color: section.style?.textColor }">{{ plan.period }}</span></div>
               <ul class="space-y-3 mb-8">
                 <li v-for="(feat, fi) in plan.features" :key="fi" class="flex items-center gap-2 opacity-80" :style="{ color: section.style?.textColor }">
-                  <svg class="w-4 h-4 text-green-400 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" /></svg>
-                  <span>{{ feat }}</span>
+                  <svg v-if="typeof feat === 'object' ? feat.included : true" class="w-4 h-4 text-green-400 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" /></svg>
+                  <svg v-else class="w-4 h-4 text-gray-500 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" /></svg>
+                  <span :class="typeof feat === 'object' && !feat.included ? 'opacity-40' : ''">{{ typeof feat === 'object' ? feat.text : feat }}</span>
                 </li>
               </ul>
-              <a v-if="plan.button" :href="plan.button.url || '#'" class="block w-full py-3 rounded-lg font-semibold text-center transition-all" :style="plan.highlighted ? { backgroundColor: '#10B981', color: '#ffffff' } : { backgroundColor: 'rgba(255,255,255,0.1)', color: section.style?.textColor }">{{ plan.button.text }}</a>
+              <a v-if="plan.button" :href="plan.button.url || '#'" class="block w-full py-3 rounded-lg font-semibold text-center transition-all" :style="(plan.popular || plan.highlighted) ? { backgroundColor: '#10B981', color: '#ffffff' } : { backgroundColor: 'rgba(255,255,255,0.1)', color: section.style?.textColor }">{{ plan.button.text }}</a>
             </div>
           </div>
         </div>
