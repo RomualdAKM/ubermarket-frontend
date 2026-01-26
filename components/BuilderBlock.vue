@@ -523,7 +523,7 @@
                   class="w-16 h-16 rounded-full flex items-center justify-center text-2xl font-bold flex-shrink-0 z-10"
                   :style="{ backgroundColor: section.style?.textColor, color: section.style?.backgroundColor || '#ffffff' }"
                 >
-                  {{ item.step || index + 1 }}
+                  {{ item.step || (+index + 1) }}
                 </div>
                 <div class="pt-3">
                   <h3 class="text-xl font-semibold mb-2" :style="{ color: section.style?.textColor }">{{ item.title }}</h3>
@@ -552,7 +552,7 @@
                 class="w-24 h-24 rounded-full mx-auto mb-4 flex items-center justify-center relative z-10"
                 :style="{ backgroundColor: section.style?.textColor + '10' }"
               >
-                <span class="text-3xl font-bold" :style="{ color: section.style?.textColor }">{{ item.step || index + 1 }}</span>
+                <span class="text-3xl font-bold" :style="{ color: section.style?.textColor }">{{ item.step || (+index + 1) }}</span>
               </div>
               <h3 class="text-lg font-semibold mb-2" :style="{ color: section.style?.textColor }">{{ item.title }}</h3>
               <p class="text-sm opacity-70" :style="{ color: section.style?.textColor }">{{ item.description }}</p>
@@ -641,7 +641,7 @@
               :key="index"
               class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center"
             >
-              <div :class="index % 2 === 1 ? 'lg:order-2' : ''">
+              <div :class="+index % 2 === 1 ? 'lg:order-2' : ''">
                 <h3 class="text-2xl md:text-3xl font-bold mb-4" :style="{ color: section.style?.textColor }">
                   {{ item.title }}
                 </h3>
@@ -660,7 +660,7 @@
                   </svg>
                 </a>
               </div>
-              <div :class="index % 2 === 1 ? 'lg:order-1' : ''">
+              <div :class="+index % 2 === 1 ? 'lg:order-1' : ''">
                 <img 
                   v-if="item.image"
                   :src="item.image" 
@@ -860,29 +860,295 @@
       
     </template>
     
-    <!-- Testimonials -->
+    <!-- ==================== TESTIMONIALS ==================== -->
     <template v-else-if="section.type === 'testimonials'">
-      <div :style="{ maxWidth: section.style?.maxWidth || '1280px', margin: '0 auto', padding: '0 1rem' }">
-        <h2 v-if="section.content?.title" class="text-3xl font-bold text-center mb-8" :style="{ color: section.style?.textColor }">
-          {{ section.content.title }}
-        </h2>
-        <div v-if="section.content?.items" class="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div 
-            v-for="(item, index) in section.content.items" 
-            :key="index"
-            class="p-6 rounded-lg bg-white shadow-sm"
-          >
-            <p class="text-gray-600 mb-4 italic">"{{ item.text }}"</p>
-            <div class="flex items-center gap-3">
-              <div class="w-10 h-10 bg-gray-200 rounded-full"></div>
-              <div>
-                <p class="font-semibold text-gray-900">{{ item.name }}</p>
-                <p class="text-sm text-gray-500">{{ item.role }}</p>
+      
+      <!-- TESTIMONIALS: Layout Carousel -->
+      <template v-if="section.content?.layout === 'carousel'">
+        <div :style="{ maxWidth: section.style?.maxWidth || '800px', margin: '0 auto', padding: '0 1rem' }">
+          <h2 v-if="section.content?.title" class="text-3xl font-bold text-center mb-10" :style="{ color: section.style?.textColor }">
+            {{ section.content.title }}
+          </h2>
+          <div class="relative">
+            <div class="overflow-hidden">
+              <div 
+                class="flex transition-transform duration-500"
+                :style="{ transform: `translateX(-${currentTestimonial * 100}%)` }"
+              >
+                <div 
+                  v-for="(item, idx) in (section.content?.items || [])" 
+                  :key="idx"
+                  class="w-full flex-shrink-0 text-center px-8"
+                >
+                  <div class="flex justify-center mb-4">
+                    <svg v-for="star in 5" :key="star" class="w-5 h-5" :style="{ color: star <= (item.rating || 5) ? '#fbbf24' : '#e5e7eb' }" fill="currentColor" viewBox="0 0 20 20">
+                      <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                    </svg>
+                  </div>
+                  <p class="text-xl md:text-2xl italic mb-6 leading-relaxed" :style="{ color: section.style?.textColor }">
+                    "{{ item.text }}"
+                  </p>
+                  <div class="flex items-center justify-center gap-3">
+                    <div class="w-12 h-12 rounded-full bg-white/20 flex items-center justify-center text-lg font-semibold" :style="{ color: section.style?.textColor }">
+                      {{ item.name?.charAt(0) }}
+                    </div>
+                    <div class="text-left">
+                      <p class="font-semibold" :style="{ color: section.style?.textColor }">{{ item.name }}</p>
+                      <p class="text-sm opacity-70" :style="{ color: section.style?.textColor }">{{ item.role }}<span v-if="item.company">, {{ item.company }}</span></p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <template v-if="section.content?.showArrows !== false && (section.content?.items?.length || 0) > 1">
+              <button @click="prevTestimonial" class="absolute left-0 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white/10 flex items-center justify-center hover:bg-white/20" :style="{ color: section.style?.textColor }">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" /></svg>
+              </button>
+              <button @click="nextTestimonial" class="absolute right-0 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white/10 flex items-center justify-center hover:bg-white/20" :style="{ color: section.style?.textColor }">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" /></svg>
+              </button>
+            </template>
+            <div v-if="section.content?.showDots !== false && (section.content?.items?.length || 0) > 1" class="flex justify-center gap-2 mt-8">
+              <button 
+                v-for="(_, idx) in (section.content?.items || [])" 
+                :key="idx" 
+                @click="currentTestimonial = Number(idx)"
+                class="w-2 h-2 rounded-full transition-all"
+                :style="{ backgroundColor: currentTestimonial === Number(idx) ? section.style?.textColor : (section.style?.textColor + '40') }"
+              ></button>
+            </div>
+          </div>
+        </div>
+      </template>
+      
+      <!-- TESTIMONIALS: Layout Quote -->
+      <template v-else-if="section.content?.layout === 'quote'">
+        <div :style="{ maxWidth: section.style?.maxWidth || '900px', margin: '0 auto', padding: '0 1rem' }" class="text-center">
+          <svg class="w-16 h-16 mx-auto mb-8 opacity-20" :style="{ color: section.style?.textColor }" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M14.017 21v-7.391c0-5.704 3.731-9.57 8.983-10.609l.995 2.151c-2.432.917-3.995 3.638-3.995 5.849h4v10h-9.983zm-14.017 0v-7.391c0-5.704 3.748-9.57 9-10.609l.996 2.151c-2.433.917-3.996 3.638-3.996 5.849h3.983v10h-9.983z" />
+          </svg>
+          <p class="text-2xl md:text-3xl lg:text-4xl font-light italic leading-relaxed mb-10" :style="{ color: section.style?.textColor }">
+            "{{ section.content?.items?.[0]?.text }}"
+          </p>
+          <div class="flex items-center justify-center gap-4">
+            <div v-if="section.content?.items?.[0]?.avatar" class="w-16 h-16 rounded-full overflow-hidden">
+              <img :src="section.content.items[0].avatar" class="w-full h-full object-cover" />
+            </div>
+            <div class="w-16 h-16 rounded-full flex items-center justify-center text-2xl font-semibold" v-else :style="{ backgroundColor: section.style?.textColor + '15', color: section.style?.textColor }">
+              {{ section.content?.items?.[0]?.name?.charAt(0) }}
+            </div>
+            <div class="text-left">
+              <p class="text-xl font-semibold" :style="{ color: section.style?.textColor }">{{ section.content?.items?.[0]?.name }}</p>
+              <p class="opacity-70" :style="{ color: section.style?.textColor }">{{ section.content?.items?.[0]?.role }}<span v-if="section.content?.items?.[0]?.company">, {{ section.content.items[0].company }}</span></p>
+            </div>
+          </div>
+        </div>
+      </template>
+      
+      <!-- TESTIMONIALS: Layout Wall (Masonry) -->
+      <template v-else-if="section.content?.layout === 'wall'">
+        <div :style="{ maxWidth: section.style?.maxWidth || '1200px', margin: '0 auto', padding: '0 1rem' }">
+          <h2 v-if="section.content?.title" class="text-3xl font-bold text-center mb-10" :style="{ color: section.style?.textColor }">
+            {{ section.content.title }}
+          </h2>
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div 
+              v-for="(item, idx) in (section.content?.items || [])" 
+              :key="idx"
+              class="p-5 rounded-xl"
+              :style="{ backgroundColor: section.style?.textColor + '08' }"
+            >
+              <div class="flex mb-3">
+                <svg v-for="star in 5" :key="star" class="w-4 h-4" :style="{ color: star <= (item.rating || 5) ? '#fbbf24' : '#e5e7eb' }" fill="currentColor" viewBox="0 0 20 20">
+                  <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                </svg>
+              </div>
+              <p class="mb-3" :style="{ color: section.style?.textColor }">{{ item.text }}</p>
+              <p class="text-sm font-medium" :style="{ color: section.style?.textColor }">{{ item.name }}</p>
+            </div>
+          </div>
+        </div>
+      </template>
+      
+      <!-- TESTIMONIALS: Layout Split -->
+      <template v-else-if="section.content?.layout === 'split'">
+        <div :style="{ maxWidth: section.style?.maxWidth || '1200px', margin: '0 auto', padding: '0 1rem' }">
+          <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+            <div :class="section.content?.imagePosition === 'right' ? 'lg:order-2' : ''">
+              <img 
+                v-if="section.content?.image"
+                :src="section.content.image" 
+                class="w-full rounded-2xl shadow-xl"
+              />
+              <div v-else class="aspect-square bg-gray-100 rounded-2xl flex items-center justify-center">
+                <svg class="w-20 h-20 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                </svg>
+              </div>
+            </div>
+            <div>
+              <svg class="w-12 h-12 mb-6 opacity-20" :style="{ color: section.style?.textColor }" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M14.017 21v-7.391c0-5.704 3.731-9.57 8.983-10.609l.995 2.151c-2.432.917-3.995 3.638-3.995 5.849h4v10h-9.983zm-14.017 0v-7.391c0-5.704 3.748-9.57 9-10.609l.996 2.151c-2.433.917-3.996 3.638-3.996 5.849h3.983v10h-9.983z" />
+              </svg>
+              <p class="text-xl md:text-2xl leading-relaxed mb-8" :style="{ color: section.style?.textColor }">
+                {{ section.content?.text }}
+              </p>
+              <div class="mb-6">
+                <p class="text-lg font-semibold" :style="{ color: section.style?.textColor }">{{ section.content?.name }}</p>
+                <p class="opacity-70" :style="{ color: section.style?.textColor }">{{ section.content?.role }}<span v-if="section.content?.company">, {{ section.content.company }}</span></p>
+              </div>
+              <div v-if="section.content?.stats" class="flex gap-8">
+                <div v-for="(stat, idx) in section.content.stats" :key="idx">
+                  <p class="text-3xl font-bold" :style="{ color: section.style?.textColor }">{{ stat.value }}</p>
+                  <p class="text-sm opacity-70" :style="{ color: section.style?.textColor }">{{ stat.label }}</p>
+                </div>
               </div>
             </div>
           </div>
         </div>
-      </div>
+      </template>
+      
+      <!-- TESTIMONIALS: Layout Rating -->
+      <template v-else-if="section.content?.layout === 'rating'">
+        <div :style="{ maxWidth: section.style?.maxWidth || '900px', margin: '0 auto', padding: '0 1rem' }">
+          <div class="text-center mb-10">
+            <h2 v-if="section.content?.title" class="text-3xl font-bold mb-4" :style="{ color: section.style?.textColor }">
+              {{ section.content.title }}
+            </h2>
+            <div class="flex items-center justify-center gap-4">
+              <div class="flex">
+                <svg v-for="star in 5" :key="star" class="w-8 h-8" :style="{ color: '#fbbf24' }" fill="currentColor" viewBox="0 0 20 20">
+                  <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                </svg>
+              </div>
+              <span class="text-2xl font-bold" :style="{ color: section.style?.textColor }">{{ section.content?.averageRating || '4.9' }}</span>
+              <span class="opacity-70" :style="{ color: section.style?.textColor }">({{ section.content?.totalReviews || '0' }} avis)</span>
+            </div>
+          </div>
+          <div class="space-y-4">
+            <div 
+              v-for="(item, idx) in (section.content?.items || [])" 
+              :key="idx"
+              class="p-6 rounded-xl border"
+              :style="{ borderColor: section.style?.textColor + '20' }"
+            >
+              <div class="flex items-start justify-between mb-3">
+                <div class="flex">
+                  <svg v-for="star in 5" :key="star" class="w-4 h-4" :style="{ color: star <= (item.rating || 5) ? '#fbbf24' : '#e5e7eb' }" fill="currentColor" viewBox="0 0 20 20">
+                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                  </svg>
+                </div>
+                <span v-if="item.date" class="text-sm opacity-50" :style="{ color: section.style?.textColor }">{{ item.date }}</span>
+              </div>
+              <p class="mb-2" :style="{ color: section.style?.textColor }">{{ item.text }}</p>
+              <p class="text-sm font-medium" :style="{ color: section.style?.textColor }">{{ item.name }}</p>
+            </div>
+          </div>
+        </div>
+      </template>
+      
+      <!-- TESTIMONIALS: Layout Tweets -->
+      <template v-else-if="section.content?.layout === 'tweets'">
+        <div :style="{ maxWidth: section.style?.maxWidth || '1100px', margin: '0 auto', padding: '0 1rem' }">
+          <h2 v-if="section.content?.title" class="text-3xl font-bold text-center mb-10" :style="{ color: section.style?.textColor }">
+            {{ section.content.title }}
+          </h2>
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div 
+              v-for="(item, idx) in (section.content?.items || [])" 
+              :key="idx"
+              class="p-5 rounded-xl bg-white shadow-sm border border-gray-100"
+            >
+              <div class="flex items-center gap-3 mb-4">
+                <div class="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center text-sm font-semibold">
+                  {{ item.name?.charAt(0) }}
+                </div>
+                <div>
+                  <p class="font-semibold text-gray-900">{{ item.name }}</p>
+                  <p class="text-sm text-gray-500">{{ item.username }}</p>
+                </div>
+                <svg class="w-5 h-5 ml-auto text-[#1DA1F2]" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+                </svg>
+              </div>
+              <p class="text-gray-700">{{ item.text }}</p>
+            </div>
+          </div>
+        </div>
+      </template>
+      
+      <!-- TESTIMONIALS: Layout Featured -->
+      <template v-else-if="section.content?.layout === 'featured'">
+        <div :style="{ maxWidth: section.style?.maxWidth || '1000px', margin: '0 auto', padding: '0 1rem' }" class="text-center">
+          <span 
+            v-if="section.content?.badge" 
+            class="inline-block px-4 py-1 text-sm font-bold rounded-full mb-6 tracking-wider"
+            :style="{ backgroundColor: 'rgba(255,255,255,0.2)', color: section.style?.textColor }"
+          >
+            {{ section.content.badge }}
+          </span>
+          <p class="text-2xl md:text-3xl lg:text-4xl font-light leading-relaxed mb-10" :style="{ color: section.style?.textColor }">
+            "{{ section.content?.text }}"
+          </p>
+          <div class="flex items-center justify-center gap-4 mb-10">
+            <div v-if="section.content?.image" class="w-20 h-20 rounded-full overflow-hidden border-4 border-white/30">
+              <img :src="section.content.image" class="w-full h-full object-cover" />
+            </div>
+            <div class="text-left">
+              <p class="text-xl font-semibold" :style="{ color: section.style?.textColor }">{{ section.content?.name }}</p>
+              <p class="opacity-80" :style="{ color: section.style?.textColor }">{{ section.content?.role }}<span v-if="section.content?.company">, {{ section.content.company }}</span></p>
+            </div>
+          </div>
+          <div v-if="section.content?.metrics" class="flex justify-center gap-12">
+            <div v-for="(metric, idx) in section.content.metrics" :key="idx" class="text-center">
+              <p class="text-4xl font-bold" :style="{ color: section.style?.textColor }">{{ metric.value }}</p>
+              <p class="text-sm opacity-70" :style="{ color: section.style?.textColor }">{{ metric.label }}</p>
+            </div>
+          </div>
+        </div>
+      </template>
+      
+      <!-- TESTIMONIALS: Layout par défaut (Cartes) -->
+      <template v-else>
+        <div :style="{ maxWidth: section.style?.maxWidth || '1200px', margin: '0 auto', padding: '0 1rem' }">
+          <div class="text-center mb-10">
+            <h2 v-if="section.content?.title" class="text-3xl font-bold mb-3" :style="{ color: section.style?.textColor }">
+              {{ section.content.title }}
+            </h2>
+            <p v-if="section.content?.subtitle" class="opacity-70" :style="{ color: section.style?.textColor }">
+              {{ section.content.subtitle }}
+            </p>
+          </div>
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div 
+              v-for="(item, idx) in (section.content?.items || [])" 
+              :key="idx"
+              class="p-6 rounded-xl"
+              :style="{ backgroundColor: section.style?.textColor + '08' }"
+            >
+              <div v-if="item.rating" class="flex mb-4">
+                <svg v-for="star in 5" :key="star" class="w-4 h-4" :style="{ color: star <= item.rating ? '#fbbf24' : '#e5e7eb' }" fill="currentColor" viewBox="0 0 20 20">
+                  <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                </svg>
+              </div>
+              <p class="mb-6 leading-relaxed" :style="{ color: section.style?.textColor }">"{{ item.text }}"</p>
+              <div class="flex items-center gap-3">
+                <div 
+                  class="w-12 h-12 rounded-full flex items-center justify-center text-lg font-semibold"
+                  :style="{ backgroundColor: section.style?.textColor + '15', color: section.style?.textColor }"
+                >
+                  {{ item.name?.charAt(0) }}
+                </div>
+                <div>
+                  <p class="font-semibold" :style="{ color: section.style?.textColor }">{{ item.name }}</p>
+                  <p class="text-sm opacity-70" :style="{ color: section.style?.textColor }">{{ item.role }}<span v-if="item.company">, {{ item.company }}</span></p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </template>
+      
     </template>
     
     <!-- CTA -->
@@ -1283,6 +1549,10 @@ const props = defineProps<{
 const currentSlide = ref(0)
 let slideInterval: ReturnType<typeof setInterval> | null = null
 
+// Testimonials carousel state
+const currentTestimonial = ref(0)
+let testimonialInterval: ReturnType<typeof setInterval> | null = null
+
 // Slider navigation
 const prevSlide = () => {
   const slides = props.section.content?.slides || []
@@ -1292,6 +1562,17 @@ const prevSlide = () => {
 const nextSlide = () => {
   const slides = props.section.content?.slides || []
   currentSlide.value = (currentSlide.value + 1) % slides.length
+}
+
+// Testimonials navigation
+const prevTestimonial = () => {
+  const items = props.section.content?.items || []
+  currentTestimonial.value = currentTestimonial.value === 0 ? items.length - 1 : currentTestimonial.value - 1
+}
+
+const nextTestimonial = () => {
+  const items = props.section.content?.items || []
+  currentTestimonial.value = (currentTestimonial.value + 1) % items.length
 }
 
 // Autoplay slider

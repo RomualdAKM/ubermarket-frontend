@@ -137,6 +137,7 @@ export interface BlockTemplate {
   preview?: string
   defaultContent: BlockContent
   defaultStyle: BlockStyle
+  defaultTypography?: Record<string, any>
 }
 
 export interface BlockDefinition {

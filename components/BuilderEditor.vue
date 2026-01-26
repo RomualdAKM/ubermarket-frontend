@@ -541,7 +541,221 @@
             <!-- Testimonials -->
             <template v-else-if="section.type === 'testimonials'">
               <InputField label="Titre" :value="section.content?.title" @update="updateContent('title', $event)" />
-              <div class="mt-4">
+              <InputField v-if="section.content?.subtitle !== undefined" label="Sous-titre" :value="section.content?.subtitle" @update="updateContent('subtitle', $event)" />
+              
+              <!-- Options Carousel -->
+              <template v-if="section.content?.layout === 'carousel'">
+                <div class="section-divider mt-4 mb-3">
+                  <span class="text-xs font-semibold text-neutral-500 uppercase tracking-wide">Carousel</span>
+                </div>
+                <div class="grid grid-cols-2 gap-3">
+                  <CheckboxField 
+                    label="Lecture auto"
+                    :value="section.content?.autoplay || false"
+                    @update="updateContent('autoplay', $event)"
+                  />
+                  <CheckboxField 
+                    label="Afficher flèches"
+                    :value="section.content?.showArrows !== false"
+                    @update="updateContent('showArrows', $event)"
+                  />
+                </div>
+                <div class="grid grid-cols-2 gap-3">
+                  <CheckboxField 
+                    label="Afficher points"
+                    :value="section.content?.showDots !== false"
+                    @update="updateContent('showDots', $event)"
+                  />
+                  <NumberField 
+                    v-if="section.content?.autoplay"
+                    label="Intervalle (ms)"
+                    :value="section.content?.autoplaySpeed || 5000"
+                    @update="updateContent('autoplaySpeed', $event)"
+                    :min="1000"
+                    :max="10000"
+                    :step="500"
+                  />
+                </div>
+              </template>
+              
+              <!-- Options Wall (Masonry) -->
+              <template v-else-if="section.content?.layout === 'wall'">
+                <div class="section-divider mt-4 mb-3">
+                  <span class="text-xs font-semibold text-neutral-500 uppercase tracking-wide">Grille</span>
+                </div>
+                <SelectField 
+                  label="Colonnes"
+                  :options="wallColumnsOptions"
+                  :value="String(section.content?.columns || 3)"
+                  @update="updateContent('columns', Number($event))"
+                />
+              </template>
+              
+              <!-- Options Video -->
+              <template v-else-if="section.content?.layout === 'video'">
+                <div class="section-divider mt-4 mb-3">
+                  <span class="text-xs font-semibold text-neutral-500 uppercase tracking-wide">Vidéo</span>
+                </div>
+                <InputField label="URL vidéo (YouTube/Vimeo)" :value="section.content?.videoUrl" @update="updateContent('videoUrl', $event)" placeholder="https://youtube.com/..." />
+                <InputField label="Miniature (optionnel)" :value="section.content?.videoThumbnail" @update="updateContent('videoThumbnail', $event)" placeholder="https://..." />
+                <div class="section-divider mt-4 mb-3">
+                  <span class="text-xs font-semibold text-neutral-500 uppercase tracking-wide">Personne</span>
+                </div>
+                <InputField label="Nom" :value="section.content?.name" @update="updateContent('name', $event)" />
+                <InputField label="Rôle" :value="section.content?.role" @update="updateContent('role', $event)" />
+                <InputField label="Entreprise" :value="section.content?.company" @update="updateContent('company', $event)" />
+                <InputField label="Citation" :value="section.content?.quote" @update="updateContent('quote', $event)" multiline />
+              </template>
+              
+              <!-- Options Split -->
+              <template v-else-if="section.content?.layout === 'split'">
+                <div class="section-divider mt-4 mb-3">
+                  <span class="text-xs font-semibold text-neutral-500 uppercase tracking-wide">Image</span>
+                </div>
+                <InputField label="URL de l'image" :value="section.content?.image" @update="updateContent('image', $event)" placeholder="https://..." />
+                <SelectField 
+                  label="Position de l'image"
+                  :options="imagePositionOptions"
+                  :value="section.content?.imagePosition || 'left'"
+                  @update="updateContent('imagePosition', $event)"
+                />
+                <div class="section-divider mt-4 mb-3">
+                  <span class="text-xs font-semibold text-neutral-500 uppercase tracking-wide">Personne</span>
+                </div>
+                <InputField label="Nom" :value="section.content?.name" @update="updateContent('name', $event)" />
+                <InputField label="Rôle" :value="section.content?.role" @update="updateContent('role', $event)" />
+                <InputField label="Entreprise" :value="section.content?.company" @update="updateContent('company', $event)" />
+                <InputField label="Témoignage" :value="section.content?.text" @update="updateContent('text', $event)" multiline :rows="4" />
+                <div class="section-divider mt-4 mb-3">
+                  <span class="text-xs font-semibold text-neutral-500 uppercase tracking-wide">Statistiques</span>
+                </div>
+                <div class="flex items-center justify-between mb-2">
+                  <span class="field-label">Stats</span>
+                  <button @click="addTestimonialStat" class="text-xs text-primary hover:text-primary/80 font-medium">+ Ajouter</button>
+                </div>
+                <div class="space-y-2">
+                  <div v-for="(stat, idx) in (section.content?.stats || [])" :key="idx" class="flex gap-2">
+                    <InputField label="Valeur" :value="stat.value" @update="updateTestimonialStat(idx, 'value', $event)" placeholder="+45%" />
+                    <InputField label="Label" :value="stat.label" @update="updateTestimonialStat(idx, 'label', $event)" placeholder="Satisfaction" />
+                    <button @click="removeTestimonialStat(idx)" class="text-red-500 hover:text-red-600 px-2 mt-5">
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+                    </button>
+                  </div>
+                </div>
+              </template>
+              
+              <!-- Options Rating -->
+              <template v-else-if="section.content?.layout === 'rating'">
+                <div class="section-divider mt-4 mb-3">
+                  <span class="text-xs font-semibold text-neutral-500 uppercase tracking-wide">Notation globale</span>
+                </div>
+                <div class="grid grid-cols-2 gap-3">
+                  <NumberField 
+                    label="Note moyenne"
+                    :value="section.content?.averageRating || 4.5"
+                    @update="updateContent('averageRating', $event)"
+                    :min="0"
+                    :max="5"
+                    :step="0.1"
+                  />
+                  <NumberField 
+                    label="Nombre d'avis"
+                    :value="section.content?.totalReviews || 100"
+                    @update="updateContent('totalReviews', $event)"
+                    :min="0"
+                    :max="100000"
+                    :step="1"
+                  />
+                </div>
+              </template>
+              
+              <!-- Options Featured -->
+              <template v-else-if="section.content?.layout === 'featured'">
+                <InputField label="Badge" :value="section.content?.badge" @update="updateContent('badge', $event)" placeholder="TÉMOIGNAGE DU MOIS" />
+                <div class="section-divider mt-4 mb-3">
+                  <span class="text-xs font-semibold text-neutral-500 uppercase tracking-wide">Personne</span>
+                </div>
+                <InputField label="Nom" :value="section.content?.name" @update="updateContent('name', $event)" />
+                <InputField label="Rôle" :value="section.content?.role" @update="updateContent('role', $event)" />
+                <InputField label="Entreprise" :value="section.content?.company" @update="updateContent('company', $event)" />
+                <InputField label="Image" :value="section.content?.image" @update="updateContent('image', $event)" placeholder="https://..." />
+                <InputField label="Témoignage" :value="section.content?.text" @update="updateContent('text', $event)" multiline :rows="4" />
+                <div class="section-divider mt-4 mb-3">
+                  <span class="text-xs font-semibold text-neutral-500 uppercase tracking-wide">Métriques</span>
+                </div>
+                <div class="flex items-center justify-between mb-2">
+                  <span class="field-label">Métriques</span>
+                  <button @click="addTestimonialMetric" class="text-xs text-primary hover:text-primary/80 font-medium">+ Ajouter</button>
+                </div>
+                <div class="space-y-2">
+                  <div v-for="(metric, idx) in (section.content?.metrics || [])" :key="idx" class="flex gap-2">
+                    <InputField label="Valeur" :value="metric.value" @update="updateTestimonialMetric(idx, 'value', $event)" placeholder="3x" />
+                    <InputField label="Label" :value="metric.label" @update="updateTestimonialMetric(idx, 'label', $event)" placeholder="Croissance" />
+                    <button @click="removeTestimonialMetric(idx)" class="text-red-500 hover:text-red-600 px-2 mt-5">
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+                    </button>
+                  </div>
+                </div>
+              </template>
+              
+              <!-- Options Quote -->
+              <template v-else-if="section.content?.layout === 'quote'">
+                <div class="section-divider mt-4 mb-3">
+                  <span class="text-xs font-semibold text-neutral-500 uppercase tracking-wide">Citation principale</span>
+                </div>
+                <div v-if="section.content?.items?.[0]" class="space-y-3">
+                  <InputField label="Nom" :value="section.content.items[0].name" @update="updateQuoteItem('name', $event)" />
+                  <InputField label="Rôle" :value="section.content.items[0].role" @update="updateQuoteItem('role', $event)" />
+                  <InputField label="Entreprise" :value="section.content.items[0].company" @update="updateQuoteItem('company', $event)" />
+                  <InputField label="Citation" :value="section.content.items[0].text" @update="updateQuoteItem('text', $event)" multiline :rows="4" />
+                  <InputField label="Avatar URL" :value="section.content.items[0].avatar" @update="updateQuoteItem('avatar', $event)" placeholder="https://..." />
+                  <InputField label="Logo entreprise" :value="section.content.items[0].logo" @update="updateQuoteItem('logo', $event)" placeholder="https://..." />
+                </div>
+              </template>
+              
+              <!-- Options Tweets -->
+              <template v-else-if="section.content?.layout === 'tweets'">
+                <div class="mt-4">
+                  <div class="flex items-center justify-between mb-3">
+                    <span class="field-label">Tweets</span>
+                    <button @click="addTweetItem" class="text-xs text-primary hover:text-primary/80 font-medium">+ Ajouter</button>
+                  </div>
+                  <div class="space-y-2">
+                    <div v-for="(item, index) in (section.content?.items || [])" :key="index" class="p-3 bg-neutral-50 rounded-lg border border-neutral-200">
+                      <div class="flex justify-between mb-2">
+                        <span class="text-xs text-neutral-500">Tweet {{ index + 1 }}</span>
+                        <button @click="removeTweetItem(index)" class="text-xs text-red-500">Supprimer</button>
+                      </div>
+                      <InputField label="Nom" :value="item.name" @update="updateTweetItem(index, 'name', $event)" />
+                      <InputField label="@username" :value="item.username" @update="updateTweetItem(index, 'username', $event)" placeholder="@user" />
+                      <InputField label="Tweet" :value="item.text" @update="updateTweetItem(index, 'text', $event)" multiline />
+                      <InputField label="Avatar URL" :value="item.avatar" @update="updateTweetItem(index, 'avatar', $event)" placeholder="https://..." />
+                    </div>
+                  </div>
+                </div>
+              </template>
+              
+              <!-- Options Avatars -->
+              <template v-else-if="section.content?.layout === 'avatars'">
+                <InputField label="Sous-titre" :value="section.content?.subtitle" @update="updateContent('subtitle', $event)" />
+                <div class="section-divider mt-4 mb-3">
+                  <span class="text-xs font-semibold text-neutral-500 uppercase tracking-wide">Call to Action</span>
+                </div>
+                <InputField label="Texte du bouton" :value="section.content?.cta?.text" @update="updateTestimonialsCta('text', $event)" />
+                <InputField label="URL" :value="section.content?.cta?.url" @update="updateTestimonialsCta('url', $event)" />
+              </template>
+              
+              <!-- Options Logos -->
+              <template v-else-if="section.content?.layout === 'logos'">
+                <CheckboxField 
+                  label="Afficher les logos"
+                  :value="section.content?.showLogos !== false"
+                  @update="updateContent('showLogos', $event)"
+                />
+              </template>
+              
+              <!-- Liste de témoignages (pour layouts avec items: cards, carousel, wall, rating, logos) -->
+              <div v-if="['cards', 'carousel', 'wall', 'rating', 'logos', 'minimal'].includes(section.content?.layout || 'cards')" class="mt-4">
                 <div class="flex items-center justify-between mb-3">
                   <span class="field-label">Témoignages</span>
                   <button @click="addTestimonialItem" class="text-xs text-primary hover:text-primary/80 font-medium">+ Ajouter</button>
@@ -552,6 +766,8 @@
                     :key="index"
                     :item="item"
                     :index="index"
+                    :showRating="['cards', 'carousel', 'wall', 'rating', 'minimal'].includes(section.content?.layout || 'cards')"
+                    :showLogo="section.content?.layout === 'logos'"
                     @update="updateTestimonialItem"
                     @remove="removeTestimonialItem(index)"
                   />
@@ -1249,6 +1465,82 @@ const removeTestimonialItem = (index: number) => {
   emit('update:content', { items })
 }
 
+// === TESTIMONIALS HANDLERS ===
+
+// Stats for split layout
+const addTestimonialStat = () => {
+  const stats = [...(props.section.content?.stats || [])]
+  stats.push({ value: '+25%', label: 'Amélioration' })
+  emit('update:content', { stats })
+}
+
+const updateTestimonialStat = (index: number, key: string, value: string) => {
+  const stats = [...(props.section.content?.stats || [])]
+  stats[index] = { ...stats[index], [key]: value }
+  emit('update:content', { stats })
+}
+
+const removeTestimonialStat = (index: number) => {
+  const stats = [...(props.section.content?.stats || [])]
+  stats.splice(index, 1)
+  emit('update:content', { stats })
+}
+
+// Metrics for featured layout
+const addTestimonialMetric = () => {
+  const metrics = [...(props.section.content?.metrics || [])]
+  metrics.push({ value: '2x', label: 'Croissance' })
+  emit('update:content', { metrics })
+}
+
+const updateTestimonialMetric = (index: number, key: string, value: string) => {
+  const metrics = [...(props.section.content?.metrics || [])]
+  metrics[index] = { ...metrics[index], [key]: value }
+  emit('update:content', { metrics })
+}
+
+const removeTestimonialMetric = (index: number) => {
+  const metrics = [...(props.section.content?.metrics || [])]
+  metrics.splice(index, 1)
+  emit('update:content', { metrics })
+}
+
+// Quote layout (single item)
+const updateQuoteItem = (key: string, value: any) => {
+  const items = [...(props.section.content?.items || [])]
+  if (items.length > 0) {
+    items[0] = { ...items[0], [key]: value }
+  } else {
+    items.push({ [key]: value })
+  }
+  emit('update:content', { items })
+}
+
+// Tweets layout
+const addTweetItem = () => {
+  const items = [...(props.section.content?.items || [])]
+  items.push({ name: 'Utilisateur', username: '@user', text: 'Tweet...', avatar: '', platform: 'twitter' })
+  emit('update:content', { items })
+}
+
+const updateTweetItem = (index: number, key: string, value: string) => {
+  const items = [...(props.section.content?.items || [])]
+  items[index] = { ...items[index], [key]: value }
+  emit('update:content', { items })
+}
+
+const removeTweetItem = (index: number) => {
+  const items = [...(props.section.content?.items || [])]
+  items.splice(index, 1)
+  emit('update:content', { items })
+}
+
+// Avatars layout CTA
+const updateTestimonialsCta = (key: string, value: any) => {
+  const currentCta = props.section.content?.cta || {}
+  emit('update:content', { cta: { ...currentCta, [key]: value } })
+}
+
 const addFaqItem = () => {
   const items = [...(props.section.content?.items || [])]
   items.push({ question: 'Nouvelle question ?', answer: 'Réponse...' })
@@ -1573,6 +1865,13 @@ const iconOptions = [
 const imagePositionOptions = [
   { value: 'left', label: 'Gauche' },
   { value: 'right', label: 'Droite' }
+]
+
+// Wall columns options (testimonials)
+const wallColumnsOptions = [
+  { value: '2', label: '2 colonnes' },
+  { value: '3', label: '3 colonnes' },
+  { value: '4', label: '4 colonnes' }
 ]
 
 // Section labels & icons

@@ -362,7 +362,8 @@ export const BLOCK_DEFINITIONS: BlockDefinition[] = [
         defaultStyle: {
           alignment: 'center',
           maxWidth: '900px',
-          backgroundType: 'video',
+          backgroundType: 'color',
+          backgroundColor: '#0a0a0a',
           backgroundOverlay: 50,
           textColor: '#ffffff',
           height: 'full',
@@ -939,30 +940,39 @@ export const BLOCK_DEFINITIONS: BlockDefinition[] = [
     icon: 'heroicons:chat-bubble-left-right',
     description: 'Avis clients',
     templates: [
+      // === CARTES CLASSIQUES ===
       {
         id: 'testimonials-cards-3',
-        name: 'Cartes élégantes',
-        preview: 'cards',
+        name: 'Cartes 3 colonnes',
+        preview: 'cards-3',
         defaultContent: {
+          layout: 'cards',
           title: 'Ils nous font confiance',
+          subtitle: 'D\u00e9couvrez ce que nos clients disent de nous',
           items: [
             { 
               name: 'Marie Laurent', 
               role: 'Directrice Marketing',
-              text: 'Une expérience exceptionnelle. Le professionnalisme et la qualité sont au rendez-vous.',
-              avatar: ''
+              company: 'TechCorp',
+              text: 'Une exp\u00e9rience exceptionnelle. Le professionnalisme et la qualit\u00e9 sont au rendez-vous.',
+              avatar: '',
+              rating: 5
             },
             { 
               name: 'Thomas Dubois', 
               role: 'Entrepreneur',
-              text: 'Service impeccable et résultats au-delà de mes attentes. Je recommande vivement.',
-              avatar: ''
+              company: 'StartupXYZ',
+              text: 'Service impeccable et r\u00e9sultats au-del\u00e0 de mes attentes. Je recommande vivement.',
+              avatar: '',
+              rating: 5
             },
             { 
               name: 'Sophie Martin', 
               role: 'Designer',
-              text: 'La qualité et l\'attention aux détails font toute la différence.',
-              avatar: ''
+              company: 'Studio Creative',
+              text: 'La qualit\u00e9 et l\'attention aux d\u00e9tails font toute la diff\u00e9rence.',
+              avatar: '',
+              rating: 5
             }
           ]
         },
@@ -971,52 +981,373 @@ export const BLOCK_DEFINITIONS: BlockDefinition[] = [
           maxWidth: '1200px',
           backgroundColor: '#ffffff',
           textColor: '#262626',
-          padding: { top: 80, bottom: 80 }
+          backgroundType: 'color',
+          verticalSpacing: 'large',
+          horizontalSpacing: 'medium'
         }
       },
+        
+      // === CITATION CENTRALE ===
       {
-        id: 'testimonials-quote',
-        name: 'Citation centrale',
-        preview: 'quote',
+        id: 'testimonials-quote-large',
+        name: 'Citation Highlight',
+        preview: 'quote-large',
         defaultContent: {
-          title: '',
+          layout: 'quote',
           items: [
             {
               name: 'Jean-Pierre Moreau',
-              role: 'CEO, Entreprise XYZ',
-              text: 'Une collaboration remarquable qui a transformé notre vision en réalité. L\'expertise et le dévouement de l\'équipe ont été déterminants.',
-              avatar: ''
+              role: 'CEO',
+              company: 'Entreprise Leader',
+              text: 'Une collaboration remarquable qui a transform\u00e9 notre vision en r\u00e9alit\u00e9. L\'expertise et le d\u00e9vouement de l\'\u00e9quipe ont \u00e9t\u00e9 d\u00e9terminants dans notre succ\u00e8s.',
+              avatar: '',
+              logo: ''
+            }
+          ]
+        },
+        defaultStyle: {
+          alignment: 'center',
+          maxWidth: '900px',
+          backgroundColor: '#fafafa',
+          textColor: '#171717',
+          backgroundType: 'color',
+          verticalSpacing: 'large',
+          horizontalSpacing: 'medium'
+        }
+      },
+        
+      // === CAROUSEL/SLIDER ===
+      {
+        id: 'testimonials-carousel',
+        name: 'Carousel',
+        preview: 'carousel',
+        defaultContent: {
+          layout: 'carousel',
+          title: 'Ce que disent nos clients',
+          autoplay: true,
+          autoplaySpeed: 5000,
+          showArrows: true,
+          showDots: true,
+          items: [
+            { 
+              name: 'Alice Dupont', 
+              role: 'Product Manager',
+              company: 'InnoTech',
+              text: 'Un partenaire de confiance. Leur r\u00e9activit\u00e9 et leur expertise technique sont impressionnantes.',
+              avatar: '',
+              rating: 5
+            },
+            { 
+              name: 'Marc Bernard', 
+              role: 'CTO',
+              company: 'DataFlow',
+              text: 'La meilleure d\u00e9cision que nous ayons prise. R\u00e9sultats concrets et mesurables.',
+              avatar: '',
+              rating: 5
+            },
+            { 
+              name: 'Claire Petit', 
+              role: 'Fondatrice',
+              company: 'EcoStart',
+              text: 'Une \u00e9quipe passionn\u00e9e qui comprend vraiment les enjeux business.',
+              avatar: '',
+              rating: 5
             }
           ]
         },
         defaultStyle: {
           alignment: 'center',
           maxWidth: '800px',
-          backgroundColor: '#fafafa',
-          textColor: '#171717',
-          padding: { top: 100, bottom: 100 }
+          backgroundColor: '#0f172a',
+          textColor: '#f8fafc',
+          backgroundType: 'color',
+          verticalSpacing: 'large',
+          horizontalSpacing: 'medium'
         }
       },
+        
+      // === MUR DE T\u00c9MOIGNAGES (Masonry) ===
       {
-        id: 'testimonials-minimal',
-        name: 'Minimaliste',
-        preview: 'minimal',
+        id: 'testimonials-wall',
+        name: 'Mur Social',
+        preview: 'wall',
         defaultContent: {
+          layout: 'wall',
+          title: 'La voix de nos clients',
+          columns: 3,
+          items: [
+            { name: 'Client 1', text: 'Excellent produit !', rating: 5 },
+            { name: 'Client 2', text: 'Service client au top. R\u00e9ponse rapide et efficace.', rating: 5 },
+            { name: 'Client 3', text: 'Je recommande les yeux ferm\u00e9s.', rating: 5 },
+            { name: 'Client 4', text: 'Tr\u00e8s satisfait de mon achat. La qualit\u00e9 est l\u00e0.', rating: 4 },
+            { name: 'Client 5', text: 'Livraison ultra rapide !', rating: 5 },
+            { name: 'Client 6', text: 'Rapport qualit\u00e9-prix imbattable.', rating: 5 }
+          ]
+        },
+        defaultStyle: {
+          alignment: 'center',
+          maxWidth: '1200px',
+          backgroundColor: '#ffffff',
+          textColor: '#171717',
+          backgroundType: 'color',
+          verticalSpacing: 'large',
+          horizontalSpacing: 'medium'
+        }
+      },
+        
+      // === AVEC LOGOS ENTREPRISES ===
+      {
+        id: 'testimonials-logos',
+        name: 'Avec Logos',
+        preview: 'logos',
+        defaultContent: {
+          layout: 'logos',
+          title: 'Ils travaillent avec nous',
+          showLogos: true,
           items: [
             { 
-              name: 'Client satisfait', 
-              role: '',
-              text: 'Excellent service.',
-              avatar: ''
+              name: 'Responsable Achats', 
+              company: 'Grande Entreprise',
+              text: 'Partenariat strat\u00e9gique qui a d\u00e9pass\u00e9 toutes nos attentes.',
+              logo: ''
+            },
+            { 
+              name: 'Directeur Digital', 
+              company: 'Groupe M\u00e9dia',
+              text: 'Une expertise rare et un accompagnement de qualit\u00e9.',
+              logo: ''
+            },
+            { 
+              name: 'CEO', 
+              company: 'Startup Innovante',
+              text: 'Le partenaire id\u00e9al pour acc\u00e9l\u00e9rer notre croissance.',
+              logo: ''
             }
           ]
         },
         defaultStyle: {
           alignment: 'center',
-          maxWidth: '600px',
+          maxWidth: '1100px',
+          backgroundColor: '#fafafa',
+          textColor: '#171717',
+          backgroundType: 'color',
+          verticalSpacing: 'large',
+          horizontalSpacing: 'medium'
+        }
+      },
+        
+      // === AVEC VID\u00c9O ===
+      {
+        id: 'testimonials-video',
+        name: 'T\u00e9moignage Vid\u00e9o',
+        preview: 'video',
+        defaultContent: {
+          layout: 'video',
+          title: 'T\u00e9moignage client',
+          videoUrl: '',
+          videoThumbnail: '',
+          name: 'Client Satisfait',
+          role: 'Directeur G\u00e9n\u00e9ral',
+          company: 'Entreprise Partenaire',
+          quote: 'D\u00e9couvrez pourquoi nous avons choisi cette solution...'
+        },
+        defaultStyle: {
+          alignment: 'center',
+          maxWidth: '1000px',
+          backgroundColor: '#0a0a0a',
+          textColor: '#fafafa',
+          backgroundType: 'color',
+          verticalSpacing: 'large',
+          horizontalSpacing: 'medium'
+        }
+      },
+        
+      // === MINIMAL DARK ===
+      {
+        id: 'testimonials-minimal-dark',
+        name: 'Minimal Dark',
+        preview: 'minimal-dark',
+        defaultContent: {
+          layout: 'minimal',
+          items: [
+            { 
+              name: 'Client V\u00e9rifi\u00e9', 
+              text: 'Simple, efficace, indispensable.',
+              rating: 5
+            }
+          ]
+        },
+        defaultStyle: {
+          alignment: 'center',
+          maxWidth: '700px',
           backgroundColor: '#0a0a0a',
           textColor: '#e5e5e5',
-          padding: { top: 60, bottom: 60 }
+          backgroundType: 'color',
+          verticalSpacing: 'medium',
+          horizontalSpacing: 'medium'
+        }
+      },
+        
+      // === SPLIT AVEC IMAGE ===
+      {
+        id: 'testimonials-split',
+        name: 'Split Image',
+        preview: 'split',
+        defaultContent: {
+          layout: 'split',
+          image: 'https://images.unsplash.com/photo-1560250097-0b93528c311a?w=600',
+          imagePosition: 'left',
+          name: 'Alexandre Martin',
+          role: 'Directeur Commercial',
+          company: 'Solutions Pro',
+          text: 'Cette collaboration a transform\u00e9 notre approche client. Les r\u00e9sultats parlent d\'eux-m\u00eames : +45% de satisfaction client en 6 mois.',
+          stats: [
+            { value: '+45%', label: 'Satisfaction' },
+            { value: '2x', label: 'Conversions' }
+          ]
+        },
+        defaultStyle: {
+          alignment: 'left',
+          maxWidth: '1200px',
+          backgroundColor: '#ffffff',
+          textColor: '#171717',
+          backgroundType: 'color',
+          verticalSpacing: 'large',
+          horizontalSpacing: 'medium'
+        }
+      },
+        
+      // === AVEC NOTATION ===
+      {
+        id: 'testimonials-rating',
+        name: 'Avec Notation',
+        preview: 'rating',
+        defaultContent: {
+          layout: 'rating',
+          title: 'Avis v\u00e9rifi\u00e9s',
+          averageRating: 4.9,
+          totalReviews: 2847,
+          items: [
+            { name: 'Julie R.', text: 'Parfait ! Exactement ce qu\'il me fallait.', rating: 5, date: '2024-01-15' },
+            { name: 'Pierre M.', text: 'Tr\u00e8s bonne qualit\u00e9, je recommande.', rating: 5, date: '2024-01-10' },
+            { name: 'Marie L.', text: 'Service client r\u00e9actif et produit conforme.', rating: 4, date: '2024-01-08' }
+          ]
+        },
+        defaultStyle: {
+          alignment: 'center',
+          maxWidth: '900px',
+          backgroundColor: '#ffffff',
+          textColor: '#171717',
+          backgroundType: 'color',
+          verticalSpacing: 'large',
+          horizontalSpacing: 'medium'
+        }
+      },
+        
+      // === TWITTER/SOCIAL STYLE ===
+      {
+        id: 'testimonials-tweets',
+        name: 'Style Twitter',
+        preview: 'tweets',
+        defaultContent: {
+          layout: 'tweets',
+          title: 'Ce qu\'ils disent sur les r\u00e9seaux',
+          items: [
+            { 
+              name: 'Sarah Tech', 
+              username: '@sarahtech',
+              text: 'Enfin un service qui tient ses promesses ! Impressionn\u00e9e par la qualit\u00e9.',
+              avatar: '',
+              platform: 'twitter'
+            },
+            { 
+              name: 'Marc Digital', 
+              username: '@marcdigital',
+              text: 'Apr\u00e8s 6 mois d\'utilisation, je ne peux plus m\'en passer. Bravo !',
+              avatar: '',
+              platform: 'twitter'
+            },
+            { 
+              name: 'Emma Business', 
+              username: '@emmabiz',
+              text: 'ROI positif d\u00e8s le premier mois. Merci \u00e0 toute l\'\u00e9quipe !',
+              avatar: '',
+              platform: 'twitter'
+            }
+          ]
+        },
+        defaultStyle: {
+          alignment: 'center',
+          maxWidth: '1100px',
+          backgroundColor: '#f8fafc',
+          textColor: '#0f172a',
+          backgroundType: 'color',
+          verticalSpacing: 'large',
+          horizontalSpacing: 'medium'
+        }
+      },
+        
+      // === AVATAR GRID ===
+      {
+        id: 'testimonials-avatars',
+        name: 'Grille Avatars',
+        preview: 'avatars',
+        defaultContent: {
+          layout: 'avatars',
+          title: 'Rejoignez plus de 10 000 clients satisfaits',
+          subtitle: 'Des professionnels comme vous nous font confiance',
+          avatarCount: 12,
+          items: [
+            { name: 'A. Martin', avatar: '' },
+            { name: 'S. Dubois', avatar: '' },
+            { name: 'L. Bernard', avatar: '' },
+            { name: 'M. Petit', avatar: '' },
+            { name: 'C. Leroy', avatar: '' },
+            { name: 'P. Moreau', avatar: '' }
+          ],
+          cta: {
+            text: 'Voir tous les avis',
+            url: '#'
+          }
+        },
+        defaultStyle: {
+          alignment: 'center',
+          maxWidth: '900px',
+          backgroundColor: '#0f172a',
+          textColor: '#f8fafc',
+          backgroundType: 'color',
+          verticalSpacing: 'large',
+          horizontalSpacing: 'medium'
+        }
+      },
+        
+      // === FEATURED SINGLE ===
+      {
+        id: 'testimonials-featured',
+        name: 'T\u00e9moignage Vedette',
+        preview: 'featured',
+        defaultContent: {
+          layout: 'featured',
+          badge: 'T\u00c9MOIGNAGE DU MOIS',
+          name: 'Nicolas Fontaine',
+          role: 'CEO & Fondateur',
+          company: 'NextGen Solutions',
+          text: 'Ce partenariat a litt\u00e9ralement transform\u00e9 notre entreprise. En 12 mois, nous avons tripl\u00e9 notre chiffre d\'affaires gr\u00e2ce \u00e0 leur accompagnement strat\u00e9gique et leur expertise technique.',
+          image: '',
+          metrics: [
+            { value: '3x', label: 'Croissance CA' },
+            { value: '150%', label: 'ROI' },
+            { value: '12', label: 'Mois' }
+          ]
+        },
+        defaultStyle: {
+          alignment: 'center',
+          maxWidth: '1000px',
+          backgroundType: 'gradient',
+          backgroundGradient: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+          textColor: '#ffffff',
+          verticalSpacing: 'large',
+          horizontalSpacing: 'medium'
         }
       }
     ]
