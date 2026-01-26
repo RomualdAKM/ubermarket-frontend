@@ -976,9 +976,21 @@
                             <span class="text-xs text-neutral-400">Fonctionnalités</span>
                             <button @click="addPlanFeature(+index)" class="text-xs text-primary/70 hover:text-primary">+ Ajouter</button>
                           </div>
-                          <div class="space-y-1">
-                            <div v-for="(feature, fIndex) in (plan.features || [])" :key="fIndex" class="flex items-center gap-1">
-                              <input type="text" :value="feature" @input="handlePlanFeatureInput(+index, +fIndex, $event)" class="input-field flex-1 text-xs py-1" />
+                          <div class="space-y-1.5">
+                            <div v-for="(feature, fIndex) in (plan.features || [])" :key="fIndex" class="flex items-center gap-2">
+                              <input 
+                                type="checkbox" 
+                                :checked="typeof feature === 'object' ? feature.included : true" 
+                                @change="updatePlanFeatureIncluded(+index, +fIndex, ($event.target as HTMLInputElement).checked)" 
+                                class="w-4 h-4 rounded border-neutral-600 bg-neutral-700 text-primary focus:ring-primary/50 cursor-pointer"
+                              />
+                              <input 
+                                type="text" 
+                                :value="typeof feature === 'object' ? feature.text : feature" 
+                                @input="handlePlanFeatureInput(+index, +fIndex, $event)" 
+                                class="input-field flex-1 text-xs py-1" 
+                                :class="{ 'opacity-50': typeof feature === 'object' && !feature.included }"
+                              />
                               <button @click="removePlanFeature(+index, +fIndex)" class="text-red-400/70 hover:text-red-300 p-0.5"><TrashIcon class="w-3 h-3" /></button>
                             </div>
                           </div>
@@ -2175,11 +2187,12 @@ const removePricingPlan = (index: number) => {
   emit('update:content', { plans })
 }
 
-// Plan features
+// Plan features - support both string and {text, included} object formats
 const addPlanFeature = (planIndex: number) => {
   const plans = [...(props.section.content?.plans || [])]
   const features = [...(plans[planIndex]?.features || [])]
-  features.push('Nouvelle fonctionnalité')
+  // Add as object format for consistency
+  features.push({ text: 'Nouvelle fonctionnalité', included: true })
   plans[planIndex] = { ...plans[planIndex], features }
   emit('update:content', { plans })
 }
@@ -2187,7 +2200,27 @@ const addPlanFeature = (planIndex: number) => {
 const updatePlanFeature = (planIndex: number, featureIndex: number, value: string) => {
   const plans = [...(props.section.content?.plans || [])]
   const features = [...(plans[planIndex]?.features || [])]
-  features[featureIndex] = value
+  const currentFeature = features[featureIndex]
+  // Preserve the included status when updating text
+  if (typeof currentFeature === 'object') {
+    features[featureIndex] = { ...currentFeature, text: value }
+  } else {
+    features[featureIndex] = { text: value, included: true }
+  }
+  plans[planIndex] = { ...plans[planIndex], features }
+  emit('update:content', { plans })
+}
+
+const updatePlanFeatureIncluded = (planIndex: number, featureIndex: number, included: boolean) => {
+  const plans = [...(props.section.content?.plans || [])]
+  const features = [...(plans[planIndex]?.features || [])]
+  const currentFeature = features[featureIndex]
+  // Update included status
+  if (typeof currentFeature === 'object') {
+    features[featureIndex] = { ...currentFeature, included }
+  } else {
+    features[featureIndex] = { text: currentFeature, included }
+  }
   plans[planIndex] = { ...plans[planIndex], features }
   emit('update:content', { plans })
 }
