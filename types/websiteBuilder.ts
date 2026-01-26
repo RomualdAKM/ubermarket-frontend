@@ -2127,48 +2127,64 @@ export const BLOCK_DEFINITIONS: BlockDefinition[] = [
         id: 'text-paragraph',
         name: 'Paragraphe',
         preview: 'paragraph',
-        defaultContent: {
-          content: 'Votre contenu textuel ici. Rédigez un paragraphe clair et engageant pour vos visiteurs.'
-        },
-        defaultStyle: {
-          alignment: 'left',
-          maxWidth: '700px',
-          backgroundColor: '#ffffff',
-          textColor: '#404040',
-          padding: { top: 40, bottom: 40 }
-        }
+        defaultContent: { layout: 'paragraph', content: 'Votre contenu textuel ici. Rédigez un paragraphe clair et engageant.' },
+        defaultStyle: { alignment: 'left', maxWidth: '700px', backgroundColor: '#ffffff', textColor: '#404040', padding: { top: 40, bottom: 40 } }
       },
       {
-        id: 'text-with-heading',
+        id: 'text-heading',
         name: 'Avec titre',
         preview: 'heading',
-        defaultContent: {
-          title: 'Titre de section',
-          content: 'Développez votre message avec un contenu structuré et professionnel.'
-        },
-        defaultStyle: {
-          alignment: 'center',
-          maxWidth: '800px',
-          backgroundColor: '#ffffff',
-          textColor: '#262626',
-          padding: { top: 60, bottom: 60 }
-        }
+        defaultContent: { layout: 'heading', title: 'Titre de section', content: 'Développez votre message avec un contenu structuré.' },
+        defaultStyle: { alignment: 'center', maxWidth: '800px', backgroundColor: '#ffffff', textColor: '#262626', padding: { top: 60, bottom: 60 } }
       },
       {
         id: 'text-quote',
         name: 'Citation',
         preview: 'quote',
-        defaultContent: {
-          content: 'Une citation inspirante ou un message clé qui résonne avec votre audience.',
-          author: 'Auteur'
-        },
-        defaultStyle: {
-          alignment: 'center',
-          maxWidth: '600px',
-          backgroundColor: '#fafafa',
-          textColor: '#525252',
-          padding: { top: 60, bottom: 60 }
-        }
+        defaultContent: { layout: 'quote', content: 'Une citation inspirante qui résonne avec votre audience.', author: 'Auteur' },
+        defaultStyle: { alignment: 'center', maxWidth: '600px', backgroundColor: '#fafafa', textColor: '#525252', padding: { top: 60, bottom: 60 } }
+      },
+      {
+        id: 'text-two-columns',
+        name: 'Deux colonnes',
+        preview: 'columns',
+        defaultContent: { layout: 'two-columns', title: 'Notre histoire', leftContent: 'Première partie du texte.', rightContent: 'Deuxième partie du texte.' },
+        defaultStyle: { alignment: 'center', maxWidth: '1000px', backgroundColor: '#ffffff', textColor: '#404040', padding: { top: 80, bottom: 80 } }
+      },
+      {
+        id: 'text-highlight',
+        name: 'Mise en avant',
+        preview: 'highlight',
+        defaultContent: { layout: 'highlight', title: 'Information importante', content: 'Message clé pour vos visiteurs.', icon: 'info' },
+        defaultStyle: { alignment: 'center', maxWidth: '700px', backgroundColor: '#eff6ff', textColor: '#1e40af', padding: { top: 40, bottom: 40 } }
+      },
+      {
+        id: 'text-numbered-list',
+        name: 'Liste numérotée',
+        preview: 'numbered',
+        defaultContent: { layout: 'numbered', title: 'Notre processus', items: [{ title: 'Étape 1', description: 'Description.' }, { title: 'Étape 2', description: 'Description.' }, { title: 'Étape 3', description: 'Description.' }] },
+        defaultStyle: { alignment: 'left', maxWidth: '800px', backgroundColor: '#ffffff', textColor: '#262626', padding: { top: 60, bottom: 60 } }
+      },
+      {
+        id: 'text-dropcap',
+        name: 'Lettrine',
+        preview: 'dropcap',
+        defaultContent: { layout: 'dropcap', content: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore.' },
+        defaultStyle: { alignment: 'left', maxWidth: '700px', backgroundColor: '#ffffff', textColor: '#404040', padding: { top: 60, bottom: 60 } }
+      },
+      {
+        id: 'text-pullquote',
+        name: 'Citation en exergue',
+        preview: 'pullquote',
+        defaultContent: { layout: 'pullquote', content: 'Citation mise en valeur.', sideContent: 'Texte contextuel autour.' },
+        defaultStyle: { alignment: 'center', maxWidth: '900px', backgroundColor: '#ffffff', textColor: '#262626', padding: { top: 60, bottom: 60 } }
+      },
+      {
+        id: 'text-article',
+        name: 'Style article',
+        preview: 'article',
+        defaultContent: { layout: 'article', category: 'ACTUALITÉS', title: 'Titre de l\'article', date: '15 janvier 2024', content: 'Contenu de l\'article.', author: 'Jean Dupont' },
+        defaultStyle: { alignment: 'center', maxWidth: '750px', backgroundColor: '#ffffff', textColor: '#262626', padding: { top: 80, bottom: 80 } }
       }
     ]
   },
@@ -2182,52 +2198,57 @@ export const BLOCK_DEFINITIONS: BlockDefinition[] = [
         id: 'image-full-width',
         name: 'Pleine largeur',
         preview: 'full',
-        defaultContent: {
-          src: '',
-          alt: 'Description de l\'image',
-          caption: ''
-        },
-        defaultStyle: {
-          alignment: 'center',
-          maxWidth: '100%',
-          backgroundColor: 'transparent',
-          textColor: '#737373',
-          padding: { top: 0, bottom: 0 }
-        }
+        defaultContent: { layout: 'full', src: '', alt: 'Description de l\'image' },
+        defaultStyle: { alignment: 'center', maxWidth: '100%', backgroundColor: 'transparent', textColor: '#737373', padding: { top: 0, bottom: 0 } }
       },
       {
         id: 'image-contained',
         name: 'Contenue',
         preview: 'contained',
-        defaultContent: {
-          src: '',
-          alt: 'Description de l\'image',
-          caption: ''
-        },
-        defaultStyle: {
-          alignment: 'center',
-          maxWidth: '800px',
-          backgroundColor: 'transparent',
-          textColor: '#737373',
-          padding: { top: 40, bottom: 40 }
-        }
+        defaultContent: { layout: 'contained', src: '', alt: 'Description de l\'image' },
+        defaultStyle: { alignment: 'center', maxWidth: '800px', backgroundColor: 'transparent', textColor: '#737373', padding: { top: 40, bottom: 40 } }
       },
       {
-        id: 'image-with-caption',
+        id: 'image-caption',
         name: 'Avec légende',
         preview: 'caption',
-        defaultContent: {
-          src: '',
-          alt: 'Description de l\'image',
-          caption: 'Légende de l\'image'
-        },
-        defaultStyle: {
-          alignment: 'center',
-          maxWidth: '700px',
-          backgroundColor: '#ffffff',
-          textColor: '#525252',
-          padding: { top: 40, bottom: 40 }
-        }
+        defaultContent: { layout: 'caption', src: '', alt: 'Description', caption: 'Légende de l\'image' },
+        defaultStyle: { alignment: 'center', maxWidth: '700px', backgroundColor: '#ffffff', textColor: '#525252', padding: { top: 40, bottom: 40 } }
+      },
+      {
+        id: 'image-parallax',
+        name: 'Parallax',
+        preview: 'parallax',
+        defaultContent: { layout: 'parallax', src: '', alt: 'Image parallax', height: 400, overlayText: '' },
+        defaultStyle: { alignment: 'center', maxWidth: '100%', backgroundColor: '#0a0a0a', textColor: '#ffffff', padding: { top: 0, bottom: 0 } }
+      },
+      {
+        id: 'image-comparison',
+        name: 'Avant/Après',
+        preview: 'comparison',
+        defaultContent: { layout: 'comparison', beforeImage: '', afterImage: '', beforeLabel: 'Avant', afterLabel: 'Après' },
+        defaultStyle: { alignment: 'center', maxWidth: '800px', backgroundColor: '#ffffff', textColor: '#262626', padding: { top: 60, bottom: 60 } }
+      },
+      {
+        id: 'image-split-text',
+        name: 'Image + Texte',
+        preview: 'split-text',
+        defaultContent: { layout: 'split-text', src: '', alt: 'Image', title: 'Titre', content: 'Description.', imagePosition: 'left' },
+        defaultStyle: { alignment: 'center', maxWidth: '1100px', backgroundColor: '#ffffff', textColor: '#262626', padding: { top: 80, bottom: 80 } }
+      },
+      {
+        id: 'image-rounded',
+        name: 'Arrondie',
+        preview: 'rounded',
+        defaultContent: { layout: 'rounded', src: '', alt: 'Image arrondie', borderRadius: 24 },
+        defaultStyle: { alignment: 'center', maxWidth: '600px', backgroundColor: '#fafafa', textColor: '#525252', padding: { top: 60, bottom: 60 } }
+      },
+      {
+        id: 'image-framed',
+        name: 'Encadrée',
+        preview: 'framed',
+        defaultContent: { layout: 'framed', src: '', alt: 'Image encadrée', frameColor: '#262626', frameWidth: 8 },
+        defaultStyle: { alignment: 'center', maxWidth: '700px', backgroundColor: '#ffffff', textColor: '#262626', padding: { top: 60, bottom: 60 } }
       }
     ]
   },
@@ -2238,36 +2259,60 @@ export const BLOCK_DEFINITIONS: BlockDefinition[] = [
     description: 'Galerie d\'images',
     templates: [
       {
-        id: 'gallery-grid-3',
-        name: 'Grille 3 colonnes',
-        preview: 'grid3',
-        defaultContent: {
-          images: [],
-          columns: 3
-        },
-        defaultStyle: {
-          alignment: 'center',
-          maxWidth: '1100px',
-          backgroundColor: '#ffffff',
-          textColor: '#404040',
-          padding: { top: 40, bottom: 40 }
-        }
+        id: 'gallery-grid',
+        name: 'Grille',
+        preview: 'grid',
+        defaultContent: { layout: 'grid', images: [], columns: 3, gap: 16 },
+        defaultStyle: { alignment: 'center', maxWidth: '1100px', backgroundColor: '#ffffff', textColor: '#404040', padding: { top: 40, bottom: 40 } }
       },
       {
         id: 'gallery-masonry',
         name: 'Masonry',
         preview: 'masonry',
-        defaultContent: {
-          images: [],
-          columns: 3
-        },
-        defaultStyle: {
-          alignment: 'center',
-          maxWidth: '1200px',
-          backgroundColor: '#fafafa',
-          textColor: '#404040',
-          padding: { top: 60, bottom: 60 }
-        }
+        defaultContent: { layout: 'masonry', images: [], columns: 3 },
+        defaultStyle: { alignment: 'center', maxWidth: '1200px', backgroundColor: '#fafafa', textColor: '#404040', padding: { top: 60, bottom: 60 } }
+      },
+      {
+        id: 'gallery-carousel',
+        name: 'Carousel',
+        preview: 'carousel',
+        defaultContent: { layout: 'carousel', images: [], autoplay: true, interval: 4000 },
+        defaultStyle: { alignment: 'center', maxWidth: '1000px', backgroundColor: '#0a0a0a', textColor: '#ffffff', padding: { top: 60, bottom: 60 } }
+      },
+      {
+        id: 'gallery-lightbox',
+        name: 'Lightbox',
+        preview: 'lightbox',
+        defaultContent: { layout: 'lightbox', title: 'Notre galerie', images: [], columns: 4 },
+        defaultStyle: { alignment: 'center', maxWidth: '1200px', backgroundColor: '#ffffff', textColor: '#262626', padding: { top: 80, bottom: 80 } }
+      },
+      {
+        id: 'gallery-featured',
+        name: 'Image vedette',
+        preview: 'featured',
+        defaultContent: { layout: 'featured', images: [], featuredIndex: 0 },
+        defaultStyle: { alignment: 'center', maxWidth: '1100px', backgroundColor: '#ffffff', textColor: '#404040', padding: { top: 60, bottom: 60 } }
+      },
+      {
+        id: 'gallery-justified',
+        name: 'Justifiée',
+        preview: 'justified',
+        defaultContent: { layout: 'justified', images: [], rowHeight: 200 },
+        defaultStyle: { alignment: 'center', maxWidth: '1200px', backgroundColor: '#f5f5f5', textColor: '#404040', padding: { top: 40, bottom: 40 } }
+      },
+      {
+        id: 'gallery-hover',
+        name: 'Infos au survol',
+        preview: 'hover',
+        defaultContent: { layout: 'hover', images: [], columns: 3 },
+        defaultStyle: { alignment: 'center', maxWidth: '1100px', backgroundColor: '#ffffff', textColor: '#262626', padding: { top: 60, bottom: 60 } }
+      },
+      {
+        id: 'gallery-filmstrip',
+        name: 'Pellicule',
+        preview: 'filmstrip',
+        defaultContent: { layout: 'filmstrip', images: [], mainIndex: 0 },
+        defaultStyle: { alignment: 'center', maxWidth: '900px', backgroundColor: '#171717', textColor: '#ffffff', padding: { top: 60, bottom: 60 } }
       }
     ]
   },
@@ -2281,36 +2326,43 @@ export const BLOCK_DEFINITIONS: BlockDefinition[] = [
         id: 'video-centered',
         name: 'Centrée',
         preview: 'centered',
-        defaultContent: {
-          url: '',
-          title: '',
-          autoplay: false
-        },
-        defaultStyle: {
-          alignment: 'center',
-          maxWidth: '900px',
-          backgroundColor: '#0a0a0a',
-          textColor: '#ffffff',
-          padding: { top: 60, bottom: 60 }
-        }
+        defaultContent: { layout: 'centered', url: '', title: '' },
+        defaultStyle: { alignment: 'center', maxWidth: '900px', backgroundColor: '#0a0a0a', textColor: '#ffffff', padding: { top: 60, bottom: 60 } }
       },
       {
-        id: 'video-with-description',
+        id: 'video-description',
         name: 'Avec description',
         preview: 'description',
-        defaultContent: {
-          url: '',
-          title: 'Titre de la vidéo',
-          description: 'Description de la vidéo',
-          autoplay: false
-        },
-        defaultStyle: {
-          alignment: 'center',
-          maxWidth: '800px',
-          backgroundColor: '#ffffff',
-          textColor: '#262626',
-          padding: { top: 60, bottom: 60 }
-        }
+        defaultContent: { layout: 'description', url: '', title: 'Titre de la vidéo', description: 'Description de la vidéo' },
+        defaultStyle: { alignment: 'center', maxWidth: '800px', backgroundColor: '#ffffff', textColor: '#262626', padding: { top: 60, bottom: 60 } }
+      },
+      {
+        id: 'video-hero',
+        name: 'Hero vidéo',
+        preview: 'hero',
+        defaultContent: { layout: 'hero', url: '', title: 'Découvrez notre univers', subtitle: 'Une expérience unique', overlayOpacity: 40 },
+        defaultStyle: { alignment: 'center', maxWidth: '100%', backgroundColor: '#0a0a0a', textColor: '#ffffff', padding: { top: 0, bottom: 0 } }
+      },
+      {
+        id: 'video-split',
+        name: 'Vidéo + Texte',
+        preview: 'split',
+        defaultContent: { layout: 'split', url: '', title: 'Notre histoire', content: 'Découvrez notre parcours.', videoPosition: 'left' },
+        defaultStyle: { alignment: 'center', maxWidth: '1100px', backgroundColor: '#ffffff', textColor: '#262626', padding: { top: 80, bottom: 80 } }
+      },
+      {
+        id: 'video-modal',
+        name: 'Bouton lecture',
+        preview: 'modal',
+        defaultContent: { layout: 'modal', url: '', thumbnail: '', title: 'Voir la vidéo', buttonText: 'Lire la vidéo' },
+        defaultStyle: { alignment: 'center', maxWidth: '800px', backgroundColor: '#f5f5f5', textColor: '#262626', padding: { top: 80, bottom: 80 } }
+      },
+      {
+        id: 'video-grid',
+        name: 'Grille vidéos',
+        preview: 'grid',
+        defaultContent: { layout: 'grid', title: 'Nos vidéos', videos: [{ url: '', title: 'Vidéo 1', thumbnail: '' }, { url: '', title: 'Vidéo 2', thumbnail: '' }, { url: '', title: 'Vidéo 3', thumbnail: '' }] },
+        defaultStyle: { alignment: 'center', maxWidth: '1100px', backgroundColor: '#ffffff', textColor: '#262626', padding: { top: 80, bottom: 80 } }
       }
     ]
   },
@@ -2324,43 +2376,57 @@ export const BLOCK_DEFINITIONS: BlockDefinition[] = [
         id: 'faq-accordion',
         name: 'Accordéon',
         preview: 'accordion',
-        defaultContent: {
-          title: 'Questions fréquentes',
-          items: [
-            { question: 'Comment ça fonctionne ?', answer: 'Explication claire et détaillée du fonctionnement.' },
-            { question: 'Quels sont les délais ?', answer: 'Information sur les délais de livraison ou de traitement.' },
-            { question: 'Comment vous contacter ?', answer: 'Nos coordonnées et moyens de contact disponibles.' }
-          ]
-        },
-        defaultStyle: {
-          alignment: 'left',
-          maxWidth: '800px',
-          backgroundColor: '#ffffff',
-          textColor: '#262626',
-          padding: { top: 80, bottom: 80 }
-        }
+        defaultContent: { layout: 'accordion', title: 'Questions fréquentes', items: [{ question: 'Comment ça fonctionne ?', answer: 'Explication claire.' }, { question: 'Quels sont les délais ?', answer: 'Information sur les délais.' }, { question: 'Comment vous contacter ?', answer: 'Nos coordonnées.' }] },
+        defaultStyle: { alignment: 'left', maxWidth: '800px', backgroundColor: '#ffffff', textColor: '#262626', padding: { top: 80, bottom: 80 } }
       },
       {
-        id: 'faq-two-columns',
+        id: 'faq-columns',
         name: 'Deux colonnes',
         preview: 'columns',
-        defaultContent: {
-          title: 'Besoin d\'aide ?',
-          subtitle: 'Trouvez rapidement vos réponses',
-          items: [
-            { question: 'Question 1 ?', answer: 'Réponse concise.' },
-            { question: 'Question 2 ?', answer: 'Réponse concise.' },
-            { question: 'Question 3 ?', answer: 'Réponse concise.' },
-            { question: 'Question 4 ?', answer: 'Réponse concise.' }
-          ]
-        },
-        defaultStyle: {
-          alignment: 'center',
-          maxWidth: '1000px',
-          backgroundColor: '#fafafa',
-          textColor: '#404040',
-          padding: { top: 80, bottom: 80 }
-        }
+        defaultContent: { layout: 'columns', title: 'Besoin d\'aide ?', subtitle: 'Trouvez vos réponses', items: [{ question: 'Question 1 ?', answer: 'Réponse.' }, { question: 'Question 2 ?', answer: 'Réponse.' }, { question: 'Question 3 ?', answer: 'Réponse.' }, { question: 'Question 4 ?', answer: 'Réponse.' }] },
+        defaultStyle: { alignment: 'center', maxWidth: '1000px', backgroundColor: '#fafafa', textColor: '#404040', padding: { top: 80, bottom: 80 } }
+      },
+      {
+        id: 'faq-tabs',
+        name: 'Onglets',
+        preview: 'tabs',
+        defaultContent: { layout: 'tabs', title: 'Centre d\'aide', categories: [{ name: 'Général', items: [{ question: 'Question 1 ?', answer: 'Réponse.' }] }, { name: 'Paiement', items: [{ question: 'Moyens de paiement ?', answer: 'CB, PayPal...' }] }] },
+        defaultStyle: { alignment: 'center', maxWidth: '900px', backgroundColor: '#ffffff', textColor: '#262626', padding: { top: 80, bottom: 80 } }
+      },
+      {
+        id: 'faq-search',
+        name: 'Recherche',
+        preview: 'search',
+        defaultContent: { layout: 'search', title: 'Comment pouvons-nous vous aider ?', placeholder: 'Rechercher...', items: [{ question: 'Comment créer un compte ?', answer: 'Cliquez sur S\'inscrire.' }, { question: 'Comment modifier mon profil ?', answer: 'Accédez aux paramètres.' }] },
+        defaultStyle: { alignment: 'center', maxWidth: '800px', backgroundColor: '#f5f5f5', textColor: '#262626', padding: { top: 80, bottom: 80 } }
+      },
+      {
+        id: 'faq-side',
+        name: 'Côte à côte',
+        preview: 'side',
+        defaultContent: { layout: 'side', title: 'FAQ', subtitle: 'Tout ce que vous devez savoir', image: '', items: [{ question: 'Pourquoi nous choisir ?', answer: 'Notre expertise.' }, { question: 'Délai de réponse ?', answer: 'Sous 24h.' }] },
+        defaultStyle: { alignment: 'center', maxWidth: '1100px', backgroundColor: '#ffffff', textColor: '#262626', padding: { top: 80, bottom: 80 } }
+      },
+      {
+        id: 'faq-minimal',
+        name: 'Minimal',
+        preview: 'minimal',
+        defaultContent: { layout: 'minimal', items: [{ question: 'Question ?', answer: 'Réponse.' }, { question: 'Autre question ?', answer: 'Autre réponse.' }] },
+        defaultStyle: { alignment: 'left', maxWidth: '700px', backgroundColor: '#ffffff', textColor: '#404040', padding: { top: 60, bottom: 60 } }
+      },
+      {
+        id: 'faq-cards',
+        name: 'Cartes',
+        preview: 'cards',
+        defaultContent: { layout: 'cards', title: 'Questions fréquentes', items: [{ question: 'Livraison', answer: 'Livraison gratuite dès 50\u20ac.', icon: 'truck' }, { question: 'Retours', answer: 'Retours gratuits sous 30j.', icon: 'refresh' }, { question: 'Support', answer: 'Support 7j/7.', icon: 'headphones' }, { question: 'Sécurité', answer: 'Paiement 100% sécurisé.', icon: 'shield' }] },
+        defaultStyle: { alignment: 'center', maxWidth: '1000px', backgroundColor: '#f5f5f5', textColor: '#262626', padding: { top: 80, bottom: 80 } }
+      },
+      {
+        id: 'faq-numbered',
+        name: 'Numérotée',
+        preview: 'numbered',
+        defaultContent: { layout: 'numbered', title: 'Top 5 questions', items: [{ question: 'Comment commander ?', answer: 'Ajoutez au panier.' }, { question: 'Quels délais ?', answer: '2-5 jours.' }, { question: 'Modifier commande ?', answer: 'Oui, dans l\'heure.' }, { question: 'Suivi commande ?', answer: 'Via email.' }, { question: 'Retours ?', answer: 'Sous 30 jours.' }] },
+        defaultStyle: { alignment: 'center', maxWidth: '800px', backgroundColor: '#ffffff', textColor: '#262626', padding: { top: 80, bottom: 80 } }
       }
     ]
   },
@@ -2374,39 +2440,57 @@ export const BLOCK_DEFINITIONS: BlockDefinition[] = [
         id: 'contact-simple',
         name: 'Simple',
         preview: 'simple',
-        defaultContent: {
-          title: 'Contactez-nous',
-          email: 'contact@exemple.com',
-          phone: '+33 1 23 45 67 89',
-          address: ''
-        },
-        defaultStyle: {
-          alignment: 'center',
-          maxWidth: '500px',
-          backgroundColor: '#ffffff',
-          textColor: '#404040',
-          padding: { top: 60, bottom: 60 }
-        }
+        defaultContent: { layout: 'simple', title: 'Contactez-nous', email: 'contact@exemple.com', phone: '+33 1 23 45 67 89' },
+        defaultStyle: { alignment: 'center', maxWidth: '500px', backgroundColor: '#ffffff', textColor: '#404040', padding: { top: 60, bottom: 60 } }
       },
       {
         id: 'contact-detailed',
         name: 'Détaillé',
         preview: 'detailed',
-        defaultContent: {
-          title: 'Nous contacter',
-          subtitle: 'Notre équipe est à votre disposition',
-          email: 'contact@exemple.com',
-          phone: '+33 1 23 45 67 89',
-          address: '123 Rue Exemple, 75001 Paris',
-          hours: 'Lun-Ven : 9h-18h'
-        },
-        defaultStyle: {
-          alignment: 'center',
-          maxWidth: '700px',
-          backgroundColor: '#f5f5f5',
-          textColor: '#262626',
-          padding: { top: 80, bottom: 80 }
-        }
+        defaultContent: { layout: 'detailed', title: 'Nous contacter', subtitle: 'Notre équipe est à votre disposition', email: 'contact@exemple.com', phone: '+33 1 23 45 67 89', address: '123 Rue Exemple, 75001 Paris', hours: 'Lun-Ven : 9h-18h' },
+        defaultStyle: { alignment: 'center', maxWidth: '700px', backgroundColor: '#f5f5f5', textColor: '#262626', padding: { top: 80, bottom: 80 } }
+      },
+      {
+        id: 'contact-split',
+        name: 'Deux colonnes',
+        preview: 'split',
+        defaultContent: { layout: 'split', title: 'Écrivez-nous', subtitle: 'Réponse sous 24h', email: 'contact@exemple.com', phone: '+33 1 23 45 67 89', address: 'Paris, France', image: '' },
+        defaultStyle: { alignment: 'center', maxWidth: '1100px', backgroundColor: '#ffffff', textColor: '#262626', padding: { top: 80, bottom: 80 } }
+      },
+      {
+        id: 'contact-cards',
+        name: 'Cartes',
+        preview: 'cards',
+        defaultContent: { layout: 'cards', title: 'Comment nous joindre', cards: [{ icon: 'mail', title: 'Email', value: 'contact@exemple.com', description: 'Réponse sous 24h' }, { icon: 'phone', title: 'Téléphone', value: '+33 1 23 45 67 89', description: 'Lun-Ven 9h-18h' }, { icon: 'location', title: 'Adresse', value: 'Paris, France', description: 'Sur rendez-vous' }] },
+        defaultStyle: { alignment: 'center', maxWidth: '1000px', backgroundColor: '#fafafa', textColor: '#262626', padding: { top: 80, bottom: 80 } }
+      },
+      {
+        id: 'contact-form',
+        name: 'Avec formulaire',
+        preview: 'form',
+        defaultContent: { layout: 'form', title: 'Envoyez-nous un message', subtitle: 'Remplissez le formulaire', fields: ['name', 'email', 'subject', 'message'], buttonText: 'Envoyer', email: 'contact@exemple.com' },
+        defaultStyle: { alignment: 'center', maxWidth: '600px', backgroundColor: '#ffffff', textColor: '#262626', padding: { top: 80, bottom: 80 } }
+      },
+      {
+        id: 'contact-map',
+        name: 'Avec carte',
+        preview: 'map',
+        defaultContent: { layout: 'map', title: 'Où nous trouver', address: '123 Rue Exemple, 75001 Paris', email: 'contact@exemple.com', phone: '+33 1 23 45 67 89', mapEmbed: '' },
+        defaultStyle: { alignment: 'center', maxWidth: '1100px', backgroundColor: '#ffffff', textColor: '#262626', padding: { top: 60, bottom: 60 } }
+      },
+      {
+        id: 'contact-minimal',
+        name: 'Minimal',
+        preview: 'minimal',
+        defaultContent: { layout: 'minimal', email: 'hello@exemple.com' },
+        defaultStyle: { alignment: 'center', maxWidth: '400px', backgroundColor: '#171717', textColor: '#ffffff', padding: { top: 60, bottom: 60 } }
+      },
+      {
+        id: 'contact-social',
+        name: 'Avec réseaux',
+        preview: 'social',
+        defaultContent: { layout: 'social', title: 'Restons en contact', email: 'contact@exemple.com', phone: '+33 1 23 45 67 89', socials: { facebook: '', instagram: '', twitter: '', linkedin: '' } },
+        defaultStyle: { alignment: 'center', maxWidth: '600px', backgroundColor: '#f5f5f5', textColor: '#262626', padding: { top: 80, bottom: 80 } }
       }
     ]
   },
@@ -2420,35 +2504,43 @@ export const BLOCK_DEFINITIONS: BlockDefinition[] = [
         id: 'countdown-urgent',
         name: 'Urgence',
         preview: 'urgent',
-        defaultContent: {
-          title: 'Offre limitée',
-          endDate: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000).toISOString(),
-          subtitle: 'Ne manquez pas cette opportunité'
-        },
-        defaultStyle: {
-          alignment: 'center',
-          maxWidth: '600px',
-          backgroundColor: '#dc2626',
-          textColor: '#ffffff',
-          padding: { top: 40, bottom: 40 }
-        }
+        defaultContent: { layout: 'urgent', title: 'Offre limitée', endDate: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000).toISOString(), subtitle: 'Ne manquez pas cette opportunité' },
+        defaultStyle: { alignment: 'center', maxWidth: '600px', backgroundColor: '#dc2626', textColor: '#ffffff', padding: { top: 40, bottom: 40 } }
       },
       {
         id: 'countdown-elegant',
         name: 'Élégant',
         preview: 'elegant',
-        defaultContent: {
-          title: 'Bientôt disponible',
-          endDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
-          subtitle: ''
-        },
-        defaultStyle: {
-          alignment: 'center',
-          maxWidth: '500px',
-          backgroundColor: '#171717',
-          textColor: '#fafafa',
-          padding: { top: 60, bottom: 60 }
-        }
+        defaultContent: { layout: 'elegant', title: 'Bientôt disponible', endDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString() },
+        defaultStyle: { alignment: 'center', maxWidth: '500px', backgroundColor: '#171717', textColor: '#fafafa', padding: { top: 60, bottom: 60 } }
+      },
+      {
+        id: 'countdown-launch',
+        name: 'Lancement',
+        preview: 'launch',
+        defaultContent: { layout: 'launch', title: 'Lancement imminent', subtitle: 'Soyez prêt', endDate: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toISOString(), buttonText: 'Me notifier', buttonUrl: '#' },
+        defaultStyle: { alignment: 'center', maxWidth: '700px', backgroundColor: '#0f172a', textColor: '#ffffff', padding: { top: 80, bottom: 80 } }
+      },
+      {
+        id: 'countdown-event',
+        name: 'Événement',
+        preview: 'event',
+        defaultContent: { layout: 'event', title: 'Save the date', eventName: 'Conférence annuelle', endDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(), location: 'Paris, France' },
+        defaultStyle: { alignment: 'center', maxWidth: '800px', backgroundColor: '#ffffff', textColor: '#262626', padding: { top: 80, bottom: 80 } }
+      },
+      {
+        id: 'countdown-promo',
+        name: 'Promo',
+        preview: 'promo',
+        defaultContent: { layout: 'promo', badge: '-50%', title: 'Soldes flash', endDate: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000).toISOString(), buttonText: 'Profiter maintenant', buttonUrl: '#' },
+        defaultStyle: { alignment: 'center', maxWidth: '100%', backgroundColor: '#7c3aed', textColor: '#ffffff', padding: { top: 30, bottom: 30 } }
+      },
+      {
+        id: 'countdown-minimal',
+        name: 'Minimal',
+        preview: 'minimal',
+        defaultContent: { layout: 'minimal', endDate: new Date(Date.now() + 5 * 24 * 60 * 60 * 1000).toISOString() },
+        defaultStyle: { alignment: 'center', maxWidth: '400px', backgroundColor: 'transparent', textColor: '#262626', padding: { top: 40, bottom: 40 } }
       }
     ]
   },
@@ -2459,46 +2551,46 @@ export const BLOCK_DEFINITIONS: BlockDefinition[] = [
     description: 'Liens sociaux',
     templates: [
       {
-        id: 'social-icons-centered',
+        id: 'social-centered',
         name: 'Icônes centrées',
         preview: 'centered',
-        defaultContent: {
-          title: 'Suivez-nous',
-          links: {
-            facebook: '',
-            instagram: '',
-            twitter: '',
-            youtube: '',
-            linkedin: ''
-          }
-        },
-        defaultStyle: {
-          alignment: 'center',
-          maxWidth: '400px',
-          backgroundColor: '#ffffff',
-          textColor: '#525252',
-          padding: { top: 40, bottom: 40 }
-        }
+        defaultContent: { layout: 'centered', title: 'Suivez-nous', links: { facebook: '', instagram: '', twitter: '', youtube: '', linkedin: '' } },
+        defaultStyle: { alignment: 'center', maxWidth: '400px', backgroundColor: '#ffffff', textColor: '#525252', padding: { top: 40, bottom: 40 } }
       },
       {
         id: 'social-footer',
         name: 'Style footer',
         preview: 'footer',
-        defaultContent: {
-          links: {
-            facebook: '',
-            instagram: '',
-            twitter: '',
-            linkedin: ''
-          }
-        },
-        defaultStyle: {
-          alignment: 'center',
-          maxWidth: '300px',
-          backgroundColor: '#171717',
-          textColor: '#a3a3a3',
-          padding: { top: 30, bottom: 30 }
-        }
+        defaultContent: { layout: 'footer', links: { facebook: '', instagram: '', twitter: '', linkedin: '' } },
+        defaultStyle: { alignment: 'center', maxWidth: '300px', backgroundColor: '#171717', textColor: '#a3a3a3', padding: { top: 30, bottom: 30 } }
+      },
+      {
+        id: 'social-colored',
+        name: 'Couleurs marques',
+        preview: 'colored',
+        defaultContent: { layout: 'colored', title: 'Rejoignez notre communauté', links: { facebook: '', instagram: '', twitter: '', youtube: '', tiktok: '' } },
+        defaultStyle: { alignment: 'center', maxWidth: '500px', backgroundColor: '#ffffff', textColor: '#262626', padding: { top: 60, bottom: 60 } }
+      },
+      {
+        id: 'social-buttons',
+        name: 'Boutons',
+        preview: 'buttons',
+        defaultContent: { layout: 'buttons', title: 'Retrouvez-nous sur', links: { facebook: '', instagram: '', twitter: '', linkedin: '' } },
+        defaultStyle: { alignment: 'center', maxWidth: '600px', backgroundColor: '#f5f5f5', textColor: '#262626', padding: { top: 60, bottom: 60 } }
+      },
+      {
+        id: 'social-stats',
+        name: 'Avec stats',
+        preview: 'stats',
+        defaultContent: { layout: 'stats', title: 'Notre communauté', stats: [{ platform: 'instagram', followers: '50K', url: '' }, { platform: 'twitter', followers: '25K', url: '' }, { platform: 'youtube', followers: '100K', url: '' }] },
+        defaultStyle: { alignment: 'center', maxWidth: '800px', backgroundColor: '#ffffff', textColor: '#262626', padding: { top: 60, bottom: 60 } }
+      },
+      {
+        id: 'social-cta',
+        name: 'Avec CTA',
+        preview: 'cta',
+        defaultContent: { layout: 'cta', title: 'Ne manquez rien', subtitle: 'Suivez-nous pour les actualités', links: { facebook: '', instagram: '', twitter: '' }, buttonText: 'S\'abonner', buttonUrl: '#' },
+        defaultStyle: { alignment: 'center', maxWidth: '600px', backgroundColor: '#0a0a0a', textColor: '#ffffff', padding: { top: 80, bottom: 80 } }
       }
     ]
   },
@@ -2510,42 +2602,38 @@ export const BLOCK_DEFINITIONS: BlockDefinition[] = [
     templates: [
       {
         id: 'spacer-small',
-        name: 'Petit',
+        name: 'Petit (40px)',
         preview: 'small',
-        defaultContent: {},
-        defaultStyle: {
-          alignment: 'center',
-          maxWidth: '100%',
-          backgroundColor: 'transparent',
-          textColor: 'transparent',
-          padding: { top: 20, bottom: 20 }
-        }
+        defaultContent: { layout: 'small', height: 40 },
+        defaultStyle: { alignment: 'center', maxWidth: '100%', backgroundColor: 'transparent', textColor: 'transparent', padding: { top: 20, bottom: 20 } }
       },
       {
         id: 'spacer-medium',
-        name: 'Moyen',
+        name: 'Moyen (80px)',
         preview: 'medium',
-        defaultContent: {},
-        defaultStyle: {
-          alignment: 'center',
-          maxWidth: '100%',
-          backgroundColor: 'transparent',
-          textColor: 'transparent',
-          padding: { top: 40, bottom: 40 }
-        }
+        defaultContent: { layout: 'medium', height: 80 },
+        defaultStyle: { alignment: 'center', maxWidth: '100%', backgroundColor: 'transparent', textColor: 'transparent', padding: { top: 40, bottom: 40 } }
       },
       {
         id: 'spacer-large',
-        name: 'Grand',
+        name: 'Grand (120px)',
         preview: 'large',
-        defaultContent: {},
-        defaultStyle: {
-          alignment: 'center',
-          maxWidth: '100%',
-          backgroundColor: 'transparent',
-          textColor: 'transparent',
-          padding: { top: 80, bottom: 80 }
-        }
+        defaultContent: { layout: 'large', height: 120 },
+        defaultStyle: { alignment: 'center', maxWidth: '100%', backgroundColor: 'transparent', textColor: 'transparent', padding: { top: 60, bottom: 60 } }
+      },
+      {
+        id: 'spacer-responsive',
+        name: 'Responsive',
+        preview: 'responsive',
+        defaultContent: { layout: 'responsive', desktopHeight: 100, mobileHeight: 50 },
+        defaultStyle: { alignment: 'center', maxWidth: '100%', backgroundColor: 'transparent', textColor: 'transparent', padding: { top: 0, bottom: 0 } }
+      },
+      {
+        id: 'spacer-colored',
+        name: 'Coloré',
+        preview: 'colored',
+        defaultContent: { layout: 'colored', height: 60 },
+        defaultStyle: { alignment: 'center', maxWidth: '100%', backgroundColor: '#f5f5f5', textColor: 'transparent', padding: { top: 30, bottom: 30 } }
       }
     ]
   },
@@ -2559,35 +2647,50 @@ export const BLOCK_DEFINITIONS: BlockDefinition[] = [
         id: 'divider-line',
         name: 'Ligne fine',
         preview: 'line',
-        defaultContent: {
-          style: 'solid',
-          width: '100%',
-          color: '#e5e5e5'
-        },
-        defaultStyle: {
-          alignment: 'center',
-          maxWidth: '1200px',
-          backgroundColor: 'transparent',
-          textColor: 'transparent',
-          padding: { top: 20, bottom: 20 }
-        }
+        defaultContent: { layout: 'line', width: '100%', thickness: 1, color: '#e5e5e5' },
+        defaultStyle: { alignment: 'center', maxWidth: '1200px', backgroundColor: 'transparent', textColor: 'transparent', padding: { top: 20, bottom: 20 } }
       },
       {
         id: 'divider-short',
         name: 'Courte centrée',
         preview: 'short',
-        defaultContent: {
-          style: 'solid',
-          width: '80px',
-          color: '#171717'
-        },
-        defaultStyle: {
-          alignment: 'center',
-          maxWidth: '100%',
-          backgroundColor: 'transparent',
-          textColor: 'transparent',
-          padding: { top: 40, bottom: 40 }
-        }
+        defaultContent: { layout: 'short', width: '80px', thickness: 3, color: '#171717' },
+        defaultStyle: { alignment: 'center', maxWidth: '100%', backgroundColor: 'transparent', textColor: 'transparent', padding: { top: 40, bottom: 40 } }
+      },
+      {
+        id: 'divider-gradient',
+        name: 'Dégradé',
+        preview: 'gradient',
+        defaultContent: { layout: 'gradient', width: '60%', gradientFrom: '#3b82f6', gradientTo: '#8b5cf6' },
+        defaultStyle: { alignment: 'center', maxWidth: '100%', backgroundColor: 'transparent', textColor: 'transparent', padding: { top: 40, bottom: 40 } }
+      },
+      {
+        id: 'divider-dots',
+        name: 'Points',
+        preview: 'dots',
+        defaultContent: { layout: 'dots', count: 3, color: '#262626' },
+        defaultStyle: { alignment: 'center', maxWidth: '100%', backgroundColor: 'transparent', textColor: 'transparent', padding: { top: 40, bottom: 40 } }
+      },
+      {
+        id: 'divider-icon',
+        name: 'Avec icône',
+        preview: 'icon',
+        defaultContent: { layout: 'icon', icon: 'star', lineColor: '#e5e5e5', iconColor: '#262626' },
+        defaultStyle: { alignment: 'center', maxWidth: '600px', backgroundColor: 'transparent', textColor: 'transparent', padding: { top: 40, bottom: 40 } }
+      },
+      {
+        id: 'divider-wave',
+        name: 'Vague',
+        preview: 'wave',
+        defaultContent: { layout: 'wave', color: '#f5f5f5', flip: false },
+        defaultStyle: { alignment: 'center', maxWidth: '100%', backgroundColor: 'transparent', textColor: 'transparent', padding: { top: 0, bottom: 0 } }
+      },
+      {
+        id: 'divider-dashed',
+        name: 'Pointillés',
+        preview: 'dashed',
+        defaultContent: { layout: 'dashed', width: '100%', color: '#d4d4d4' },
+        defaultStyle: { alignment: 'center', maxWidth: '800px', backgroundColor: 'transparent', textColor: 'transparent', padding: { top: 30, bottom: 30 } }
       }
     ]
   }

@@ -79,9 +79,9 @@
     
     <!-- Contenu de la page -->
     <main v-if="currentPage">
-      <!-- Rendu des sections -->
+      <!-- Rendu des sections avec BuilderBlock (mêmes layouts que le builder) -->
       <div v-for="section in currentPage.sections" :key="section.id">
-        <WebsiteSection :section="section" :primaryColor="shop?.primary_color" />
+        <BuilderBlock :section="section" />
       </div>
     </main>
     

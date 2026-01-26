@@ -27,7 +27,7 @@
             v-if="section.content?.button"
             :href="section.content.button.url || '#'"
             class="inline-block px-6 py-3 rounded-lg font-semibold transition-all hover:scale-105 hover:shadow-lg"
-            :style="getButtonStyle(section.content.button.style)"
+            :style="getButtonStyleWithParam(section.content.button.style)"
           >
             {{ section.content.button.text || 'Bouton' }}
           </a>
@@ -224,38 +224,259 @@
     
     <!-- Pricing -->
     <template v-else-if="section.type === 'pricing'">
-      <div :style="{ maxWidth: section.style?.maxWidth || '400px', margin: '0 auto', padding: '0 1rem', textAlign: 'center' }">
-        <div class="bg-white rounded-2xl shadow-xl p-8">
-          <h3 class="text-2xl font-bold mb-2" :style="{ color: section.style?.textColor }">
-            {{ section.content?.title || 'Notre offre' }}
-          </h3>
-          <div class="my-6">
-            <span class="text-5xl font-bold" :style="{ color: primaryColor || '#10B981' }">
-              {{ section.content?.price || '99€' }}
-            </span>
-            <span class="text-gray-500">{{ section.content?.period || '/mois' }}</span>
+      
+      <!-- PRICING: Layout Tiers (3 colonnes) -->
+      <template v-if="section.content?.layout === 'tiers' && section.content?.plans">
+        <div :style="{ maxWidth: section.style?.maxWidth || '1200px', margin: '0 auto', padding: '0 1rem' }">
+          <div class="text-center mb-12">
+            <h2 class="text-3xl md:text-4xl font-bold mb-3" :style="{ color: section.style?.textColor }">{{ section.content?.title }}</h2>
+            <p v-if="section.content?.subtitle" class="text-lg opacity-70" :style="{ color: section.style?.textColor }">{{ section.content.subtitle }}</p>
           </div>
-          <p v-if="section.content?.description" class="text-gray-600 mb-6">
-            {{ section.content.description }}
-          </p>
-          <ul v-if="section.content?.features" class="text-left space-y-3 mb-8">
-            <li v-for="(feature, i) in section.content.features" :key="i" class="flex items-center gap-2">
-              <svg class="w-5 h-5 flex-shrink-0" :style="{ color: primaryColor || '#10B981' }" fill="currentColor" viewBox="0 0 20 20">
-                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
-              </svg>
-              <span>{{ feature }}</span>
-            </li>
-          </ul>
-          <a
-            v-if="section.content?.button"
-            :href="section.content.button.url || '#'"
-            class="block w-full py-3 rounded-lg font-semibold text-white transition-all hover:opacity-90"
-            :style="{ backgroundColor: primaryColor || '#10B981' }"
-          >
-            {{ section.content.button.text || 'Commencer' }}
-          </a>
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div 
+              v-for="(plan, idx) in section.content.plans" 
+              :key="idx"
+              class="rounded-2xl p-8 transition-all"
+              :class="plan.highlighted ? 'ring-2 ring-primary scale-105 shadow-xl' : ''"
+              :style="{ backgroundColor: plan.highlighted ? '#ffffff' : section.style?.textColor + '08' }"
+            >
+              <span v-if="plan.badge" class="inline-block px-3 py-1 text-xs font-bold rounded-full mb-4 bg-primary text-white">{{ plan.badge }}</span>
+              <h3 class="text-xl font-bold mb-1" :style="{ color: section.style?.textColor }">{{ plan.name }}</h3>
+              <p v-if="plan.description" class="text-sm opacity-60 mb-4" :style="{ color: section.style?.textColor }">{{ plan.description }}</p>
+              <div class="mb-6">
+                <span class="text-4xl font-bold" :style="{ color: section.style?.textColor }">{{ plan.price }}{{ plan.currency }}</span>
+                <span class="opacity-60" :style="{ color: section.style?.textColor }">{{ plan.period }}</span>
+              </div>
+              <ul class="space-y-3 mb-8">
+                <li v-for="(feat, fi) in plan.features" :key="fi" class="flex items-center gap-2" :style="{ color: section.style?.textColor }">
+                  <svg v-if="typeof feat === 'object' ? feat.included : true" class="w-5 h-5 text-green-500 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" /></svg>
+                  <svg v-else class="w-5 h-5 text-gray-300 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" /></svg>
+                  <span :class="typeof feat === 'object' && !feat.included ? 'opacity-40' : ''">{{ typeof feat === 'object' ? feat.text : feat }}</span>
+                </li>
+              </ul>
+              <a v-if="plan.button" :href="plan.button.url || '#'" class="block w-full py-3 rounded-lg font-semibold text-center transition-all"
+                :style="plan.highlighted ? getButtonStyle : { backgroundColor: section.style?.textColor + '10', color: section.style?.textColor }">
+                {{ plan.button.text }}
+              </a>
+            </div>
+          </div>
         </div>
-      </div>
+      </template>
+      
+      <!-- PRICING: Layout Two Columns -->
+      <template v-else-if="section.content?.layout === 'two-columns' && section.content?.plans">
+        <div :style="{ maxWidth: section.style?.maxWidth || '900px', margin: '0 auto', padding: '0 1rem' }">
+          <div class="text-center mb-12">
+            <h2 class="text-3xl font-bold mb-3" :style="{ color: section.style?.textColor }">{{ section.content?.title }}</h2>
+            <p v-if="section.content?.subtitle" class="opacity-70" :style="{ color: section.style?.textColor }">{{ section.content.subtitle }}</p>
+          </div>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div 
+              v-for="(plan, idx) in section.content.plans" 
+              :key="idx"
+              class="rounded-2xl p-8 border-2 transition-all"
+              :style="{ borderColor: plan.highlighted ? '#10B981' : section.style?.textColor + '20', backgroundColor: plan.highlighted ? '#f0fdf4' : 'transparent' }"
+            >
+              <span v-if="plan.badge" class="inline-block px-3 py-1 text-xs font-bold rounded-full mb-4 bg-green-500 text-white">{{ plan.badge }}</span>
+              <h3 class="text-2xl font-bold mb-1" :style="{ color: section.style?.textColor }">{{ plan.name }}</h3>
+              <p v-if="plan.description" class="text-sm opacity-60 mb-4" :style="{ color: section.style?.textColor }">{{ plan.description }}</p>
+              <div class="mb-6">
+                <span class="text-5xl font-bold" :style="{ color: section.style?.textColor }">{{ plan.price }}{{ plan.currency }}</span>
+                <span class="opacity-60" :style="{ color: section.style?.textColor }">{{ plan.period }}</span>
+              </div>
+              <ul class="space-y-3 mb-8">
+                <li v-for="(feat, fi) in plan.features" :key="fi" class="flex items-center gap-2" :style="{ color: section.style?.textColor }">
+                  <svg class="w-5 h-5 text-green-500 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" /></svg>
+                  <span>{{ feat }}</span>
+                </li>
+              </ul>
+              <a v-if="plan.button" :href="plan.button.url || '#'" class="block w-full py-3 rounded-lg font-semibold text-center transition-all"
+                :style="plan.highlighted ? getButtonStyle : { backgroundColor: section.style?.textColor + '10', color: section.style?.textColor }">
+                {{ plan.button.text }}
+              </a>
+            </div>
+          </div>
+        </div>
+      </template>
+      
+      <!-- PRICING: Layout Minimal -->
+      <template v-else-if="section.content?.layout === 'minimal' && section.content?.plans">
+        <div :style="{ maxWidth: section.style?.maxWidth || '1000px', margin: '0 auto', padding: '0 1rem' }">
+          <h2 v-if="section.content?.title" class="text-3xl font-bold text-center mb-10" :style="{ color: section.style?.textColor }">{{ section.content.title }}</h2>
+          <div class="flex flex-wrap justify-center gap-6">
+            <div 
+              v-for="(plan, idx) in section.content.plans" 
+              :key="idx"
+              class="w-64 p-6 rounded-xl text-center transition-all"
+              :class="plan.highlighted ? 'ring-2 ring-primary shadow-lg' : ''"
+              :style="{ backgroundColor: section.style?.textColor + '08' }"
+            >
+              <h3 class="text-lg font-bold mb-1" :style="{ color: section.style?.textColor }">{{ plan.name }}</h3>
+              <p v-if="plan.description" class="text-sm opacity-60 mb-4" :style="{ color: section.style?.textColor }">{{ plan.description }}</p>
+              <div class="text-3xl font-bold mb-4" :style="{ color: section.style?.textColor }">{{ plan.price }}{{ plan.currency }}<span class="text-base font-normal opacity-60">{{ plan.period }}</span></div>
+              <a v-if="plan.button" :href="plan.button.url || '#'" class="block w-full py-2 rounded-lg font-semibold transition-all" :style="plan.highlighted ? getButtonStyle : { backgroundColor: 'transparent', border: '1px solid ' + section.style?.textColor + '30', color: section.style?.textColor }">{{ plan.button.text }}</a>
+            </div>
+          </div>
+        </div>
+      </template>
+      
+      <!-- PRICING: Layout Toggle (Mensuel/Annuel) -->
+      <template v-else-if="section.content?.layout === 'toggle' && section.content?.plans">
+        <div :style="{ maxWidth: section.style?.maxWidth || '1200px', margin: '0 auto', padding: '0 1rem' }">
+          <div class="text-center mb-10">
+            <h2 class="text-3xl md:text-4xl font-bold mb-3" :style="{ color: section.style?.textColor }">{{ section.content?.title }}</h2>
+            <p v-if="section.content?.subtitle" class="opacity-70 mb-6" :style="{ color: section.style?.textColor }">{{ section.content.subtitle }}</p>
+            <div class="inline-flex items-center gap-3 p-1 rounded-full" :style="{ backgroundColor: section.style?.textColor + '10' }">
+              <button class="px-4 py-2 rounded-full font-medium transition-all" :style="{ backgroundColor: section.content?.billingPeriod !== 'yearly' ? section.style?.textColor : 'transparent', color: section.content?.billingPeriod !== 'yearly' ? '#ffffff' : section.style?.textColor }">Mensuel</button>
+              <button class="px-4 py-2 rounded-full font-medium transition-all" :style="{ backgroundColor: section.content?.billingPeriod === 'yearly' ? section.style?.textColor : 'transparent', color: section.content?.billingPeriod === 'yearly' ? '#ffffff' : section.style?.textColor }">Annuel <span class="text-xs bg-green-500 text-white px-2 py-0.5 rounded-full ml-1">-{{ section.content?.discount || 20 }}%</span></button>
+            </div>
+          </div>
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div v-for="(plan, idx) in section.content.plans" :key="idx" class="rounded-2xl p-8" :class="plan.highlighted ? 'ring-2 ring-primary shadow-xl' : ''" :style="{ backgroundColor: plan.highlighted ? '#ffffff' : section.style?.textColor + '08' }">
+              <span v-if="plan.badge" class="inline-block px-3 py-1 text-xs font-bold rounded-full mb-4 bg-primary text-white">{{ plan.badge }}</span>
+              <h3 class="text-xl font-bold mb-4" :style="{ color: section.style?.textColor }">{{ plan.name }}</h3>
+              <div class="mb-6">
+                <span class="text-4xl font-bold" :style="{ color: section.style?.textColor }">{{ section.content?.billingPeriod === 'yearly' ? plan.yearlyPrice : plan.monthlyPrice }}{{ plan.currency }}</span>
+                <span class="opacity-60" :style="{ color: section.style?.textColor }">{{ section.content?.billingPeriod === 'yearly' ? '/an' : '/mois' }}</span>
+              </div>
+              <ul class="space-y-3 mb-8">
+                <li v-for="(feat, fi) in plan.features" :key="fi" class="flex items-center gap-2" :style="{ color: section.style?.textColor }">
+                  <svg class="w-5 h-5 text-green-500 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" /></svg>
+                  <span>{{ feat }}</span>
+                </li>
+              </ul>
+              <a v-if="plan.button" :href="plan.button.url || '#'" class="block w-full py-3 rounded-lg font-semibold text-center transition-all" :style="plan.highlighted ? getButtonStyle : { backgroundColor: section.style?.textColor + '10', color: section.style?.textColor }">{{ plan.button.text }}</a>
+            </div>
+          </div>
+        </div>
+      </template>
+      
+      <!-- PRICING: Layout Highlighted (Focus) -->
+      <template v-else-if="section.content?.layout === 'highlighted' && section.content?.mainPlan">
+        <div :style="{ maxWidth: section.style?.maxWidth || '600px', margin: '0 auto', padding: '0 1rem' }">
+          <div class="text-center mb-8">
+            <h2 class="text-2xl md:text-3xl font-bold" :style="{ color: section.style?.textColor }">{{ section.content?.title }}</h2>
+          </div>
+          <div class="rounded-3xl p-10 shadow-2xl" style="background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);">
+            <span v-if="section.content.mainPlan.badge" class="inline-block px-4 py-1 text-sm font-bold rounded-full mb-4 bg-gradient-to-r from-primary to-purple-500 text-white">{{ section.content.mainPlan.badge }}</span>
+            <h3 class="text-3xl font-bold mb-2 text-gray-900">{{ section.content.mainPlan.name }}</h3>
+            <p v-if="section.content.mainPlan.description" class="text-gray-600 mb-6">{{ section.content.mainPlan.description }}</p>
+            <div class="mb-8">
+              <span class="text-6xl font-bold text-gray-900">{{ section.content.mainPlan.price }}{{ section.content.mainPlan.currency }}</span>
+              <span class="text-gray-500">{{ section.content.mainPlan.period }}</span>
+            </div>
+            <ul class="space-y-4 mb-8">
+              <li v-for="(feat, fi) in section.content.mainPlan.features" :key="fi" class="flex items-center gap-3">
+                <svg class="w-6 h-6 text-green-500 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" /></svg>
+                <span class="text-gray-700">{{ feat }}</span>
+              </li>
+            </ul>
+            <a v-if="section.content.mainPlan.button" :href="section.content.mainPlan.button.url || '#'" class="block w-full py-4 rounded-xl font-bold text-lg text-center transition-all" :style="getButtonStyle">{{ section.content.mainPlan.button.text }}</a>
+            <p v-if="section.content.mainPlan.guarantee" class="text-center text-sm text-gray-500 mt-4">{{ section.content.mainPlan.guarantee }}</p>
+          </div>
+          <a v-if="section.content?.otherPlansUrl" :href="section.content.otherPlansUrl" class="block text-center mt-6 font-medium hover:underline" :style="{ color: section.style?.textColor }">{{ section.content?.otherPlansText || 'Voir toutes les formules' }} →</a>
+        </div>
+      </template>
+      
+      <!-- PRICING: Layout Dark -->
+      <template v-else-if="section.content?.layout === 'dark' && section.content?.plans">
+        <div :style="{ maxWidth: section.style?.maxWidth || '1200px', margin: '0 auto', padding: '0 1rem' }">
+          <div class="text-center mb-12">
+            <h2 class="text-3xl md:text-4xl font-bold mb-3" :style="{ color: section.style?.textColor }">{{ section.content?.title }}</h2>
+            <p v-if="section.content?.subtitle" class="opacity-70" :style="{ color: section.style?.textColor }">{{ section.content.subtitle }}</p>
+          </div>
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div v-for="(plan, idx) in section.content.plans" :key="idx" class="rounded-2xl p-8 border transition-all" :style="{ borderColor: plan.highlighted ? '#10B981' : 'rgba(255,255,255,0.1)', backgroundColor: plan.highlighted ? 'rgba(16,185,129,0.1)' : 'rgba(255,255,255,0.05)' }">
+              <span v-if="plan.badge" class="inline-block px-3 py-1 text-xs font-bold rounded-full mb-4 bg-green-500 text-white">{{ plan.badge }}</span>
+              <h3 class="text-xl font-bold mb-1" :style="{ color: section.style?.textColor }">{{ plan.name }}</h3>
+              <div class="my-6"><span class="text-4xl font-bold" :style="{ color: section.style?.textColor }">{{ plan.price }}{{ plan.currency }}</span><span class="opacity-60" :style="{ color: section.style?.textColor }">{{ plan.period }}</span></div>
+              <ul class="space-y-3 mb-8">
+                <li v-for="(feat, fi) in plan.features" :key="fi" class="flex items-center gap-2 opacity-80" :style="{ color: section.style?.textColor }">
+                  <svg class="w-4 h-4 text-green-400 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" /></svg>
+                  <span>{{ feat }}</span>
+                </li>
+              </ul>
+              <a v-if="plan.button" :href="plan.button.url || '#'" class="block w-full py-3 rounded-lg font-semibold text-center transition-all" :style="plan.highlighted ? { backgroundColor: '#10B981', color: '#ffffff' } : { backgroundColor: 'rgba(255,255,255,0.1)', color: section.style?.textColor }">{{ plan.button.text }}</a>
+            </div>
+          </div>
+        </div>
+      </template>
+      
+      <!-- PRICING: Layout Enterprise -->
+      <template v-else-if="section.content?.layout === 'enterprise'">
+        <div :style="{ maxWidth: section.style?.maxWidth || '1000px', margin: '0 auto', padding: '0 1rem' }">
+          <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+            <div>
+              <span v-if="section.content?.badge" class="inline-block px-3 py-1 text-xs font-bold rounded-full mb-4" :style="{ backgroundColor: section.style?.textColor + '10', color: section.style?.textColor }">{{ section.content.badge }}</span>
+              <h2 class="text-3xl md:text-4xl font-bold mb-4" :style="{ color: section.style?.textColor }">{{ section.content?.title }}</h2>
+              <p class="text-lg opacity-80 mb-8" :style="{ color: section.style?.textColor }">{{ section.content?.description }}</p>
+              <ul v-if="section.content?.features" class="space-y-4 mb-8">
+                <li v-for="(feat, fi) in section.content.features" :key="fi" class="flex items-center gap-3" :style="{ color: section.style?.textColor }">
+                  <svg class="w-6 h-6 text-green-500 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" /></svg>
+                  <span>{{ feat }}</span>
+                </li>
+              </ul>
+            </div>
+            <div v-if="section.content?.contact" class="rounded-2xl p-8" :style="{ backgroundColor: section.style?.textColor + '08' }">
+              <h3 class="text-xl font-bold mb-2" :style="{ color: section.style?.textColor }">{{ section.content.contact.title }}</h3>
+              <p class="opacity-70 mb-6" :style="{ color: section.style?.textColor }">{{ section.content.contact.description }}</p>
+              <a v-if="section.content.contact.button" :href="section.content.contact.button.url || '#'" class="block w-full py-4 rounded-xl font-bold text-center transition-all mb-4" :style="getButtonStyle">{{ section.content.contact.button.text }}</a>
+              <p v-if="section.content.contact.phone" class="text-center opacity-70" :style="{ color: section.style?.textColor }">
+                ou appelez-nous : <strong>{{ section.content.contact.phone }}</strong>
+              </p>
+            </div>
+          </div>
+        </div>
+      </template>
+      
+      <!-- PRICING: Layout Lifetime -->
+      <template v-else-if="section.content?.layout === 'lifetime'">
+        <div :style="{ maxWidth: section.style?.maxWidth || '550px', margin: '0 auto', padding: '0 1rem' }">
+          <div class="rounded-3xl p-10 text-center" :style="{ backgroundColor: '#fef3c7' }">
+            <span v-if="section.content?.badge" class="inline-block px-4 py-1 text-sm font-bold rounded-full mb-4 bg-red-500 text-white animate-pulse">{{ section.content.badge }}</span>
+            <h2 class="text-3xl md:text-4xl font-bold mb-2 text-gray-900">{{ section.content?.title }}</h2>
+            <p class="text-gray-600 mb-6">{{ section.content?.subtitle }}</p>
+            <div class="mb-6">
+              <span v-if="section.content?.originalPrice" class="text-2xl text-gray-400 line-through mr-3">{{ section.content.originalPrice }}{{ section.content?.currency }}</span>
+              <span class="text-6xl font-bold text-gray-900">{{ section.content?.price }}{{ section.content?.currency }}</span>
+              <span v-if="section.content?.discount" class="ml-3 px-3 py-1 bg-red-500 text-white text-sm font-bold rounded-full">-{{ section.content.discount }}</span>
+            </div>
+            <ul v-if="section.content?.features" class="text-left max-w-sm mx-auto space-y-3 mb-8">
+              <li v-for="(feat, fi) in section.content.features" :key="fi" class="flex items-center gap-3 text-gray-700">
+                <svg class="w-5 h-5 text-green-500 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" /></svg>
+                <span>{{ feat }}</span>
+              </li>
+            </ul>
+            <a v-if="section.content?.button" :href="section.content.button.url || '#'" class="block w-full py-4 rounded-xl font-bold text-lg text-center transition-all bg-gray-900 text-white hover:bg-gray-800">{{ section.content.button.text }}</a>
+            <p v-if="section.content?.spotsLeft" class="mt-4 text-sm text-red-600 font-medium">Plus que {{ section.content.spotsLeft }} places disponibles !</p>
+            <p v-if="section.content?.guarantee" class="mt-4 text-sm text-gray-500">{{ section.content.guarantee }}</p>
+          </div>
+        </div>
+      </template>
+      
+      <!-- PRICING: Layout par défaut (Single) -->
+      <template v-else>
+        <div :style="{ maxWidth: section.style?.maxWidth || '450px', margin: '0 auto', padding: '0 1rem', textAlign: 'center' }">
+          <div class="bg-white rounded-2xl shadow-xl p-8">
+            <span v-if="section.content?.badge" class="inline-block px-3 py-1 text-xs font-bold rounded-full mb-4 bg-primary text-white">{{ section.content.badge }}</span>
+            <h3 class="text-2xl font-bold mb-2 text-gray-900">{{ section.content?.title || 'Notre offre' }}</h3>
+            <p v-if="section.content?.description" class="text-gray-600 mb-6">{{ section.content.description }}</p>
+            <div class="my-6">
+              <span class="text-5xl font-bold text-gray-900">{{ section.content?.price || '49' }}{{ section.content?.currency || '€' }}</span>
+              <span class="text-gray-500">{{ section.content?.period || '/mois' }}</span>
+            </div>
+            <ul v-if="section.content?.features" class="text-left space-y-3 mb-8">
+              <li v-for="(feature, i) in section.content.features" :key="i" class="flex items-center gap-2 text-gray-700">
+                <svg class="w-5 h-5 text-green-500 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" /></svg>
+                <span>{{ feature }}</span>
+              </li>
+            </ul>
+            <a v-if="section.content?.button" :href="section.content.button.url || '#'" class="block w-full py-4 rounded-lg font-bold text-center transition-all" :style="getButtonStyle">{{ section.content.button.text || 'Commencer' }}</a>
+            <p v-if="section.content?.guarantee" class="mt-4 text-sm text-gray-500">{{ section.content.guarantee }}</p>
+          </div>
+        </div>
+      </template>
+      
     </template>
     
     <!-- Spacer -->
@@ -529,8 +750,16 @@ const getFontSize = (size: string): string => {
   return sizes[size] || size
 }
 
-// Style du bouton
-const getButtonStyle = (buttonStyle?: string) => {
+// Style du bouton (computed sans paramètre pour Pricing et autres blocs)
+const getButtonStyle = computed(() => {
+  return {
+    backgroundColor: props.primaryColor || '#10B981',
+    color: '#ffffff'
+  }
+})
+
+// Style du bouton avec paramètre optionnel pour Hero et CTA
+const getButtonStyleWithParam = (buttonStyle?: string) => {
   if (buttonStyle === 'secondary') {
     return {
       backgroundColor: 'transparent',

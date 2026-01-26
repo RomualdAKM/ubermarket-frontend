@@ -1368,90 +1368,509 @@
     
     <!-- Text -->
     <template v-else-if="section.type === 'text'">
-      <div :style="{ maxWidth: section.style?.maxWidth || '800px', margin: '0 auto', padding: '0 1rem' }">
-        <h2 v-if="section.content?.title" class="text-2xl font-bold mb-4" :style="{ color: section.style?.textColor, textAlign: section.style?.alignment }">
-          {{ section.content.title }}
-        </h2>
-        <div 
-          class="prose max-w-none" 
-          :style="{ color: section.style?.textColor, textAlign: section.style?.alignment }"
-          v-html="section.content?.content || '<p>Votre texte ici...</p>'"
-        ></div>
-      </div>
+      <!-- TEXT: Two Columns -->
+      <template v-if="section.content?.layout === 'two-columns'">
+        <div :style="{ maxWidth: section.style?.maxWidth || '1000px', margin: '0 auto', padding: '0 1rem' }">
+          <h2 v-if="section.content?.title" class="text-3xl font-bold mb-8 text-center" :style="{ color: section.style?.textColor }">{{ section.content.title }}</h2>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div :style="{ color: section.style?.textColor }" class="text-base leading-relaxed">{{ section.content?.leftContent }}</div>
+            <div :style="{ color: section.style?.textColor }" class="text-base leading-relaxed">{{ section.content?.rightContent }}</div>
+          </div>
+        </div>
+      </template>
+      <!-- TEXT: Highlight -->
+      <template v-else-if="section.content?.layout === 'highlight'">
+        <div :style="{ maxWidth: section.style?.maxWidth || '700px', margin: '0 auto', padding: '0 1rem' }">
+          <div class="rounded-xl p-6" :style="{ backgroundColor: section.style?.backgroundColor }">
+            <div class="flex items-start gap-4">
+              <div class="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0" :style="{ backgroundColor: section.style?.textColor + '20' }">
+                <svg class="w-5 h-5" :style="{ color: section.style?.textColor }" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd" /></svg>
+              </div>
+              <div>
+                <h3 class="font-bold text-lg mb-2" :style="{ color: section.style?.textColor }">{{ section.content?.title }}</h3>
+                <p :style="{ color: section.style?.textColor }" class="opacity-90">{{ section.content?.content }}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </template>
+      <!-- TEXT: Numbered List -->
+      <template v-else-if="section.content?.layout === 'numbered'">
+        <div :style="{ maxWidth: section.style?.maxWidth || '800px', margin: '0 auto', padding: '0 1rem' }">
+          <h2 v-if="section.content?.title" class="text-3xl font-bold mb-8" :style="{ color: section.style?.textColor }">{{ section.content.title }}</h2>
+          <div class="space-y-6">
+            <div v-for="(item, index) in (section.content?.items || [])" :key="index" class="flex gap-4">
+              <div class="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 font-bold" :style="{ backgroundColor: section.style?.textColor + '10', color: section.style?.textColor }">{{ +index + 1 }}</div>
+              <div>
+                <h4 class="font-semibold mb-1" :style="{ color: section.style?.textColor }">{{ item.title }}</h4>
+                <p class="opacity-70" :style="{ color: section.style?.textColor }">{{ item.description }}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </template>
+      <!-- TEXT: Dropcap -->
+      <template v-else-if="section.content?.layout === 'dropcap'">
+        <div :style="{ maxWidth: section.style?.maxWidth || '700px', margin: '0 auto', padding: '0 1rem' }">
+          <p :style="{ color: section.style?.textColor }" class="text-lg leading-relaxed">
+            <span class="float-left text-6xl font-bold mr-3 mt-1" :style="{ color: section.style?.textColor }">{{ (section.content?.content || 'L')[0] }}</span>
+            {{ (section.content?.content || '').substring(1) }}
+          </p>
+        </div>
+      </template>
+      <!-- TEXT: Quote -->
+      <template v-else-if="section.content?.layout === 'quote'">
+        <div :style="{ maxWidth: section.style?.maxWidth || '600px', margin: '0 auto', padding: '0 1rem', textAlign: 'center' }">
+          <svg class="w-12 h-12 mx-auto mb-4 opacity-20" :style="{ color: section.style?.textColor }" fill="currentColor" viewBox="0 0 24 24"><path d="M14.017 21v-7.391c0-5.704 3.731-9.57 8.983-10.609l.995 2.151c-2.432.917-3.995 3.638-3.995 5.849h4v10h-9.983zm-14.017 0v-7.391c0-5.704 3.748-9.57 9-10.609l.996 2.151c-2.433.917-3.996 3.638-3.996 5.849h4v10h-10z"/></svg>
+          <blockquote class="text-2xl italic mb-4" :style="{ color: section.style?.textColor }">{{ section.content?.content }}</blockquote>
+          <cite v-if="section.content?.author" class="text-sm font-medium opacity-70" :style="{ color: section.style?.textColor }">\u2014 {{ section.content.author }}</cite>
+        </div>
+      </template>
+      <!-- TEXT: Article -->
+      <template v-else-if="section.content?.layout === 'article'">
+        <div :style="{ maxWidth: section.style?.maxWidth || '750px', margin: '0 auto', padding: '0 1rem' }">
+          <div class="mb-6">
+            <span v-if="section.content?.category" class="text-xs font-bold tracking-wider opacity-60" :style="{ color: section.style?.textColor }">{{ section.content.category }}</span>
+            <h1 class="text-4xl font-bold mt-2 mb-3" :style="{ color: section.style?.textColor }">{{ section.content?.title }}</h1>
+            <div class="flex items-center gap-4 text-sm opacity-60" :style="{ color: section.style?.textColor }">
+              <span v-if="section.content?.date">{{ section.content.date }}</span>
+              <span v-if="section.content?.author">Par {{ section.content.author }}</span>
+            </div>
+          </div>
+          <div class="prose max-w-none" :style="{ color: section.style?.textColor }">{{ section.content?.content }}</div>
+        </div>
+      </template>
+      <!-- TEXT: Default (Heading/Paragraph) -->
+      <template v-else>
+        <div :style="{ maxWidth: section.style?.maxWidth || '800px', margin: '0 auto', padding: '0 1rem' }">
+          <h2 v-if="section.content?.title" class="text-2xl font-bold mb-4" :style="{ color: section.style?.textColor, textAlign: section.style?.alignment }">{{ section.content.title }}</h2>
+          <div class="prose max-w-none" :style="{ color: section.style?.textColor, textAlign: section.style?.alignment }" v-html="section.content?.content || '<p>Votre texte ici...</p>'"></div>
+        </div>
+      </template>
     </template>
     
     <!-- Image -->
     <template v-else-if="section.type === 'image'">
-      <div :style="{ maxWidth: section.style?.maxWidth || '800px', margin: '0 auto', padding: '0 1rem', textAlign: section.style?.alignment || 'center' }">
-        <img
-          v-if="section.content?.src"
-          :src="section.content.src"
-          :alt="section.content.alt || 'Image'"
-          class="max-w-full h-auto rounded-lg"
-        />
-        <div v-else class="bg-gray-200 rounded-lg py-20 px-10 text-gray-500">
-          <svg class="w-16 h-16 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-          </svg>
-          <p>Aucune image</p>
+      <!-- IMAGE: Parallax -->
+      <template v-if="section.content?.layout === 'parallax'">
+        <div class="relative overflow-hidden" :style="{ height: (section.content?.height || 400) + 'px' }">
+          <div class="absolute inset-0 bg-cover bg-center bg-fixed" :style="{ backgroundImage: section.content?.src ? 'url(' + section.content.src + ')' : 'linear-gradient(45deg, #374151 25%, #1f2937 75%)' }"></div>
+          <div class="absolute inset-0 bg-black/40 flex items-center justify-center">
+            <h2 v-if="section.content?.overlayText" class="text-4xl font-bold text-white text-center px-4">{{ section.content.overlayText }}</h2>
+          </div>
         </div>
-        <p v-if="section.content?.caption" class="mt-2 text-sm" :style="{ color: section.style?.textColor, opacity: 0.7 }">
-          {{ section.content.caption }}
-        </p>
-      </div>
+      </template>
+      <!-- IMAGE: Comparison -->
+      <template v-else-if="section.content?.layout === 'comparison'">
+        <div :style="{ maxWidth: section.style?.maxWidth || '800px', margin: '0 auto', padding: '0 1rem' }">
+          <div class="relative overflow-hidden rounded-xl">
+            <div class="grid grid-cols-2 gap-4">
+              <div class="text-center">
+                <div class="bg-gray-200 aspect-video rounded-lg flex items-center justify-center text-gray-500">{{ section.content?.beforeLabel || 'Avant' }}</div>
+                <span class="text-sm mt-2 block" :style="{ color: section.style?.textColor }">{{ section.content?.beforeLabel || 'Avant' }}</span>
+              </div>
+              <div class="text-center">
+                <div class="bg-gray-200 aspect-video rounded-lg flex items-center justify-center text-gray-500">{{ section.content?.afterLabel || 'Apr\u00e8s' }}</div>
+                <span class="text-sm mt-2 block" :style="{ color: section.style?.textColor }">{{ section.content?.afterLabel || 'Apr\u00e8s' }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </template>
+      <!-- IMAGE: Split Text -->
+      <template v-else-if="section.content?.layout === 'split-text'">
+        <div :style="{ maxWidth: section.style?.maxWidth || '1100px', margin: '0 auto', padding: '0 1rem' }">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-12 items-center" :class="section.content?.imagePosition === 'right' ? 'md:flex-row-reverse' : ''">
+            <div :class="section.content?.imagePosition === 'right' ? 'md:order-2' : ''">
+              <img v-if="section.content?.src" :src="section.content.src" :alt="section.content?.alt" class="w-full rounded-xl" />
+              <div v-else class="bg-gray-200 aspect-video rounded-xl flex items-center justify-center text-gray-500">Image</div>
+            </div>
+            <div :class="section.content?.imagePosition === 'right' ? 'md:order-1' : ''">
+              <h3 class="text-3xl font-bold mb-4" :style="{ color: section.style?.textColor }">{{ section.content?.title }}</h3>
+              <p class="text-lg opacity-80" :style="{ color: section.style?.textColor }">{{ section.content?.content }}</p>
+            </div>
+          </div>
+        </div>
+      </template>
+      <!-- IMAGE: Rounded -->
+      <template v-else-if="section.content?.layout === 'rounded'">
+        <div :style="{ maxWidth: section.style?.maxWidth || '600px', margin: '0 auto', padding: '0 1rem', textAlign: 'center' }">
+          <img v-if="section.content?.src" :src="section.content.src" :alt="section.content?.alt" class="max-w-full h-auto" :style="{ borderRadius: (section.content?.borderRadius || 24) + 'px' }" />
+          <div v-else class="bg-gray-200 py-20 text-gray-500" :style="{ borderRadius: (section.content?.borderRadius || 24) + 'px' }">Aucune image</div>
+        </div>
+      </template>
+      <!-- IMAGE: Framed -->
+      <template v-else-if="section.content?.layout === 'framed'">
+        <div :style="{ maxWidth: section.style?.maxWidth || '700px', margin: '0 auto', padding: '0 1rem', textAlign: 'center' }">
+          <div class="p-2" :style="{ backgroundColor: section.content?.frameColor || '#262626', borderRadius: '8px' }">
+            <img v-if="section.content?.src" :src="section.content.src" :alt="section.content?.alt" class="max-w-full h-auto rounded" />
+            <div v-else class="bg-gray-200 py-20 text-gray-500 rounded">Aucune image</div>
+          </div>
+        </div>
+      </template>
+      <!-- IMAGE: Default -->
+      <template v-else>
+        <div :style="{ maxWidth: section.style?.maxWidth || '800px', margin: '0 auto', padding: '0 1rem', textAlign: section.style?.alignment || 'center' }">
+          <img v-if="section.content?.src" :src="section.content.src" :alt="section.content?.alt || 'Image'" class="max-w-full h-auto rounded-lg" />
+          <div v-else class="bg-gray-200 rounded-lg py-20 px-10 text-gray-500">
+            <svg class="w-16 h-16 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
+            <p>Aucune image</p>
+          </div>
+          <p v-if="section.content?.caption" class="mt-2 text-sm" :style="{ color: section.style?.textColor, opacity: 0.7 }">{{ section.content.caption }}</p>
+        </div>
+      </template>
     </template>
     
     <!-- FAQ -->
     <template v-else-if="section.type === 'faq'">
-      <div :style="{ maxWidth: section.style?.maxWidth || '800px', margin: '0 auto', padding: '0 1rem' }">
-        <h2 v-if="section.content?.title" class="text-3xl font-bold mb-8" :style="{ color: section.style?.textColor, textAlign: section.style?.alignment }">
-          {{ section.content.title }}
-        </h2>
-        <div class="space-y-4">
-          <div 
-            v-for="(item, index) in (section.content?.items || [])" 
-            :key="index"
-            class="border border-gray-200 rounded-lg overflow-hidden"
-          >
-            <div class="p-4 font-semibold bg-gray-50" :style="{ color: section.style?.textColor }">
-              {{ item.question }}
-            </div>
-            <div class="p-4" :style="{ color: section.style?.textColor }">
-              {{ item.answer }}
+      <!-- FAQ: Columns (2 colonnes) -->
+      <template v-if="section.content?.layout === 'columns'">
+        <div :style="{ maxWidth: section.style?.maxWidth || '1100px', margin: '0 auto', padding: '0 1rem' }">
+          <h2 v-if="section.content?.title" class="text-3xl font-bold mb-8 text-center" :style="{ color: section.style?.textColor }">{{ section.content.title }}</h2>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div v-for="(item, index) in (section.content?.items || [])" :key="index" class="p-6 rounded-xl" :style="{ backgroundColor: section.style?.textColor + '08' }">
+              <h4 class="font-bold mb-2" :style="{ color: section.style?.textColor }">{{ item.question }}</h4>
+              <p class="opacity-70" :style="{ color: section.style?.textColor }">{{ item.answer }}</p>
             </div>
           </div>
         </div>
-      </div>
+      </template>
+      
+      <!-- FAQ: Tabs -->
+      <template v-else-if="section.content?.layout === 'tabs'">
+        <div :style="{ maxWidth: section.style?.maxWidth || '900px', margin: '0 auto', padding: '0 1rem' }">
+          <h2 v-if="section.content?.title" class="text-3xl font-bold mb-8 text-center" :style="{ color: section.style?.textColor }">{{ section.content.title }}</h2>
+          <div class="flex flex-wrap justify-center gap-2 mb-8">
+            <button v-for="(category, index) in (section.content?.categories || ['Général'])" :key="index" @click="activeTab = index" class="px-4 py-2 rounded-full font-medium transition-all" :style="{ backgroundColor: activeTab === index ? (section.content?.accentColor || '#10B981') : section.style?.textColor + '10', color: activeTab === index ? '#ffffff' : section.style?.textColor }">{{ category }}</button>
+          </div>
+          <div class="space-y-4">
+            <div v-for="(item, index) in (section.content?.items || [])" :key="index" class="border rounded-xl overflow-hidden" :style="{ borderColor: section.style?.textColor + '15' }">
+              <div class="p-4 font-semibold" :style="{ backgroundColor: section.style?.textColor + '05', color: section.style?.textColor }">{{ item.question }}</div>
+              <div class="p-4 opacity-80" :style="{ color: section.style?.textColor }">{{ item.answer }}</div>
+            </div>
+          </div>
+        </div>
+      </template>
+      
+      <!-- FAQ: Search -->
+      <template v-else-if="section.content?.layout === 'search'">
+        <div :style="{ maxWidth: section.style?.maxWidth || '800px', margin: '0 auto', padding: '0 1rem' }">
+          <h2 v-if="section.content?.title" class="text-3xl font-bold mb-4 text-center" :style="{ color: section.style?.textColor }">{{ section.content.title }}</h2>
+          <div class="relative mb-8">
+            <input type="text" :placeholder="section.content?.searchPlaceholder || 'Rechercher...'" class="w-full px-6 py-4 rounded-xl border-2 text-lg" :style="{ borderColor: section.style?.textColor + '20', color: section.style?.textColor }" />
+            <svg class="absolute right-4 top-1/2 -translate-y-1/2 w-6 h-6 opacity-40" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
+          </div>
+          <div class="space-y-4">
+            <div v-for="(item, index) in (section.content?.items || [])" :key="index" class="border-b pb-4" :style="{ borderColor: section.style?.textColor + '15' }">
+              <h4 class="font-bold mb-2" :style="{ color: section.style?.textColor }">{{ item.question }}</h4>
+              <p class="opacity-70" :style="{ color: section.style?.textColor }">{{ item.answer }}</p>
+            </div>
+          </div>
+        </div>
+      </template>
+      
+      <!-- FAQ: Side (Titre à gauche) -->
+      <template v-else-if="section.content?.layout === 'side'">
+        <div :style="{ maxWidth: section.style?.maxWidth || '1100px', margin: '0 auto', padding: '0 1rem' }">
+          <div class="grid grid-cols-1 lg:grid-cols-3 gap-12">
+            <div>
+              <h2 class="text-3xl font-bold mb-4" :style="{ color: section.style?.textColor }">{{ section.content?.title }}</h2>
+              <p v-if="section.content?.subtitle" class="opacity-70 mb-6" :style="{ color: section.style?.textColor }">{{ section.content.subtitle }}</p>
+              <a v-if="section.content?.contactLink" :href="section.content.contactLink" class="inline-flex items-center gap-2 font-medium" :style="{ color: section.content?.accentColor || '#10B981' }">
+                Besoin d'aide ?
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" /></svg>
+              </a>
+            </div>
+            <div class="lg:col-span-2 space-y-4">
+              <div v-for="(item, index) in (section.content?.items || [])" :key="index" class="p-6 rounded-xl" :style="{ backgroundColor: section.style?.textColor + '05' }">
+                <h4 class="font-bold mb-2" :style="{ color: section.style?.textColor }">{{ item.question }}</h4>
+                <p class="opacity-70" :style="{ color: section.style?.textColor }">{{ item.answer }}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </template>
+      
+      <!-- FAQ: Minimal -->
+      <template v-else-if="section.content?.layout === 'minimal'">
+        <div :style="{ maxWidth: section.style?.maxWidth || '700px', margin: '0 auto', padding: '0 1rem' }">
+          <h2 v-if="section.content?.title" class="text-2xl font-bold mb-8 text-center" :style="{ color: section.style?.textColor }">{{ section.content.title }}</h2>
+          <div class="space-y-6">
+            <div v-for="(item, index) in (section.content?.items || [])" :key="index">
+              <h4 class="font-medium mb-1" :style="{ color: section.style?.textColor }">{{ item.question }}</h4>
+              <p class="opacity-60 text-sm" :style="{ color: section.style?.textColor }">{{ item.answer }}</p>
+            </div>
+          </div>
+        </div>
+      </template>
+      
+      <!-- FAQ: Cards -->
+      <template v-else-if="section.content?.layout === 'cards'">
+        <div :style="{ maxWidth: section.style?.maxWidth || '1200px', margin: '0 auto', padding: '0 1rem' }">
+          <h2 v-if="section.content?.title" class="text-3xl font-bold mb-8 text-center" :style="{ color: section.style?.textColor }">{{ section.content.title }}</h2>
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div v-for="(item, index) in (section.content?.items || [])" :key="index" class="p-6 rounded-2xl border" :style="{ borderColor: section.style?.textColor + '15' }">
+              <div class="w-10 h-10 rounded-full mb-4 flex items-center justify-center text-white font-bold" :style="{ backgroundColor: section.content?.accentColor || '#10B981' }">{{ +index + 1 }}</div>
+              <h4 class="font-bold mb-2" :style="{ color: section.style?.textColor }">{{ item.question }}</h4>
+              <p class="text-sm opacity-70" :style="{ color: section.style?.textColor }">{{ item.answer }}</p>
+            </div>
+          </div>
+        </div>
+      </template>
+      
+      <!-- FAQ: Numbered -->
+      <template v-else-if="section.content?.layout === 'numbered'">
+        <div :style="{ maxWidth: section.style?.maxWidth || '800px', margin: '0 auto', padding: '0 1rem' }">
+          <h2 v-if="section.content?.title" class="text-3xl font-bold mb-8 text-center" :style="{ color: section.style?.textColor }">{{ section.content.title }}</h2>
+          <div class="space-y-6">
+            <div v-for="(item, index) in (section.content?.items || [])" :key="index" class="flex gap-6">
+              <div class="flex-none w-12 h-12 rounded-full border-2 flex items-center justify-center font-bold text-xl" :style="{ borderColor: section.content?.accentColor || '#10B981', color: section.content?.accentColor || '#10B981' }">{{ +index + 1 }}</div>
+              <div class="flex-1">
+                <h4 class="font-bold mb-1" :style="{ color: section.style?.textColor }">{{ item.question }}</h4>
+                <p class="opacity-70" :style="{ color: section.style?.textColor }">{{ item.answer }}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </template>
+      
+      <!-- FAQ: Default (Accordion) -->
+      <template v-else>
+        <div :style="{ maxWidth: section.style?.maxWidth || '800px', margin: '0 auto', padding: '0 1rem' }">
+          <h2 v-if="section.content?.title" class="text-3xl font-bold mb-8" :style="{ color: section.style?.textColor, textAlign: section.style?.alignment }">{{ section.content.title }}</h2>
+          <div class="space-y-4">
+            <div v-for="(item, index) in (section.content?.items || [])" :key="index" class="border border-gray-200 rounded-lg overflow-hidden">
+              <div class="p-4 font-semibold bg-gray-50" :style="{ color: section.style?.textColor }">{{ item.question }}</div>
+              <div class="p-4" :style="{ color: section.style?.textColor }">{{ item.answer }}</div>
+            </div>
+          </div>
+        </div>
+      </template>
     </template>
     
     <!-- Contact -->
     <template v-else-if="section.type === 'contact'">
-      <div :style="{ maxWidth: section.style?.maxWidth || '600px', margin: '0 auto', padding: '0 1rem', textAlign: 'center' }">
-        <h2 v-if="section.content?.title" class="text-3xl font-bold mb-6" :style="{ color: section.style?.textColor }">
-          {{ section.content.title }}
-        </h2>
-        <div class="space-y-3" :style="{ color: section.style?.textColor }">
-          <p v-if="section.content?.email" class="flex items-center justify-center gap-2">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-            </svg>
-            {{ section.content.email }}
-          </p>
-          <p v-if="section.content?.phone" class="flex items-center justify-center gap-2">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
-            </svg>
-            {{ section.content.phone }}
-          </p>
-          <p v-if="section.content?.address" class="flex items-center justify-center gap-2">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-            </svg>
-            {{ section.content.address }}
-          </p>
+      <!-- CONTACT: Detailed -->
+      <template v-if="section.content?.layout === 'detailed'">
+        <div :style="{ maxWidth: section.style?.maxWidth || '1100px', margin: '0 auto', padding: '0 1rem' }">
+          <div class="text-center mb-12">
+            <h2 class="text-3xl font-bold mb-2" :style="{ color: section.style?.textColor }">{{ section.content?.title }}</h2>
+            <p v-if="section.content?.subtitle" class="opacity-70" :style="{ color: section.style?.textColor }">{{ section.content.subtitle }}</p>
+          </div>
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div class="text-center p-6 rounded-xl" :style="{ backgroundColor: section.style?.textColor + '08' }">
+              <div class="w-14 h-14 mx-auto mb-4 rounded-full flex items-center justify-center" :style="{ backgroundColor: section.content?.accentColor || '#10B981' }">
+                <svg class="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>
+              </div>
+              <h4 class="font-bold mb-1" :style="{ color: section.style?.textColor }">Email</h4>
+              <p class="opacity-70" :style="{ color: section.style?.textColor }">{{ section.content?.email }}</p>
+            </div>
+            <div class="text-center p-6 rounded-xl" :style="{ backgroundColor: section.style?.textColor + '08' }">
+              <div class="w-14 h-14 mx-auto mb-4 rounded-full flex items-center justify-center" :style="{ backgroundColor: section.content?.accentColor || '#10B981' }">
+                <svg class="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" /></svg>
+              </div>
+              <h4 class="font-bold mb-1" :style="{ color: section.style?.textColor }">Téléphone</h4>
+              <p class="opacity-70" :style="{ color: section.style?.textColor }">{{ section.content?.phone }}</p>
+            </div>
+            <div class="text-center p-6 rounded-xl" :style="{ backgroundColor: section.style?.textColor + '08' }">
+              <div class="w-14 h-14 mx-auto mb-4 rounded-full flex items-center justify-center" :style="{ backgroundColor: section.content?.accentColor || '#10B981' }">
+                <svg class="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
+              </div>
+              <h4 class="font-bold mb-1" :style="{ color: section.style?.textColor }">Adresse</h4>
+              <p class="opacity-70" :style="{ color: section.style?.textColor }">{{ section.content?.address }}</p>
+            </div>
+          </div>
         </div>
-      </div>
+      </template>
+      
+      <!-- CONTACT: Split -->
+      <template v-else-if="section.content?.layout === 'split'">
+        <div :style="{ maxWidth: section.style?.maxWidth || '1100px', margin: '0 auto', padding: '0 1rem' }">
+          <div class="grid grid-cols-1 lg:grid-cols-2 gap-12">
+            <div>
+              <h2 class="text-3xl font-bold mb-4" :style="{ color: section.style?.textColor }">{{ section.content?.title }}</h2>
+              <p class="opacity-70 mb-8" :style="{ color: section.style?.textColor }">{{ section.content?.description }}</p>
+              <div class="space-y-4">
+                <div v-if="section.content?.email" class="flex items-center gap-4" :style="{ color: section.style?.textColor }">
+                  <div class="w-12 h-12 rounded-xl flex items-center justify-center" :style="{ backgroundColor: section.style?.textColor + '10' }">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>
+                  </div>
+                  <div>
+                    <div class="text-sm opacity-60">Email</div>
+                    <div class="font-medium">{{ section.content.email }}</div>
+                  </div>
+                </div>
+                <div v-if="section.content?.phone" class="flex items-center gap-4" :style="{ color: section.style?.textColor }">
+                  <div class="w-12 h-12 rounded-xl flex items-center justify-center" :style="{ backgroundColor: section.style?.textColor + '10' }">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" /></svg>
+                  </div>
+                  <div>
+                    <div class="text-sm opacity-60">Téléphone</div>
+                    <div class="font-medium">{{ section.content.phone }}</div>
+                  </div>
+                </div>
+                <div v-if="section.content?.address" class="flex items-center gap-4" :style="{ color: section.style?.textColor }">
+                  <div class="w-12 h-12 rounded-xl flex items-center justify-center" :style="{ backgroundColor: section.style?.textColor + '10' }">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" /></svg>
+                  </div>
+                  <div>
+                    <div class="text-sm opacity-60">Adresse</div>
+                    <div class="font-medium">{{ section.content.address }}</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="rounded-2xl p-8" :style="{ backgroundColor: section.style?.textColor + '05' }">
+              <h3 class="text-xl font-bold mb-6" :style="{ color: section.style?.textColor }">Envoyez-nous un message</h3>
+              <form class="space-y-4">
+                <input type="text" placeholder="Votre nom" class="w-full px-4 py-3 rounded-lg border" :style="{ borderColor: section.style?.textColor + '20' }" />
+                <input type="email" placeholder="Votre email" class="w-full px-4 py-3 rounded-lg border" :style="{ borderColor: section.style?.textColor + '20' }" />
+                <textarea placeholder="Votre message" rows="4" class="w-full px-4 py-3 rounded-lg border" :style="{ borderColor: section.style?.textColor + '20' }"></textarea>
+                <button type="submit" class="w-full py-3 rounded-lg font-semibold transition-all" :style="getButtonStyle">Envoyer</button>
+              </form>
+            </div>
+          </div>
+        </div>
+      </template>
+      
+      <!-- CONTACT: Cards -->
+      <template v-else-if="section.content?.layout === 'cards'">
+        <div :style="{ maxWidth: section.style?.maxWidth || '900px', margin: '0 auto', padding: '0 1rem' }">
+          <h2 v-if="section.content?.title" class="text-3xl font-bold mb-8 text-center" :style="{ color: section.style?.textColor }">{{ section.content.title }}</h2>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <a v-if="section.content?.email" :href="'mailto:' + section.content.email" class="flex items-center gap-4 p-6 rounded-2xl border transition-all hover:shadow-lg" :style="{ borderColor: section.style?.textColor + '15' }">
+              <div class="w-14 h-14 rounded-xl flex items-center justify-center" :style="{ backgroundColor: section.content?.accentColor || '#10B981' }">
+                <svg class="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>
+              </div>
+              <div>
+                <div class="font-bold" :style="{ color: section.style?.textColor }">Email</div>
+                <div class="opacity-70" :style="{ color: section.style?.textColor }">{{ section.content.email }}</div>
+              </div>
+            </a>
+            <a v-if="section.content?.phone" :href="'tel:' + section.content.phone" class="flex items-center gap-4 p-6 rounded-2xl border transition-all hover:shadow-lg" :style="{ borderColor: section.style?.textColor + '15' }">
+              <div class="w-14 h-14 rounded-xl flex items-center justify-center" :style="{ backgroundColor: section.content?.accentColor || '#10B981' }">
+                <svg class="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" /></svg>
+              </div>
+              <div>
+                <div class="font-bold" :style="{ color: section.style?.textColor }">Téléphone</div>
+                <div class="opacity-70" :style="{ color: section.style?.textColor }">{{ section.content.phone }}</div>
+              </div>
+            </a>
+          </div>
+        </div>
+      </template>
+      
+      <!-- CONTACT: Form -->
+      <template v-else-if="section.content?.layout === 'form'">
+        <div :style="{ maxWidth: section.style?.maxWidth || '600px', margin: '0 auto', padding: '0 1rem' }">
+          <div class="text-center mb-8">
+            <h2 class="text-3xl font-bold mb-2" :style="{ color: section.style?.textColor }">{{ section.content?.title }}</h2>
+            <p v-if="section.content?.subtitle" class="opacity-70" :style="{ color: section.style?.textColor }">{{ section.content.subtitle }}</p>
+          </div>
+          <form class="space-y-4">
+            <div class="grid grid-cols-2 gap-4">
+              <input type="text" placeholder="Prénom" class="px-4 py-3 rounded-lg border" :style="{ borderColor: section.style?.textColor + '20' }" />
+              <input type="text" placeholder="Nom" class="px-4 py-3 rounded-lg border" :style="{ borderColor: section.style?.textColor + '20' }" />
+            </div>
+            <input type="email" placeholder="Email" class="w-full px-4 py-3 rounded-lg border" :style="{ borderColor: section.style?.textColor + '20' }" />
+            <input type="tel" placeholder="Téléphone" class="w-full px-4 py-3 rounded-lg border" :style="{ borderColor: section.style?.textColor + '20' }" />
+            <select class="w-full px-4 py-3 rounded-lg border" :style="{ borderColor: section.style?.textColor + '20' }">
+              <option>Sélectionnez un sujet</option>
+              <option>Support</option>
+              <option>Commercial</option>
+              <option>Autre</option>
+            </select>
+            <textarea placeholder="Votre message" rows="5" class="w-full px-4 py-3 rounded-lg border" :style="{ borderColor: section.style?.textColor + '20' }"></textarea>
+            <button type="submit" class="w-full py-4 rounded-lg font-bold text-lg transition-all" :style="getButtonStyle">{{ section.content?.buttonText || 'Envoyer' }}</button>
+          </form>
+        </div>
+      </template>
+      
+      <!-- CONTACT: Map -->
+      <template v-else-if="section.content?.layout === 'map'">
+        <div :style="{ maxWidth: section.style?.maxWidth || '1200px', margin: '0 auto', padding: '0 1rem' }">
+          <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <div class="lg:col-span-2 h-[400px] rounded-2xl overflow-hidden bg-gray-200">
+              <iframe v-if="section.content?.mapUrl" :src="section.content.mapUrl" class="w-full h-full" frameborder="0" allowfullscreen></iframe>
+              <div v-else class="w-full h-full flex items-center justify-center text-gray-400">
+                <svg class="w-16 h-16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" /></svg>
+              </div>
+            </div>
+            <div class="p-8 rounded-2xl" :style="{ backgroundColor: section.style?.textColor + '08' }">
+              <h3 class="text-xl font-bold mb-6" :style="{ color: section.style?.textColor }">{{ section.content?.title || 'Nos coordonnées' }}</h3>
+              <div class="space-y-4">
+                <p v-if="section.content?.address" class="flex items-start gap-3" :style="{ color: section.style?.textColor }">
+                  <svg class="w-5 h-5 mt-1 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" /></svg>
+                  {{ section.content.address }}
+                </p>
+                <p v-if="section.content?.phone" class="flex items-center gap-3" :style="{ color: section.style?.textColor }">
+                  <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" /></svg>
+                  {{ section.content.phone }}
+                </p>
+                <p v-if="section.content?.email" class="flex items-center gap-3" :style="{ color: section.style?.textColor }">
+                  <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>
+                  {{ section.content.email }}
+                </p>
+                <p v-if="section.content?.hours" class="flex items-center gap-3" :style="{ color: section.style?.textColor }">
+                  <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                  {{ section.content.hours }}
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </template>
+      
+      <!-- CONTACT: Minimal -->
+      <template v-else-if="section.content?.layout === 'minimal'">
+        <div :style="{ maxWidth: section.style?.maxWidth || '500px', margin: '0 auto', padding: '0 1rem', textAlign: 'center' }">
+          <h3 v-if="section.content?.title" class="text-2xl font-bold mb-6" :style="{ color: section.style?.textColor }">{{ section.content.title }}</h3>
+          <div class="space-y-2" :style="{ color: section.style?.textColor }">
+            <p v-if="section.content?.email" class="opacity-80">{{ section.content.email }}</p>
+            <p v-if="section.content?.phone" class="opacity-80">{{ section.content.phone }}</p>
+            <p v-if="section.content?.address" class="opacity-60 text-sm">{{ section.content.address }}</p>
+          </div>
+        </div>
+      </template>
+      
+      <!-- CONTACT: Social -->
+      <template v-else-if="section.content?.layout === 'social'">
+        <div :style="{ maxWidth: section.style?.maxWidth || '700px', margin: '0 auto', padding: '0 1rem', textAlign: 'center' }">
+          <h2 class="text-3xl font-bold mb-4" :style="{ color: section.style?.textColor }">{{ section.content?.title }}</h2>
+          <p v-if="section.content?.subtitle" class="opacity-70 mb-8" :style="{ color: section.style?.textColor }">{{ section.content.subtitle }}</p>
+          <div class="flex justify-center gap-4 mb-8">
+            <a v-if="section.content?.links?.facebook" :href="section.content.links.facebook" target="_blank" class="w-12 h-12 rounded-xl flex items-center justify-center transition-all hover:scale-110" style="background: #1877F2;"><svg class="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 24 24"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg></a>
+            <a v-if="section.content?.links?.instagram" :href="section.content.links.instagram" target="_blank" class="w-12 h-12 rounded-xl flex items-center justify-center transition-all hover:scale-110" style="background: linear-gradient(45deg, #f09433 0%,#e6683c 25%,#dc2743 50%,#cc2366 75%,#bc1888 100%);"><svg class="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/></svg></a>
+            <a v-if="section.content?.links?.twitter" :href="section.content.links.twitter" target="_blank" class="w-12 h-12 rounded-xl flex items-center justify-center bg-black transition-all hover:scale-110"><svg class="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg></a>
+            <a v-if="section.content?.links?.linkedin" :href="section.content.links.linkedin" target="_blank" class="w-12 h-12 rounded-xl flex items-center justify-center transition-all hover:scale-110" style="background: #0A66C2;"><svg class="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 24 24"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg></a>
+          </div>
+          <div class="space-y-2" :style="{ color: section.style?.textColor }">
+            <p v-if="section.content?.email" class="opacity-80">{{ section.content.email }}</p>
+            <p v-if="section.content?.phone" class="opacity-80">{{ section.content.phone }}</p>
+          </div>
+        </div>
+      </template>
+      
+      <!-- CONTACT: Default (Simple) -->
+      <template v-else>
+        <div :style="{ maxWidth: section.style?.maxWidth || '600px', margin: '0 auto', padding: '0 1rem', textAlign: 'center' }">
+          <h2 v-if="section.content?.title" class="text-3xl font-bold mb-6" :style="{ color: section.style?.textColor }">{{ section.content.title }}</h2>
+          <div class="space-y-3" :style="{ color: section.style?.textColor }">
+            <p v-if="section.content?.email" class="flex items-center justify-center gap-2">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>
+              {{ section.content.email }}
+            </p>
+            <p v-if="section.content?.phone" class="flex items-center justify-center gap-2">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" /></svg>
+              {{ section.content.phone }}
+            </p>
+            <p v-if="section.content?.address" class="flex items-center justify-center gap-2">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
+              {{ section.content.address }}
+            </p>
+          </div>
+        </div>
+      </template>
     </template>
     
     <!-- Pricing -->
@@ -1713,177 +2132,635 @@
     
     <!-- Spacer -->
     <template v-else-if="section.type === 'spacer'">
-      <div class="w-full"></div>
+      <!-- SPACER: Responsive -->
+      <template v-if="section.content?.layout === 'responsive'">
+        <div class="w-full" :style="{ height: (section.content?.mobileHeight || 40) + 'px' }" :class="'md:h-[' + (section.content?.height || 80) + 'px]'"></div>
+      </template>
+      
+      <!-- SPACER: Colored -->
+      <template v-else-if="section.content?.layout === 'colored'">
+        <div class="w-full" :style="{ height: (section.content?.height || 60) + 'px', backgroundColor: section.content?.color || '#f3f4f6' }"></div>
+      </template>
+      
+      <!-- SPACER: Small -->
+      <template v-else-if="section.content?.layout === 'small'">
+        <div class="w-full h-8"></div>
+      </template>
+      
+      <!-- SPACER: Large -->
+      <template v-else-if="section.content?.layout === 'large'">
+        <div class="w-full h-32"></div>
+      </template>
+      
+      <!-- SPACER: Default (Medium) -->
+      <template v-else>
+        <div class="w-full" :style="{ height: (section.content?.height || 60) + 'px' }"></div>
+      </template>
     </template>
     
     <!-- Divider -->
     <template v-else-if="section.type === 'divider'">
-      <div :style="{ maxWidth: section.style?.maxWidth || '1280px', margin: '0 auto', padding: '0 1rem' }">
-        <hr :style="{ 
-          borderColor: section.content?.color || '#e5e7eb',
-          borderStyle: section.content?.style || 'solid',
-          width: section.content?.width || '100%'
-        }" />
-      </div>
+      <!-- DIVIDER: Short -->
+      <template v-if="section.content?.layout === 'short'">
+        <div :style="{ maxWidth: section.style?.maxWidth || '1280px', margin: '0 auto', padding: '0 1rem' }">
+          <div class="flex justify-center">
+            <hr class="w-24" :style="{ borderColor: section.content?.color || '#e5e7eb', borderWidth: (section.content?.thickness || 2) + 'px' }" />
+          </div>
+        </div>
+      </template>
+      
+      <!-- DIVIDER: Gradient -->
+      <template v-else-if="section.content?.layout === 'gradient'">
+        <div :style="{ maxWidth: section.style?.maxWidth || '1280px', margin: '0 auto', padding: '0 1rem' }">
+          <div class="h-1 rounded-full" :style="{ background: section.content?.gradient || 'linear-gradient(90deg, transparent, #10B981, transparent)' }"></div>
+        </div>
+      </template>
+      
+      <!-- DIVIDER: Dots -->
+      <template v-else-if="section.content?.layout === 'dots'">
+        <div :style="{ maxWidth: section.style?.maxWidth || '1280px', margin: '0 auto', padding: '0 1rem' }">
+          <div class="flex justify-center items-center gap-4">
+            <span class="w-2 h-2 rounded-full" :style="{ backgroundColor: section.content?.color || '#d1d5db' }"></span>
+            <span class="w-2 h-2 rounded-full" :style="{ backgroundColor: section.content?.color || '#d1d5db' }"></span>
+            <span class="w-2 h-2 rounded-full" :style="{ backgroundColor: section.content?.color || '#d1d5db' }"></span>
+          </div>
+        </div>
+      </template>
+      
+      <!-- DIVIDER: Icon -->
+      <template v-else-if="section.content?.layout === 'icon'">
+        <div :style="{ maxWidth: section.style?.maxWidth || '1280px', margin: '0 auto', padding: '0 1rem' }">
+          <div class="flex items-center gap-4">
+            <div class="flex-1 h-px" :style="{ backgroundColor: section.content?.color || '#e5e7eb' }"></div>
+            <div class="w-10 h-10 rounded-full flex items-center justify-center" :style="{ backgroundColor: section.content?.iconBgColor || '#f3f4f6' }">
+              <svg v-if="section.content?.icon === 'star'" class="w-5 h-5" :style="{ color: section.content?.iconColor || '#6b7280' }" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" /></svg>
+              <svg v-else-if="section.content?.icon === 'heart'" class="w-5 h-5" :style="{ color: section.content?.iconColor || '#6b7280' }" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z" clip-rule="evenodd" /></svg>
+              <svg v-else class="w-5 h-5" :style="{ color: section.content?.iconColor || '#6b7280' }" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12h.01M12 12h.01M19 12h.01M6 12a1 1 0 11-2 0 1 1 0 012 0zm7 0a1 1 0 11-2 0 1 1 0 012 0zm7 0a1 1 0 11-2 0 1 1 0 012 0z" /></svg>
+            </div>
+            <div class="flex-1 h-px" :style="{ backgroundColor: section.content?.color || '#e5e7eb' }"></div>
+          </div>
+        </div>
+      </template>
+      
+      <!-- DIVIDER: Wave -->
+      <template v-else-if="section.content?.layout === 'wave'">
+        <div class="w-full overflow-hidden">
+          <svg viewBox="0 0 1200 120" preserveAspectRatio="none" class="w-full" :style="{ height: (section.content?.height || 60) + 'px', fill: section.content?.color || '#f3f4f6' }">
+            <path d="M0,0V46.29c47.79,22.2,103.59,32.17,158,28,70.36-5.37,136.33-33.31,206.8-37.5C438.64,32.43,512.34,53.67,583,72.05c69.27,18,138.3,24.88,209.4,13.08,36.15-6,69.85-17.84,104.45-29.34C989.49,25,1113-14.29,1200,52.47V0Z" opacity=".25"></path>
+            <path d="M0,0V15.81C13,36.92,27.64,56.86,47.69,72.05,99.41,111.27,165,111,224.58,91.58c31.15-10.15,60.09-26.07,89.67-39.8,40.92-19,84.73-46,130.83-49.67,36.26-2.85,70.9,9.42,98.6,31.56,31.77,25.39,62.32,62,103.63,73,40.44,10.79,81.35-6.69,119.13-24.28s75.16-39,116.92-43.05c59.73-5.85,113.28,22.88,168.9,38.84,30.2,8.66,59,6.17,87.09-7.5,22.43-10.89,48-26.93,60.65-49.24V0Z" opacity=".5"></path>
+            <path d="M0,0V5.63C149.93,59,314.09,71.32,475.83,42.57c43-7.64,84.23-20.12,127.61-26.46,59-8.63,112.48,12.24,165.56,35.4C827.93,77.22,886,95.24,951.2,90c86.53-7,172.46-45.71,248.8-84.81V0Z"></path>
+          </svg>
+        </div>
+      </template>
+      
+      <!-- DIVIDER: Dashed -->
+      <template v-else-if="section.content?.layout === 'dashed'">
+        <div :style="{ maxWidth: section.style?.maxWidth || '1280px', margin: '0 auto', padding: '0 1rem' }">
+          <hr :style="{ borderColor: section.content?.color || '#e5e7eb', borderStyle: 'dashed', borderWidth: (section.content?.thickness || 1) + 'px' }" />
+        </div>
+      </template>
+      
+      <!-- DIVIDER: Default (Line) -->
+      <template v-else>
+        <div :style="{ maxWidth: section.style?.maxWidth || '1280px', margin: '0 auto', padding: '0 1rem' }">
+          <hr :style="{ borderColor: section.content?.color || '#e5e7eb', borderStyle: section.content?.style || 'solid', width: section.content?.width || '100%', borderWidth: (section.content?.thickness || 1) + 'px' }" />
+        </div>
+      </template>
     </template>
     
     <!-- Gallery -->
     <template v-else-if="section.type === 'gallery'">
-      <div :style="{ maxWidth: section.style?.maxWidth || '1280px', margin: '0 auto', padding: '0 1rem' }">
-        <div 
-          class="grid gap-4"
-          :style="{ gridTemplateColumns: `repeat(${section.content?.columns || 3}, 1fr)` }"
-        >
-          <div 
-            v-for="(image, index) in (section.content?.images || [])" 
-            :key="index"
-            class="aspect-square bg-gray-100 rounded-lg overflow-hidden"
-          >
-            <img 
-              v-if="image.src" 
-              :src="image.src" 
-              :alt="image.alt || 'Image'" 
-              class="w-full h-full object-cover"
-            />
-            <div v-else class="w-full h-full flex items-center justify-center text-gray-400">
-              <svg class="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-              </svg>
+      <!-- GALLERY: Masonry -->
+      <template v-if="section.content?.layout === 'masonry'">
+        <div :style="{ maxWidth: section.style?.maxWidth || '1280px', margin: '0 auto', padding: '0 1rem' }">
+          <h2 v-if="section.content?.title" class="text-3xl font-bold mb-8 text-center" :style="{ color: section.style?.textColor }">{{ section.content.title }}</h2>
+          <div class="columns-2 md:columns-3 lg:columns-4 gap-4 space-y-4">
+            <div v-for="(image, index) in (section.content?.images || [])" :key="index" class="break-inside-avoid">
+              <div class="rounded-lg overflow-hidden bg-gray-100">
+                <img v-if="image.src" :src="image.src" :alt="image.alt || 'Image'" class="w-full h-auto" />
+              </div>
+              <p v-if="image.caption" class="text-sm mt-2 opacity-70" :style="{ color: section.style?.textColor }">{{ image.caption }}</p>
             </div>
           </div>
         </div>
-        <div v-if="!section.content?.images?.length" class="text-center py-12 text-gray-400">
-          <svg class="w-16 h-16 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-          </svg>
-          <p>Aucune image dans la galerie</p>
+      </template>
+      
+      <!-- GALLERY: Carousel -->
+      <template v-else-if="section.content?.layout === 'carousel'">
+        <div :style="{ maxWidth: section.style?.maxWidth || '900px', margin: '0 auto', padding: '0 1rem' }">
+          <h2 v-if="section.content?.title" class="text-3xl font-bold mb-8 text-center" :style="{ color: section.style?.textColor }">{{ section.content.title }}</h2>
+          <div class="relative overflow-hidden rounded-xl">
+            <div class="flex transition-transform duration-500" :style="{ transform: `translateX(-${currentSlide * 100}%)` }">
+              <div v-for="(image, index) in (section.content?.images || [])" :key="index" class="flex-none w-full">
+                <img v-if="image.src" :src="image.src" :alt="image.alt" class="w-full h-[500px] object-cover" />
+              </div>
+            </div>
+            <button @click="prevSlide" class="absolute left-4 top-1/2 -translate-y-1/2 w-12 h-12 bg-white/90 rounded-full flex items-center justify-center shadow-lg hover:bg-white">
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" /></svg>
+            </button>
+            <button @click="nextSlide" class="absolute right-4 top-1/2 -translate-y-1/2 w-12 h-12 bg-white/90 rounded-full flex items-center justify-center shadow-lg hover:bg-white">
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" /></svg>
+            </button>
+          </div>
+          <div class="flex justify-center gap-2 mt-4">
+            <button v-for="(_, index) in (section.content?.images || [])" :key="index" @click="currentSlide = index" class="w-2 h-2 rounded-full transition-all" :class="currentSlide === index ? 'bg-primary w-6' : 'bg-gray-300'"></button>
+          </div>
         </div>
-      </div>
+      </template>
+      
+      <!-- GALLERY: Featured -->
+      <template v-else-if="section.content?.layout === 'featured'">
+        <div :style="{ maxWidth: section.style?.maxWidth || '1200px', margin: '0 auto', padding: '0 1rem' }">
+          <h2 v-if="section.content?.title" class="text-3xl font-bold mb-8 text-center" :style="{ color: section.style?.textColor }">{{ section.content.title }}</h2>
+          <div class="grid grid-cols-4 grid-rows-2 gap-4 h-[600px]">
+            <div v-if="section.content?.images?.[0]" class="col-span-2 row-span-2 rounded-xl overflow-hidden bg-gray-100">
+              <img :src="section.content.images[0].src" :alt="section.content.images[0].alt" class="w-full h-full object-cover" />
+            </div>
+            <div v-for="(image, index) in (section.content?.images || []).slice(1, 5)" :key="index" class="rounded-xl overflow-hidden bg-gray-100">
+              <img v-if="image.src" :src="image.src" :alt="image.alt" class="w-full h-full object-cover" />
+            </div>
+          </div>
+        </div>
+      </template>
+      
+      <!-- GALLERY: Hover -->
+      <template v-else-if="section.content?.layout === 'hover'">
+        <div :style="{ maxWidth: section.style?.maxWidth || '1200px', margin: '0 auto', padding: '0 1rem' }">
+          <h2 v-if="section.content?.title" class="text-3xl font-bold mb-8 text-center" :style="{ color: section.style?.textColor }">{{ section.content.title }}</h2>
+          <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+            <div v-for="(image, index) in (section.content?.images || [])" :key="index" class="group relative aspect-square rounded-xl overflow-hidden bg-gray-100">
+              <img v-if="image.src" :src="image.src" :alt="image.alt" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" />
+              <div class="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                <div class="text-center text-white p-4">
+                  <p class="font-bold">{{ image.title || 'Image' }}</p>
+                  <p v-if="image.caption" class="text-sm opacity-80 mt-1">{{ image.caption }}</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </template>
+      
+      <!-- GALLERY: Filmstrip -->
+      <template v-else-if="section.content?.layout === 'filmstrip'">
+        <div :style="{ maxWidth: section.style?.maxWidth || '100%', margin: '0 auto' }">
+          <h2 v-if="section.content?.title" class="text-3xl font-bold mb-8 text-center px-4" :style="{ color: section.style?.textColor }">{{ section.content.title }}</h2>
+          <div class="flex gap-2 overflow-x-auto pb-4 px-4 scrollbar-hide">
+            <div v-for="(image, index) in (section.content?.images || [])" :key="index" class="flex-none w-72 h-48 rounded-lg overflow-hidden bg-gray-100">
+              <img v-if="image.src" :src="image.src" :alt="image.alt" class="w-full h-full object-cover" />
+            </div>
+          </div>
+        </div>
+      </template>
+      
+      <!-- GALLERY: Justified -->
+      <template v-else-if="section.content?.layout === 'justified'">
+        <div :style="{ maxWidth: section.style?.maxWidth || '1200px', margin: '0 auto', padding: '0 1rem' }">
+          <h2 v-if="section.content?.title" class="text-3xl font-bold mb-8 text-center" :style="{ color: section.style?.textColor }">{{ section.content.title }}</h2>
+          <div class="flex flex-wrap gap-2">
+            <div v-for="(image, index) in (section.content?.images || [])" :key="index" class="flex-grow h-48 min-w-[200px] max-w-[400px] rounded-lg overflow-hidden bg-gray-100">
+              <img v-if="image.src" :src="image.src" :alt="image.alt" class="w-full h-full object-cover" />
+            </div>
+          </div>
+        </div>
+      </template>
+      
+      <!-- GALLERY: Lightbox -->
+      <template v-else-if="section.content?.layout === 'lightbox'">
+        <div :style="{ maxWidth: section.style?.maxWidth || '1200px', margin: '0 auto', padding: '0 1rem' }">
+          <h2 v-if="section.content?.title" class="text-3xl font-bold mb-8 text-center" :style="{ color: section.style?.textColor }">{{ section.content.title }}</h2>
+          <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+            <div v-for="(image, index) in (section.content?.images || [])" :key="index" class="aspect-square rounded-lg overflow-hidden bg-gray-100 cursor-pointer hover:ring-2 hover:ring-primary transition-all">
+              <img v-if="image.src" :src="image.src" :alt="image.alt" class="w-full h-full object-cover" />
+            </div>
+          </div>
+          <p class="text-center text-sm opacity-60 mt-4" :style="{ color: section.style?.textColor }">Cliquez sur une image pour l'agrandir</p>
+        </div>
+      </template>
+      
+      <!-- GALLERY: Default (Grid) -->
+      <template v-else>
+        <div :style="{ maxWidth: section.style?.maxWidth || '1280px', margin: '0 auto', padding: '0 1rem' }">
+          <h2 v-if="section.content?.title" class="text-3xl font-bold mb-8 text-center" :style="{ color: section.style?.textColor }">{{ section.content.title }}</h2>
+          <div class="grid gap-4" :style="{ gridTemplateColumns: `repeat(${section.content?.columns || 3}, 1fr)` }">
+            <div v-for="(image, index) in (section.content?.images || [])" :key="index" class="aspect-square bg-gray-100 rounded-lg overflow-hidden">
+              <img v-if="image.src" :src="image.src" :alt="image.alt || 'Image'" class="w-full h-full object-cover" />
+              <div v-else class="w-full h-full flex items-center justify-center text-gray-400">
+                <svg class="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
+              </div>
+            </div>
+          </div>
+          <div v-if="!section.content?.images?.length" class="text-center py-12 text-gray-400">
+            <svg class="w-16 h-16 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
+            <p>Aucune image dans la galerie</p>
+          </div>
+        </div>
+      </template>
     </template>
     
     <!-- Video -->
     <template v-else-if="section.type === 'video'">
-      <div :style="{ maxWidth: section.style?.maxWidth || '900px', margin: '0 auto', padding: '0 1rem' }">
-        <h3 v-if="section.content?.title" class="text-xl font-semibold mb-4 text-center" :style="{ color: section.style?.textColor }">
-          {{ section.content.title }}
-        </h3>
-        <div class="aspect-video bg-gray-900 rounded-lg overflow-hidden">
-          <iframe
-            v-if="section.content?.url"
-            :src="getVideoEmbedUrl(section.content.url)"
-            class="w-full h-full"
-            frameborder="0"
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-            allowfullscreen
-          ></iframe>
-          <div v-else class="w-full h-full flex items-center justify-center text-gray-500">
-            <div class="text-center">
-              <svg class="w-16 h-16 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
-              </svg>
-              <p>Ajoutez une URL YouTube ou Vimeo</p>
+      <!-- VIDEO: Hero (Full width) -->
+      <template v-if="section.content?.layout === 'hero'">
+        <div class="relative w-full" :style="{ height: (section.content?.height || 600) + 'px' }">
+          <div class="absolute inset-0 bg-gray-900">
+            <iframe v-if="section.content?.url" :src="getVideoEmbedUrl(section.content.url) + '?autoplay=1&mute=1&loop=1&controls=0'" class="w-full h-full" frameborder="0" allow="autoplay"></iframe>
+          </div>
+          <div class="absolute inset-0 bg-black/50 flex items-center justify-center">
+            <div class="text-center text-white max-w-2xl px-4">
+              <h2 v-if="section.content?.title" class="text-4xl md:text-5xl font-bold mb-4">{{ section.content.title }}</h2>
+              <p v-if="section.content?.description" class="text-xl opacity-90 mb-8">{{ section.content.description }}</p>
+              <a v-if="section.content?.button" :href="section.content.button.url || '#'" class="inline-flex items-center gap-2 px-8 py-4 rounded-full font-bold text-lg transition-all" :style="getButtonStyle">
+                <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                {{ section.content.button.text }}
+              </a>
             </div>
           </div>
         </div>
-        <p v-if="section.content?.description" class="mt-3 text-sm text-center opacity-70" :style="{ color: section.style?.textColor }">
-          {{ section.content.description }}
-        </p>
-      </div>
+      </template>
+      
+      <!-- VIDEO: Split (Video + Texte) -->
+      <template v-else-if="section.content?.layout === 'split'">
+        <div :style="{ maxWidth: section.style?.maxWidth || '1200px', margin: '0 auto', padding: '0 1rem' }">
+          <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+            <div class="aspect-video bg-gray-900 rounded-xl overflow-hidden">
+              <iframe v-if="section.content?.url" :src="getVideoEmbedUrl(section.content.url)" class="w-full h-full" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+            </div>
+            <div>
+              <span v-if="section.content?.badge" class="inline-block px-3 py-1 text-xs font-bold rounded-full mb-4" :style="{ backgroundColor: section.style?.textColor + '10', color: section.style?.textColor }">{{ section.content.badge }}</span>
+              <h2 class="text-3xl font-bold mb-4" :style="{ color: section.style?.textColor }">{{ section.content?.title }}</h2>
+              <p class="text-lg opacity-80 mb-6" :style="{ color: section.style?.textColor }">{{ section.content?.description }}</p>
+              <ul v-if="section.content?.features" class="space-y-3 mb-8">
+                <li v-for="(feat, i) in section.content.features" :key="i" class="flex items-center gap-3" :style="{ color: section.style?.textColor }">
+                  <svg class="w-5 h-5 text-green-500 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" /></svg>
+                  <span>{{ feat }}</span>
+                </li>
+              </ul>
+              <a v-if="section.content?.button" :href="section.content.button.url || '#'" class="inline-block px-6 py-3 rounded-lg font-semibold transition-all" :style="getButtonStyle">{{ section.content.button.text }}</a>
+            </div>
+          </div>
+        </div>
+      </template>
+      
+      <!-- VIDEO: Modal (Thumbnail avec play) -->
+      <template v-else-if="section.content?.layout === 'modal'">
+        <div :style="{ maxWidth: section.style?.maxWidth || '900px', margin: '0 auto', padding: '0 1rem' }">
+          <h2 v-if="section.content?.title" class="text-3xl font-bold mb-8 text-center" :style="{ color: section.style?.textColor }">{{ section.content.title }}</h2>
+          <div class="relative aspect-video rounded-2xl overflow-hidden cursor-pointer group">
+            <img v-if="section.content?.thumbnail" :src="section.content.thumbnail" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
+            <div v-else class="w-full h-full bg-gradient-to-br from-gray-800 to-gray-900"></div>
+            <div class="absolute inset-0 bg-black/30 flex items-center justify-center group-hover:bg-black/50 transition-all">
+              <div class="w-20 h-20 bg-white rounded-full flex items-center justify-center shadow-2xl group-hover:scale-110 transition-transform">
+                <svg class="w-8 h-8 text-gray-900 ml-1" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+              </div>
+            </div>
+          </div>
+          <p v-if="section.content?.description" class="text-center mt-4 opacity-70" :style="{ color: section.style?.textColor }">{{ section.content.description }}</p>
+        </div>
+      </template>
+      
+      <!-- VIDEO: Grid -->
+      <template v-else-if="section.content?.layout === 'grid'">
+        <div :style="{ maxWidth: section.style?.maxWidth || '1200px', margin: '0 auto', padding: '0 1rem' }">
+          <h2 v-if="section.content?.title" class="text-3xl font-bold mb-8 text-center" :style="{ color: section.style?.textColor }">{{ section.content.title }}</h2>
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div v-for="(video, index) in (section.content?.videos || [])" :key="index" class="rounded-xl overflow-hidden bg-gray-100">
+              <div class="aspect-video">
+                <iframe v-if="video.url" :src="getVideoEmbedUrl(video.url)" class="w-full h-full" frameborder="0" allowfullscreen></iframe>
+              </div>
+              <div v-if="video.title || video.description" class="p-4" :style="{ backgroundColor: section.style?.textColor + '08' }">
+                <h4 v-if="video.title" class="font-bold" :style="{ color: section.style?.textColor }">{{ video.title }}</h4>
+                <p v-if="video.description" class="text-sm opacity-70 mt-1" :style="{ color: section.style?.textColor }">{{ video.description }}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </template>
+      
+      <!-- VIDEO: Description (avec texte à côté) -->
+      <template v-else-if="section.content?.layout === 'description'">
+        <div :style="{ maxWidth: section.style?.maxWidth || '1000px', margin: '0 auto', padding: '0 1rem' }">
+          <div class="text-center mb-8">
+            <h2 class="text-3xl font-bold mb-2" :style="{ color: section.style?.textColor }">{{ section.content?.title }}</h2>
+            <p v-if="section.content?.subtitle" class="text-lg opacity-70" :style="{ color: section.style?.textColor }">{{ section.content.subtitle }}</p>
+          </div>
+          <div class="aspect-video bg-gray-900 rounded-2xl overflow-hidden shadow-2xl">
+            <iframe v-if="section.content?.url" :src="getVideoEmbedUrl(section.content.url)" class="w-full h-full" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+          </div>
+          <div v-if="section.content?.description" class="mt-8 text-center max-w-2xl mx-auto">
+            <p class="text-lg" :style="{ color: section.style?.textColor }">{{ section.content.description }}</p>
+          </div>
+        </div>
+      </template>
+      
+      <!-- VIDEO: Default (Centered) -->
+      <template v-else>
+        <div :style="{ maxWidth: section.style?.maxWidth || '900px', margin: '0 auto', padding: '0 1rem' }">
+          <h3 v-if="section.content?.title" class="text-xl font-semibold mb-4 text-center" :style="{ color: section.style?.textColor }">{{ section.content.title }}</h3>
+          <div class="aspect-video bg-gray-900 rounded-lg overflow-hidden">
+            <iframe v-if="section.content?.url" :src="getVideoEmbedUrl(section.content.url)" class="w-full h-full" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+            <div v-else class="w-full h-full flex items-center justify-center text-gray-500">
+              <div class="text-center">
+                <svg class="w-16 h-16 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" /></svg>
+                <p>Ajoutez une URL YouTube ou Vimeo</p>
+              </div>
+            </div>
+          </div>
+          <p v-if="section.content?.description" class="mt-3 text-sm text-center opacity-70" :style="{ color: section.style?.textColor }">{{ section.content.description }}</p>
+        </div>
+      </template>
     </template>
     
     <!-- Countdown -->
     <template v-else-if="section.type === 'countdown'">
-      <div :style="{ maxWidth: section.style?.maxWidth || '600px', margin: '0 auto', padding: '0 1rem', textAlign: 'center' }">
-        <h2 class="text-2xl md:text-3xl font-bold mb-2" :style="{ color: section.style?.textColor }">
-          {{ section.content?.title || 'Offre limitée' }}
-        </h2>
-        <p v-if="section.content?.subtitle" class="mb-6 opacity-80" :style="{ color: section.style?.textColor }">
-          {{ section.content.subtitle }}
-        </p>
-        <div class="flex justify-center gap-4">
-          <div class="text-center">
-            <div class="text-4xl md:text-5xl font-bold" :style="{ color: section.style?.textColor }">00</div>
-            <div class="text-xs uppercase tracking-wider opacity-60" :style="{ color: section.style?.textColor }">Jours</div>
-          </div>
-          <div class="text-3xl font-bold opacity-50" :style="{ color: section.style?.textColor }">:</div>
-          <div class="text-center">
-            <div class="text-4xl md:text-5xl font-bold" :style="{ color: section.style?.textColor }">00</div>
-            <div class="text-xs uppercase tracking-wider opacity-60" :style="{ color: section.style?.textColor }">Heures</div>
-          </div>
-          <div class="text-3xl font-bold opacity-50" :style="{ color: section.style?.textColor }">:</div>
-          <div class="text-center">
-            <div class="text-4xl md:text-5xl font-bold" :style="{ color: section.style?.textColor }">00</div>
-            <div class="text-xs uppercase tracking-wider opacity-60" :style="{ color: section.style?.textColor }">Minutes</div>
-          </div>
-          <div class="text-3xl font-bold opacity-50" :style="{ color: section.style?.textColor }">:</div>
-          <div class="text-center">
-            <div class="text-4xl md:text-5xl font-bold" :style="{ color: section.style?.textColor }">00</div>
-            <div class="text-xs uppercase tracking-wider opacity-60" :style="{ color: section.style?.textColor }">Secondes</div>
+      <!-- COUNTDOWN: Elegant -->
+      <template v-if="section.content?.layout === 'elegant'">
+        <div :style="{ maxWidth: section.style?.maxWidth || '800px', margin: '0 auto', padding: '0 1rem', textAlign: 'center' }">
+          <span v-if="section.content?.badge" class="inline-block px-4 py-1 text-sm font-medium rounded-full mb-4" :style="{ backgroundColor: section.style?.textColor + '10', color: section.style?.textColor }">{{ section.content.badge }}</span>
+          <h2 class="text-3xl md:text-4xl font-light mb-2" :style="{ color: section.style?.textColor }">{{ section.content?.title || 'Bientôt' }}</h2>
+          <p v-if="section.content?.subtitle" class="text-lg opacity-60 mb-10" :style="{ color: section.style?.textColor }">{{ section.content.subtitle }}</p>
+          <div class="flex justify-center gap-8">
+            <div class="text-center">
+              <div class="text-6xl md:text-7xl font-extralight tracking-tight" :style="{ color: section.style?.textColor }">{{ countdownDays }}</div>
+              <div class="text-sm uppercase tracking-widest opacity-50 mt-2" :style="{ color: section.style?.textColor }">Jours</div>
+            </div>
+            <div class="text-5xl font-extralight opacity-30" :style="{ color: section.style?.textColor }">:</div>
+            <div class="text-center">
+              <div class="text-6xl md:text-7xl font-extralight tracking-tight" :style="{ color: section.style?.textColor }">{{ countdownHours }}</div>
+              <div class="text-sm uppercase tracking-widest opacity-50 mt-2" :style="{ color: section.style?.textColor }">Heures</div>
+            </div>
+            <div class="text-5xl font-extralight opacity-30" :style="{ color: section.style?.textColor }">:</div>
+            <div class="text-center">
+              <div class="text-6xl md:text-7xl font-extralight tracking-tight" :style="{ color: section.style?.textColor }">{{ countdownMinutes }}</div>
+              <div class="text-sm uppercase tracking-widest opacity-50 mt-2" :style="{ color: section.style?.textColor }">Min</div>
+            </div>
           </div>
         </div>
-      </div>
+      </template>
+      
+      <!-- COUNTDOWN: Launch -->
+      <template v-else-if="section.content?.layout === 'launch'">
+        <div :style="{ maxWidth: section.style?.maxWidth || '900px', margin: '0 auto', padding: '0 1rem', textAlign: 'center' }">
+          <div class="inline-block px-4 py-2 rounded-full mb-6 animate-pulse" style="background: linear-gradient(135deg, #6366f1, #8b5cf6);">
+            <span class="text-white font-bold">🚀 {{ section.content?.badge || 'Lancement imminent' }}</span>
+          </div>
+          <h2 class="text-4xl md:text-5xl font-bold mb-4" :style="{ color: section.style?.textColor }">{{ section.content?.title || 'Lancement dans' }}</h2>
+          <p v-if="section.content?.subtitle" class="text-xl opacity-70 mb-10" :style="{ color: section.style?.textColor }">{{ section.content.subtitle }}</p>
+          <div class="flex justify-center gap-4">
+            <div class="w-24 h-24 md:w-32 md:h-32 rounded-2xl flex flex-col items-center justify-center" style="background: linear-gradient(135deg, #6366f1, #8b5cf6);">
+              <div class="text-4xl md:text-5xl font-bold text-white">{{ countdownDays }}</div>
+              <div class="text-xs text-white/80 uppercase">Jours</div>
+            </div>
+            <div class="w-24 h-24 md:w-32 md:h-32 rounded-2xl flex flex-col items-center justify-center" style="background: linear-gradient(135deg, #6366f1, #8b5cf6);">
+              <div class="text-4xl md:text-5xl font-bold text-white">{{ countdownHours }}</div>
+              <div class="text-xs text-white/80 uppercase">Heures</div>
+            </div>
+            <div class="w-24 h-24 md:w-32 md:h-32 rounded-2xl flex flex-col items-center justify-center" style="background: linear-gradient(135deg, #6366f1, #8b5cf6);">
+              <div class="text-4xl md:text-5xl font-bold text-white">{{ countdownMinutes }}</div>
+              <div class="text-xs text-white/80 uppercase">Min</div>
+            </div>
+            <div class="w-24 h-24 md:w-32 md:h-32 rounded-2xl flex flex-col items-center justify-center" style="background: linear-gradient(135deg, #6366f1, #8b5cf6);">
+              <div class="text-4xl md:text-5xl font-bold text-white">{{ countdownSeconds }}</div>
+              <div class="text-xs text-white/80 uppercase">Sec</div>
+            </div>
+          </div>
+          <a v-if="section.content?.button" :href="section.content.button.url || '#'" class="inline-block mt-10 px-8 py-4 rounded-full font-bold text-lg text-white transition-all hover:scale-105" style="background: linear-gradient(135deg, #6366f1, #8b5cf6);">{{ section.content.button.text }}</a>
+        </div>
+      </template>
+      
+      <!-- COUNTDOWN: Event -->
+      <template v-else-if="section.content?.layout === 'event'">
+        <div :style="{ maxWidth: section.style?.maxWidth || '1000px', margin: '0 auto', padding: '0 1rem' }">
+          <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+            <div>
+              <span v-if="section.content?.date" class="inline-flex items-center gap-2 px-4 py-2 rounded-full mb-6" :style="{ backgroundColor: section.style?.textColor + '10', color: section.style?.textColor }">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
+                {{ section.content.date }}
+              </span>
+              <h2 class="text-3xl md:text-4xl font-bold mb-4" :style="{ color: section.style?.textColor }">{{ section.content?.title }}</h2>
+              <p class="text-lg opacity-80 mb-6" :style="{ color: section.style?.textColor }">{{ section.content?.description }}</p>
+              <div v-if="section.content?.location" class="flex items-center gap-2 opacity-70" :style="{ color: section.style?.textColor }">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" /></svg>
+                {{ section.content.location }}
+              </div>
+            </div>
+            <div class="p-8 rounded-2xl" :style="{ backgroundColor: section.style?.textColor + '08' }">
+              <div class="text-center mb-6">
+                <p class="text-sm uppercase tracking-wider opacity-60" :style="{ color: section.style?.textColor }">L'événement commence dans</p>
+              </div>
+              <div class="grid grid-cols-4 gap-4">
+                <div class="text-center">
+                  <div class="text-3xl font-bold" :style="{ color: section.style?.textColor }">{{ countdownDays }}</div>
+                  <div class="text-xs uppercase opacity-50" :style="{ color: section.style?.textColor }">Jours</div>
+                </div>
+                <div class="text-center">
+                  <div class="text-3xl font-bold" :style="{ color: section.style?.textColor }">{{ countdownHours }}</div>
+                  <div class="text-xs uppercase opacity-50" :style="{ color: section.style?.textColor }">Heures</div>
+                </div>
+                <div class="text-center">
+                  <div class="text-3xl font-bold" :style="{ color: section.style?.textColor }">{{ countdownMinutes }}</div>
+                  <div class="text-xs uppercase opacity-50" :style="{ color: section.style?.textColor }">Min</div>
+                </div>
+                <div class="text-center">
+                  <div class="text-3xl font-bold" :style="{ color: section.style?.textColor }">{{ countdownSeconds }}</div>
+                  <div class="text-xs uppercase opacity-50" :style="{ color: section.style?.textColor }">Sec</div>
+                </div>
+              </div>
+              <a v-if="section.content?.button" :href="section.content.button.url || '#'" class="block w-full mt-8 py-4 rounded-xl font-bold text-center transition-all" :style="getButtonStyle">{{ section.content.button.text }}</a>
+            </div>
+          </div>
+        </div>
+      </template>
+      
+      <!-- COUNTDOWN: Promo -->
+      <template v-else-if="section.content?.layout === 'promo'">
+        <div :style="{ maxWidth: section.style?.maxWidth || '800px', margin: '0 auto', padding: '0 1rem' }">
+          <div class="rounded-2xl p-8 text-center" style="background: linear-gradient(135deg, #dc2626, #ea580c);">
+            <span v-if="section.content?.badge" class="inline-block px-4 py-1 bg-white text-red-600 font-bold rounded-full mb-4">{{ section.content.badge }}</span>
+            <h2 class="text-3xl md:text-4xl font-bold text-white mb-2">{{ section.content?.title || 'Offre spéciale' }}</h2>
+            <p v-if="section.content?.subtitle" class="text-white/80 mb-8">{{ section.content.subtitle }}</p>
+            <div class="flex justify-center gap-4 mb-8">
+              <div class="w-20 h-20 bg-white/20 rounded-xl flex flex-col items-center justify-center">
+                <div class="text-3xl font-bold text-white">{{ countdownDays }}</div>
+                <div class="text-xs text-white/70">J</div>
+              </div>
+              <div class="w-20 h-20 bg-white/20 rounded-xl flex flex-col items-center justify-center">
+                <div class="text-3xl font-bold text-white">{{ countdownHours }}</div>
+                <div class="text-xs text-white/70">H</div>
+              </div>
+              <div class="w-20 h-20 bg-white/20 rounded-xl flex flex-col items-center justify-center">
+                <div class="text-3xl font-bold text-white">{{ countdownMinutes }}</div>
+                <div class="text-xs text-white/70">M</div>
+              </div>
+              <div class="w-20 h-20 bg-white/20 rounded-xl flex flex-col items-center justify-center">
+                <div class="text-3xl font-bold text-white">{{ countdownSeconds }}</div>
+                <div class="text-xs text-white/70">S</div>
+              </div>
+            </div>
+            <a v-if="section.content?.button" :href="section.content.button.url || '#'" class="inline-block px-8 py-4 bg-white text-red-600 rounded-full font-bold text-lg transition-all hover:scale-105">{{ section.content.button.text }}</a>
+          </div>
+        </div>
+      </template>
+      
+      <!-- COUNTDOWN: Minimal -->
+      <template v-else-if="section.content?.layout === 'minimal'">
+        <div :style="{ maxWidth: section.style?.maxWidth || '600px', margin: '0 auto', padding: '0 1rem', textAlign: 'center' }">
+          <h3 v-if="section.content?.title" class="text-lg font-medium mb-4 opacity-70" :style="{ color: section.style?.textColor }">{{ section.content.title }}</h3>
+          <div class="flex justify-center items-center gap-2">
+            <span class="text-2xl font-mono font-bold" :style="{ color: section.style?.textColor }">{{ countdownDays }}j</span>
+            <span class="opacity-30" :style="{ color: section.style?.textColor }">:</span>
+            <span class="text-2xl font-mono font-bold" :style="{ color: section.style?.textColor }">{{ countdownHours }}h</span>
+            <span class="opacity-30" :style="{ color: section.style?.textColor }">:</span>
+            <span class="text-2xl font-mono font-bold" :style="{ color: section.style?.textColor }">{{ countdownMinutes }}m</span>
+            <span class="opacity-30" :style="{ color: section.style?.textColor }">:</span>
+            <span class="text-2xl font-mono font-bold" :style="{ color: section.style?.textColor }">{{ countdownSeconds }}s</span>
+          </div>
+        </div>
+      </template>
+      
+      <!-- COUNTDOWN: Default (Urgent) -->
+      <template v-else>
+        <div :style="{ maxWidth: section.style?.maxWidth || '600px', margin: '0 auto', padding: '0 1rem', textAlign: 'center' }">
+          <h2 class="text-2xl md:text-3xl font-bold mb-2" :style="{ color: section.style?.textColor }">{{ section.content?.title || 'Offre limitée' }}</h2>
+          <p v-if="section.content?.subtitle" class="mb-6 opacity-80" :style="{ color: section.style?.textColor }">{{ section.content.subtitle }}</p>
+          <div class="flex justify-center gap-4">
+            <div class="text-center">
+              <div class="text-4xl md:text-5xl font-bold" :style="{ color: section.style?.textColor }">{{ countdownDays }}</div>
+              <div class="text-xs uppercase tracking-wider opacity-60" :style="{ color: section.style?.textColor }">Jours</div>
+            </div>
+            <div class="text-3xl font-bold opacity-50" :style="{ color: section.style?.textColor }">:</div>
+            <div class="text-center">
+              <div class="text-4xl md:text-5xl font-bold" :style="{ color: section.style?.textColor }">{{ countdownHours }}</div>
+              <div class="text-xs uppercase tracking-wider opacity-60" :style="{ color: section.style?.textColor }">Heures</div>
+            </div>
+            <div class="text-3xl font-bold opacity-50" :style="{ color: section.style?.textColor }">:</div>
+            <div class="text-center">
+              <div class="text-4xl md:text-5xl font-bold" :style="{ color: section.style?.textColor }">{{ countdownMinutes }}</div>
+              <div class="text-xs uppercase tracking-wider opacity-60" :style="{ color: section.style?.textColor }">Minutes</div>
+            </div>
+            <div class="text-3xl font-bold opacity-50" :style="{ color: section.style?.textColor }">:</div>
+            <div class="text-center">
+              <div class="text-4xl md:text-5xl font-bold" :style="{ color: section.style?.textColor }">{{ countdownSeconds }}</div>
+              <div class="text-xs uppercase tracking-wider opacity-60" :style="{ color: section.style?.textColor }">Secondes</div>
+            </div>
+          </div>
+        </div>
+      </template>
     </template>
     
     <!-- Social -->
     <template v-else-if="section.type === 'social'">
-      <div :style="{ maxWidth: section.style?.maxWidth || '400px', margin: '0 auto', padding: '0 1rem', textAlign: 'center' }">
-        <h3 v-if="section.content?.title" class="text-lg font-semibold mb-4" :style="{ color: section.style?.textColor }">
-          {{ section.content.title }}
-        </h3>
-        <div class="flex justify-center gap-4">
-          <a 
-            v-if="section.content?.links?.facebook" 
-            :href="section.content.links.facebook" 
-            target="_blank"
-            class="w-10 h-10 rounded-full flex items-center justify-center transition-opacity hover:opacity-70"
-            :style="{ backgroundColor: section.style?.textColor + '15', color: section.style?.textColor }"
-          >
-            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
-          </a>
-          <a 
-            v-if="section.content?.links?.instagram" 
-            :href="section.content.links.instagram" 
-            target="_blank"
-            class="w-10 h-10 rounded-full flex items-center justify-center transition-opacity hover:opacity-70"
-            :style="{ backgroundColor: section.style?.textColor + '15', color: section.style?.textColor }"
-          >
-            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/></svg>
-          </a>
-          <a 
-            v-if="section.content?.links?.twitter" 
-            :href="section.content.links.twitter" 
-            target="_blank"
-            class="w-10 h-10 rounded-full flex items-center justify-center transition-opacity hover:opacity-70"
-            :style="{ backgroundColor: section.style?.textColor + '15', color: section.style?.textColor }"
-          >
-            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
-          </a>
-          <a 
-            v-if="section.content?.links?.youtube" 
-            :href="section.content.links.youtube" 
-            target="_blank"
-            class="w-10 h-10 rounded-full flex items-center justify-center transition-opacity hover:opacity-70"
-            :style="{ backgroundColor: section.style?.textColor + '15', color: section.style?.textColor }"
-          >
-            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M23.498 6.186a3.016 3.016 0 00-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 00.502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 002.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 002.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
-          </a>
-          <a 
-            v-if="section.content?.links?.linkedin" 
-            :href="section.content.links.linkedin" 
-            target="_blank"
-            class="w-10 h-10 rounded-full flex items-center justify-center transition-opacity hover:opacity-70"
-            :style="{ backgroundColor: section.style?.textColor + '15', color: section.style?.textColor }"
-          >
-            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
-          </a>
+      <!-- SOCIAL: Footer -->
+      <template v-if="section.content?.layout === 'footer'">
+        <div :style="{ maxWidth: section.style?.maxWidth || '100%', margin: '0 auto', padding: '0 1rem' }">
+          <div class="flex flex-col md:flex-row items-center justify-between gap-4">
+            <p v-if="section.content?.copyright" class="text-sm opacity-60" :style="{ color: section.style?.textColor }">{{ section.content.copyright }}</p>
+            <div class="flex gap-4">
+              <a v-if="section.content?.links?.facebook" :href="section.content.links.facebook" target="_blank" class="opacity-60 hover:opacity-100 transition-opacity" :style="{ color: section.style?.textColor }">
+                <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+              </a>
+              <a v-if="section.content?.links?.instagram" :href="section.content.links.instagram" target="_blank" class="opacity-60 hover:opacity-100 transition-opacity" :style="{ color: section.style?.textColor }">
+                <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/></svg>
+              </a>
+              <a v-if="section.content?.links?.twitter" :href="section.content.links.twitter" target="_blank" class="opacity-60 hover:opacity-100 transition-opacity" :style="{ color: section.style?.textColor }">
+                <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+              </a>
+              <a v-if="section.content?.links?.youtube" :href="section.content.links.youtube" target="_blank" class="opacity-60 hover:opacity-100 transition-opacity" :style="{ color: section.style?.textColor }">
+                <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M23.498 6.186a3.016 3.016 0 00-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 00.502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 002.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 002.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
+              </a>
+              <a v-if="section.content?.links?.linkedin" :href="section.content.links.linkedin" target="_blank" class="opacity-60 hover:opacity-100 transition-opacity" :style="{ color: section.style?.textColor }">
+                <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+              </a>
+            </div>
+          </div>
         </div>
-        <div v-if="!hasAnySocialLink" class="py-8 text-gray-400">
-          <svg class="w-12 h-12 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
-          </svg>
-          <p class="text-sm">Ajoutez vos liens de réseaux sociaux</p>
+      </template>
+      
+      <!-- SOCIAL: Colored (boutons colorés) -->
+      <template v-else-if="section.content?.layout === 'colored'">
+        <div :style="{ maxWidth: section.style?.maxWidth || '600px', margin: '0 auto', padding: '0 1rem', textAlign: 'center' }">
+          <h3 v-if="section.content?.title" class="text-2xl font-bold mb-6" :style="{ color: section.style?.textColor }">{{ section.content.title }}</h3>
+          <div class="flex flex-wrap justify-center gap-4">
+            <a v-if="section.content?.links?.facebook" :href="section.content.links.facebook" target="_blank" class="w-14 h-14 rounded-2xl flex items-center justify-center transition-transform hover:scale-110" style="background: #1877F2;"><svg class="w-7 h-7 text-white" fill="currentColor" viewBox="0 0 24 24"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg></a>
+            <a v-if="section.content?.links?.instagram" :href="section.content.links.instagram" target="_blank" class="w-14 h-14 rounded-2xl flex items-center justify-center transition-transform hover:scale-110" style="background: linear-gradient(45deg, #f09433 0%,#e6683c 25%,#dc2743 50%,#cc2366 75%,#bc1888 100%);"><svg class="w-7 h-7 text-white" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/></svg></a>
+            <a v-if="section.content?.links?.twitter" :href="section.content.links.twitter" target="_blank" class="w-14 h-14 rounded-2xl flex items-center justify-center bg-black transition-transform hover:scale-110"><svg class="w-7 h-7 text-white" fill="currentColor" viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg></a>
+            <a v-if="section.content?.links?.youtube" :href="section.content.links.youtube" target="_blank" class="w-14 h-14 rounded-2xl flex items-center justify-center transition-transform hover:scale-110" style="background: #FF0000;"><svg class="w-7 h-7 text-white" fill="currentColor" viewBox="0 0 24 24"><path d="M23.498 6.186a3.016 3.016 0 00-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 00.502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 002.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 002.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg></a>
+            <a v-if="section.content?.links?.linkedin" :href="section.content.links.linkedin" target="_blank" class="w-14 h-14 rounded-2xl flex items-center justify-center transition-transform hover:scale-110" style="background: #0A66C2;"><svg class="w-7 h-7 text-white" fill="currentColor" viewBox="0 0 24 24"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg></a>
+            <a v-if="section.content?.links?.tiktok" :href="section.content.links.tiktok" target="_blank" class="w-14 h-14 rounded-2xl flex items-center justify-center bg-black transition-transform hover:scale-110"><svg class="w-7 h-7 text-white" fill="currentColor" viewBox="0 0 24 24"><path d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.05-2.89-.35-4.2-.97-.57-.26-1.1-.59-1.62-.93-.01 2.92.01 5.84-.02 8.75-.08 1.4-.54 2.79-1.35 3.94-1.31 1.92-3.58 3.17-5.91 3.21-1.43.08-2.86-.31-4.08-1.03-2.02-1.19-3.44-3.37-3.65-5.71-.02-.5-.03-1-.01-1.49.18-1.9 1.12-3.72 2.58-4.96 1.66-1.44 3.98-2.13 6.15-1.72.02 1.48-.04 2.96-.04 4.44-.99-.32-2.15-.23-3.02.37-.63.41-1.11 1.04-1.36 1.75-.21.51-.15 1.07-.14 1.61.24 1.64 1.82 3.02 3.5 2.87 1.12-.01 2.19-.66 2.77-1.61.19-.33.4-.67.41-1.06.1-1.79.06-3.57.07-5.36.01-4.03-.01-8.05.02-12.07z"/></svg></a>
+          </div>
         </div>
-      </div>
+      </template>
+      
+      <!-- SOCIAL: Buttons (avec texte) -->
+      <template v-else-if="section.content?.layout === 'buttons'">
+        <div :style="{ maxWidth: section.style?.maxWidth || '400px', margin: '0 auto', padding: '0 1rem', textAlign: 'center' }">
+          <h3 v-if="section.content?.title" class="text-2xl font-bold mb-6" :style="{ color: section.style?.textColor }">{{ section.content.title }}</h3>
+          <div class="space-y-3">
+            <a v-if="section.content?.links?.facebook" :href="section.content.links.facebook" target="_blank" class="flex items-center justify-center gap-3 w-full py-3 rounded-lg text-white font-medium transition-all hover:opacity-90" style="background: #1877F2;"><svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg> Facebook</a>
+            <a v-if="section.content?.links?.instagram" :href="section.content.links.instagram" target="_blank" class="flex items-center justify-center gap-3 w-full py-3 rounded-lg text-white font-medium transition-all hover:opacity-90" style="background: linear-gradient(45deg, #f09433 0%,#e6683c 25%,#dc2743 50%,#cc2366 75%,#bc1888 100%);"><svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/></svg> Instagram</a>
+            <a v-if="section.content?.links?.twitter" :href="section.content.links.twitter" target="_blank" class="flex items-center justify-center gap-3 w-full py-3 rounded-lg text-white font-medium bg-black transition-all hover:opacity-90"><svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg> X (Twitter)</a>
+            <a v-if="section.content?.links?.linkedin" :href="section.content.links.linkedin" target="_blank" class="flex items-center justify-center gap-3 w-full py-3 rounded-lg text-white font-medium transition-all hover:opacity-90" style="background: #0A66C2;"><svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg> LinkedIn</a>
+          </div>
+        </div>
+      </template>
+      
+      <!-- SOCIAL: Stats (avec compteurs) -->
+      <template v-else-if="section.content?.layout === 'stats'">
+        <div :style="{ maxWidth: section.style?.maxWidth || '800px', margin: '0 auto', padding: '0 1rem', textAlign: 'center' }">
+          <h3 v-if="section.content?.title" class="text-2xl font-bold mb-8" :style="{ color: section.style?.textColor }">{{ section.content.title }}</h3>
+          <div class="flex flex-wrap justify-center gap-8">
+            <div v-if="section.content?.stats?.followers" class="text-center">
+              <div class="text-4xl font-bold mb-1" :style="{ color: section.style?.textColor }">{{ section.content.stats.followers }}</div>
+              <div class="text-sm opacity-60" :style="{ color: section.style?.textColor }">Followers</div>
+            </div>
+            <div v-if="section.content?.stats?.subscribers" class="text-center">
+              <div class="text-4xl font-bold mb-1" :style="{ color: section.style?.textColor }">{{ section.content.stats.subscribers }}</div>
+              <div class="text-sm opacity-60" :style="{ color: section.style?.textColor }">Abonnés</div>
+            </div>
+            <div v-if="section.content?.stats?.posts" class="text-center">
+              <div class="text-4xl font-bold mb-1" :style="{ color: section.style?.textColor }">{{ section.content.stats.posts }}</div>
+              <div class="text-sm opacity-60" :style="{ color: section.style?.textColor }">Posts</div>
+            </div>
+          </div>
+          <div class="flex justify-center gap-4 mt-8">
+            <a v-if="section.content?.links?.facebook" :href="section.content.links.facebook" target="_blank" class="w-12 h-12 rounded-full flex items-center justify-center transition-all hover:scale-110" :style="{ backgroundColor: section.style?.textColor + '10', color: section.style?.textColor }"><svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg></a>
+            <a v-if="section.content?.links?.instagram" :href="section.content.links.instagram" target="_blank" class="w-12 h-12 rounded-full flex items-center justify-center transition-all hover:scale-110" :style="{ backgroundColor: section.style?.textColor + '10', color: section.style?.textColor }"><svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/></svg></a>
+            <a v-if="section.content?.links?.twitter" :href="section.content.links.twitter" target="_blank" class="w-12 h-12 rounded-full flex items-center justify-center transition-all hover:scale-110" :style="{ backgroundColor: section.style?.textColor + '10', color: section.style?.textColor }"><svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg></a>
+          </div>
+        </div>
+      </template>
+      
+      <!-- SOCIAL: CTA (avec message) -->
+      <template v-else-if="section.content?.layout === 'cta'">
+        <div :style="{ maxWidth: section.style?.maxWidth || '600px', margin: '0 auto', padding: '0 1rem', textAlign: 'center' }">
+          <h3 class="text-2xl font-bold mb-2" :style="{ color: section.style?.textColor }">{{ section.content?.title || 'Rejoignez-nous' }}</h3>
+          <p class="opacity-70 mb-8" :style="{ color: section.style?.textColor }">{{ section.content?.subtitle || 'Suivez-nous sur les réseaux sociaux' }}</p>
+          <div class="flex justify-center gap-4">
+            <a v-if="section.content?.links?.facebook" :href="section.content.links.facebook" target="_blank" class="w-14 h-14 rounded-xl flex items-center justify-center text-white transition-all hover:scale-110" style="background: #1877F2;"><svg class="w-7 h-7" fill="currentColor" viewBox="0 0 24 24"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg></a>
+            <a v-if="section.content?.links?.instagram" :href="section.content.links.instagram" target="_blank" class="w-14 h-14 rounded-xl flex items-center justify-center text-white transition-all hover:scale-110" style="background: linear-gradient(45deg, #f09433 0%,#e6683c 25%,#dc2743 50%,#cc2366 75%,#bc1888 100%);"><svg class="w-7 h-7" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/></svg></a>
+            <a v-if="section.content?.links?.twitter" :href="section.content.links.twitter" target="_blank" class="w-14 h-14 rounded-xl flex items-center justify-center text-white bg-black transition-all hover:scale-110"><svg class="w-7 h-7" fill="currentColor" viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg></a>
+            <a v-if="section.content?.links?.youtube" :href="section.content.links.youtube" target="_blank" class="w-14 h-14 rounded-xl flex items-center justify-center text-white transition-all hover:scale-110" style="background: #FF0000;"><svg class="w-7 h-7" fill="currentColor" viewBox="0 0 24 24"><path d="M23.498 6.186a3.016 3.016 0 00-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 00.502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 002.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 002.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg></a>
+          </div>
+        </div>
+      </template>
+      
+      <!-- SOCIAL: Default (Centered) -->
+      <template v-else>
+        <div :style="{ maxWidth: section.style?.maxWidth || '400px', margin: '0 auto', padding: '0 1rem', textAlign: 'center' }">
+          <h3 v-if="section.content?.title" class="text-lg font-semibold mb-4" :style="{ color: section.style?.textColor }">{{ section.content.title }}</h3>
+          <div class="flex justify-center gap-4">
+            <a v-if="section.content?.links?.facebook" :href="section.content.links.facebook" target="_blank" class="w-10 h-10 rounded-full flex items-center justify-center transition-opacity hover:opacity-70" :style="{ backgroundColor: section.style?.textColor + '15', color: section.style?.textColor }"><svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg></a>
+            <a v-if="section.content?.links?.instagram" :href="section.content.links.instagram" target="_blank" class="w-10 h-10 rounded-full flex items-center justify-center transition-opacity hover:opacity-70" :style="{ backgroundColor: section.style?.textColor + '15', color: section.style?.textColor }"><svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/></svg></a>
+            <a v-if="section.content?.links?.twitter" :href="section.content.links.twitter" target="_blank" class="w-10 h-10 rounded-full flex items-center justify-center transition-opacity hover:opacity-70" :style="{ backgroundColor: section.style?.textColor + '15', color: section.style?.textColor }"><svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg></a>
+            <a v-if="section.content?.links?.youtube" :href="section.content.links.youtube" target="_blank" class="w-10 h-10 rounded-full flex items-center justify-center transition-opacity hover:opacity-70" :style="{ backgroundColor: section.style?.textColor + '15', color: section.style?.textColor }"><svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M23.498 6.186a3.016 3.016 0 00-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 00.502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 002.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 002.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg></a>
+            <a v-if="section.content?.links?.linkedin" :href="section.content.links.linkedin" target="_blank" class="w-10 h-10 rounded-full flex items-center justify-center transition-opacity hover:opacity-70" :style="{ backgroundColor: section.style?.textColor + '15', color: section.style?.textColor }"><svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg></a>
+          </div>
+          <div v-if="!hasAnySocialLink" class="py-8 text-gray-400">
+            <svg class="w-12 h-12 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" /></svg>
+            <p class="text-sm">Ajoutez vos liens de réseaux sociaux</p>
+          </div>
+        </div>
+      </template>
     </template>
     
     <!-- Fallback pour types non implémentés -->
