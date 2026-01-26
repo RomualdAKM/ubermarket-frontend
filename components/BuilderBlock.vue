@@ -495,7 +495,6 @@ const props = defineProps<{
 // Style calculé de la section
 const sectionStyle = computed(() => {
   const style = props.section.style || {}
-  const padding = style.padding || { top: 40, bottom: 40 }
   const advanced = props.section.advanced
   
   // Calculer la hauteur basée sur la propriété height
@@ -524,38 +523,44 @@ const sectionStyle = computed(() => {
   }
   
   const verticalPadding = style.verticalSpacing 
-    ? vSpacingMap[style.verticalSpacing] || padding.top
-    : padding.top
+    ? vSpacingMap[style.verticalSpacing] || 40
+    : 40
   
   const horizontalPadding = style.horizontalSpacing 
     ? hSpacingMap[style.horizontalSpacing] || '1rem'
     : '1rem'
   
-  // Calculer le background
-  let background = style.backgroundColor || 'transparent'
-  if (style.backgroundType === 'gradient' && style.backgroundGradient) {
-    background = style.backgroundGradient
-  } else if (style.backgroundType === 'image' && style.backgroundImage) {
-    background = `url(${style.backgroundImage})`
-  }
+  // Déterminer le background en fonction du type
+  const backgroundType = style.backgroundType || 'color'
   
-  return {
-    backgroundColor: style.backgroundType !== 'gradient' ? (style.backgroundColor || 'transparent') : undefined,
-    background: style.backgroundType === 'gradient' ? style.backgroundGradient : undefined,
+  const result: Record<string, any> = {
     paddingTop: `${verticalPadding}px`,
     paddingBottom: `${verticalPadding}px`,
     paddingLeft: horizontalPadding,
     paddingRight: horizontalPadding,
-    backgroundImage: style.backgroundType === 'image' && style.backgroundImage ? `url(${style.backgroundImage})` : undefined,
-    backgroundSize: 'cover',
-    backgroundPosition: 'center',
-    position: 'relative' as const,
+    position: 'relative',
     minHeight: heightMap[style.height || 'auto'] || 'auto',
-    // Animation
-    ...(props.section.animation?.type && props.section.animation.type !== 'none' ? {
-      animation: `${props.section.animation.type} ${props.section.animation.duration || 500}ms ease-out ${props.section.animation.delay || 0}ms both`
-    } : {})
+    backgroundSize: 'cover',
+    backgroundPosition: 'center'
   }
+  
+  // Appliquer le background selon le type
+  if (backgroundType === 'gradient' && style.backgroundGradient) {
+    result.background = style.backgroundGradient
+  } else if (backgroundType === 'image' && style.backgroundImage) {
+    result.backgroundImage = `url(${style.backgroundImage})`
+    result.backgroundColor = style.backgroundColor || 'transparent'
+  } else {
+    // Type 'color' ou défaut
+    result.backgroundColor = style.backgroundColor || 'transparent'
+  }
+  
+  // Animation
+  if (props.section.animation?.type && props.section.animation.type !== 'none') {
+    result.animation = `${props.section.animation.type} ${props.section.animation.duration || 500}ms ease-out ${props.section.animation.delay || 0}ms both`
+  }
+  
+  return result
 })
 
 // Vérifier si au moins un lien social est défini
