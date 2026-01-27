@@ -1541,10 +1541,23 @@
         <div :style="{ maxWidth: section.style?.maxWidth || '900px', margin: '0 auto', padding: '0 1rem' }">
           <h2 v-if="section.content?.title" class="text-3xl font-bold mb-8 text-center" :style="{ color: section.style?.textColor }">{{ section.content.title }}</h2>
           <div class="flex flex-wrap justify-center gap-2 mb-8">
-            <button v-for="(category, index) in (section.content?.categories || ['Général'])" :key="index" @click="activeTab = index" class="px-4 py-2 rounded-full font-medium transition-all" :style="{ backgroundColor: activeTab === index ? (section.content?.accentColor || '#10B981') : section.style?.textColor + '10', color: activeTab === index ? '#ffffff' : section.style?.textColor }">{{ category }}</button>
+            <button 
+              v-for="(category, index) in (section.content?.categories || [])" 
+              :key="index" 
+              @click="activeTab = Number(index)" 
+              class="px-4 py-2 rounded-full font-medium transition-all" 
+              :style="{ backgroundColor: activeTab === Number(index) ? (section.content?.accentColor || '#10B981') : section.style?.textColor + '10', color: activeTab === Number(index) ? '#ffffff' : section.style?.textColor }"
+            >
+              {{ typeof category === 'object' ? category.name : category }}
+            </button>
           </div>
           <div class="space-y-4">
-            <div v-for="(item, index) in (section.content?.items || [])" :key="index" class="border rounded-xl overflow-hidden" :style="{ borderColor: section.style?.textColor + '15' }">
+            <div 
+              v-for="(item, index) in (typeof (section.content?.categories || [])[activeTab] === 'object' ? (section.content?.categories || [])[activeTab]?.items || [] : section.content?.items || [])" 
+              :key="index" 
+              class="border rounded-xl overflow-hidden" 
+              :style="{ borderColor: section.style?.textColor + '15' }"
+            >
               <div class="p-4 font-semibold" :style="{ backgroundColor: section.style?.textColor + '05', color: section.style?.textColor }">{{ item.question }}</div>
               <div class="p-4 opacity-80" :style="{ color: section.style?.textColor }">{{ item.answer }}</div>
             </div>

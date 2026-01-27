@@ -192,18 +192,22 @@
             <li>
               <NuxtLink 
                 :to="getDashboardLink('discount-code/codes-promo')" 
-                class="flex items-center px-3 py-2 text-sm font-medium text-gray-700 rounded hover:bg-gray-100 transition-all duration-200"
-                :class="isSidebarOpen ? '' : 'justify-center'"
-                @click="closeSidebar"
+                class="flex items-center px-3 py-2 text-sm font-medium rounded hover:bg-gray-100 transition-all duration-200"
+                :class="[
+                  isSidebarOpen ? '' : 'justify-center',
+                  hasPromoModule ? 'text-gray-700' : 'text-gray-400'
+                ]"
+                @click="(e) => handleRestrictedClick('promo', 'Codes Promo', e)"
               >
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"></path>
                 </svg>
                 <span 
-                  class="ml-3 transition-opacity duration-300"
+                  class="ml-3 transition-opacity duration-300 flex items-center gap-2"
                   :class="isSidebarOpen ? 'opacity-100' : 'opacity-0 lg:opacity-0'"
                 >
                   Codes promo
+                  <span v-if="!hasPromoModule" class="px-1.5 py-0.5 text-[10px] font-semibold bg-amber-100 text-amber-700">PRO</span>
                 </span>
               </NuxtLink>
             </li>
@@ -276,18 +280,22 @@
             <li>
               <NuxtLink 
                 :to="getDashboardLink('deliveries/livraisons')" 
-                class="flex items-center px-3 py-2 text-sm font-medium text-gray-700 rounded hover:bg-gray-100 transition-all duration-200"
-                :class="isSidebarOpen ? '' : 'justify-center'"
-                @click="closeSidebar"
+                class="flex items-center px-3 py-2 text-sm font-medium rounded hover:bg-gray-100 transition-all duration-200"
+                :class="[
+                  isSidebarOpen ? '' : 'justify-center',
+                  hasDeliveryModule ? 'text-gray-700' : 'text-gray-400'
+                ]"
+                @click="(e) => handleRestrictedClick('delivery', 'Livraisons', e)"
               >
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path>
                 </svg>
                 <span 
-                  class="ml-3 transition-opacity duration-300"
+                  class="ml-3 transition-opacity duration-300 flex items-center gap-2"
                   :class="isSidebarOpen ? 'opacity-100' : 'opacity-0 lg:opacity-0'"
                 >
                   Livraisons
+                  <span v-if="!hasDeliveryModule" class="px-1.5 py-0.5 text-[10px] font-semibold bg-amber-100 text-amber-700">PRO</span>
                 </span>
               </NuxtLink>
             </li>
@@ -360,19 +368,23 @@
             <li>
               <NuxtLink 
                 :to="getDashboardLink('marketing/marketing')" 
-                class="flex items-center px-3 py-2 text-sm font-medium text-gray-700 rounded hover:bg-gray-100 transition-all duration-200"
-                :class="isSidebarOpen ? '' : 'justify-center'"
-                @click="closeSidebar"
+                class="flex items-center px-3 py-2 text-sm font-medium rounded hover:bg-gray-100 transition-all duration-200"
+                :class="[
+                  isSidebarOpen ? '' : 'justify-center',
+                  hasMarketingModule ? 'text-gray-700' : 'text-gray-400'
+                ]"
+                @click="(e) => handleRestrictedClick('marketing', 'Marketing', e)"
               >
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 3.055A9.001 9.001 0 1020.945 13H11V3.055z"></path>
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.488 9H15V3.512A9.025 9.025 0 0120.488 9z"></path>
                 </svg>
                 <span 
-                  class="ml-3 transition-opacity duration-300"
+                  class="ml-3 transition-opacity duration-300 flex items-center gap-2"
                   :class="isSidebarOpen ? 'opacity-100' : 'opacity-0 lg:opacity-0'"
                 >
                   Marketing
+                  <span v-if="!hasMarketingModule" class="px-1.5 py-0.5 text-[10px] font-semibold bg-amber-100 text-amber-700">PRO</span>
                 </span>
               </NuxtLink>
             </li>
@@ -469,15 +481,45 @@
         <slot />
       </main>
     </div>
+
+    <!-- Modal d'upgrade -->
+    <UpgradeModal 
+      :is-open="showUpgradeModal"
+      :message="upgradeMessage"
+      :feature="upgradeFeature"
+      @close="showUpgradeModal = false"
+    />
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted, computed } from 'vue'
+import { useSubscription } from '~/composables/useSubscription'
 
 // Récupération de la boutique courante
 const { currentShop } = useShops()
 const config = useRuntimeConfig()
+
+// Abonnement
+const { currentSubscription, fetchCurrentSubscription, hasModule } = useSubscription()
+const showUpgradeModal = ref(false)
+const upgradeMessage = ref('')
+const upgradeFeature = ref('')
+
+// Vérification modules
+const hasDeliveryModule = computed(() => hasModule('delivery'))
+const hasPromoModule = computed(() => hasModule('promo'))
+const hasMarketingModule = computed(() => hasModule('marketing'))
+
+// Fonction pour gérer le clic sur un module restreint
+const handleRestrictedClick = (module: string, label: string, event: Event) => {
+  if (!hasModule(module)) {
+    event.preventDefault()
+    upgradeMessage.value = `Le module "${label}" nécessite un abonnement supérieur`
+    upgradeFeature.value = module
+    showUpgradeModal.value = true
+  }
+}
 
 // Computed pour déterminer si c'est une boutique physique
 const isPhysicalShop = computed(() => currentShop.value?.product_type === 'physical')
@@ -547,6 +589,8 @@ const checkScreenSize = () => {
 onMounted(() => {
   checkScreenSize()
   window.addEventListener('resize', checkScreenSize)
+  // Charger l'abonnement de l'utilisateur
+  fetchCurrentSubscription().catch(() => {})
 })
 
 onUnmounted(() => {
