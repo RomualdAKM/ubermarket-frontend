@@ -406,6 +406,29 @@
                 </span>
               </NuxtLink>
             </li>
+            <!-- Équipe / Collaborateurs -->
+            <li v-if="hasCollaboratorsAccess">
+              <NuxtLink 
+                :to="getDashboardLink('team/collaborateurs')" 
+                class="flex items-center px-3 py-2 text-sm font-medium rounded hover:bg-gray-100 transition-all duration-200"
+                :class="[
+                  isSidebarOpen ? '' : 'justify-center',
+                  canAddCollaborators ? 'text-gray-700' : 'text-gray-400'
+                ]"
+                @click="(e) => handleCollaboratorsClick(e)"
+              >
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
+                </svg>
+                <span 
+                  class="ml-3 transition-opacity duration-300 flex items-center gap-2"
+                  :class="isSidebarOpen ? 'opacity-100' : 'opacity-0 lg:opacity-0'"
+                >
+                  Équipe
+                  <span v-if="!canAddCollaborators" class="px-1.5 py-0.5 text-[10px] font-semibold bg-amber-100 text-amber-700">PRO</span>
+                </span>
+              </NuxtLink>
+            </li>
             <li>
               <NuxtLink 
                 :to="getDashboardLink('settings/parametres')" 
@@ -510,6 +533,29 @@ const upgradeFeature = ref('')
 const hasDeliveryModule = computed(() => hasModule('delivery'))
 const hasPromoModule = computed(() => hasModule('promo'))
 const hasMarketingModule = computed(() => hasModule('marketing'))
+
+// Vérification collaborateurs (plans Standard+ ont accès)
+const hasCollaboratorsAccess = computed(() => {
+  const plan = currentSubscription.value?.plan?.code
+  return plan && !['welcome', 'gratuit'].includes(plan)
+})
+
+// Vérifier si on peut ajouter des collaborateurs (limite non atteinte)
+const canAddCollaborators = computed(() => {
+  if (!currentSubscription.value) return false
+  const limit = currentSubscription.value.limits?.collaborators ?? 0
+  return limit === -1 || limit > 0
+})
+
+// Fonction pour gérer le clic sur le module Collaborateurs
+const handleCollaboratorsClick = (event: Event) => {
+  if (!canAddCollaborators.value) {
+    event.preventDefault()
+    upgradeMessage.value = 'Votre formule ne permet pas d\'ajouter des collaborateurs. Passez à un plan supérieur.'
+    upgradeFeature.value = 'collaborators'
+    showUpgradeModal.value = true
+  }
+}
 
 // Fonction pour gérer le clic sur un module restreint
 const handleRestrictedClick = (module: string, label: string, event: Event) => {
