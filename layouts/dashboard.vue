@@ -407,13 +407,13 @@
               </NuxtLink>
             </li>
             <!-- Équipe / Collaborateurs -->
-            <li v-if="hasCollaboratorsAccess">
+            <li>
               <NuxtLink 
                 :to="getDashboardLink('team/collaborateurs')" 
                 class="flex items-center px-3 py-2 text-sm font-medium rounded hover:bg-gray-100 transition-all duration-200"
                 :class="[
                   isSidebarOpen ? '' : 'justify-center',
-                  canAddCollaborators ? 'text-gray-700' : 'text-gray-400'
+                  hasCollaboratorsAccess ? 'text-gray-700' : 'text-gray-400'
                 ]"
                 @click="(e) => handleCollaboratorsClick(e)"
               >
@@ -425,7 +425,7 @@
                   :class="isSidebarOpen ? 'opacity-100' : 'opacity-0 lg:opacity-0'"
                 >
                   Équipe
-                  <span v-if="!canAddCollaborators" class="px-1.5 py-0.5 text-[10px] font-semibold bg-amber-100 text-amber-700">PRO</span>
+                  <span v-if="!hasCollaboratorsAccess" class="px-1.5 py-0.5 text-[10px] font-semibold bg-amber-100 text-amber-700">PRO</span>
                 </span>
               </NuxtLink>
             </li>
@@ -549,9 +549,9 @@ const canAddCollaborators = computed(() => {
 
 // Fonction pour gérer le clic sur le module Collaborateurs
 const handleCollaboratorsClick = (event: Event) => {
-  if (!canAddCollaborators.value) {
+  if (!hasCollaboratorsAccess.value) {
     event.preventDefault()
-    upgradeMessage.value = 'Votre formule ne permet pas d\'ajouter des collaborateurs. Passez à un plan supérieur.'
+    upgradeMessage.value = 'La gestion d\'équipe nécessite un abonnement Standard ou supérieur.'
     upgradeFeature.value = 'collaborators'
     showUpgradeModal.value = true
   }
