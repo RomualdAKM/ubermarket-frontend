@@ -1,5 +1,5 @@
 <template>
-  <div v-if="isOnShopSubdomain">
+  <div v-if="isOnShopSubdomain()">
     <!-- Page de maintenance -->
     <div v-if="isInMaintenance" class="min-h-screen flex items-center justify-center" :style="maintenancePageStyle">
       <div class="text-center max-w-md mx-auto px-6">
@@ -144,7 +144,7 @@
   
   <div v-else>
     <!-- Page d'accueil principale (domaine principal) -->
-    <h1 class="text-3xl font-bold underline">Hello world!</h1>
+    <LandingPage />
   </div>
 </template>
 
