@@ -95,16 +95,8 @@
               required
               class="mt-1 block w-full px-3 py-2 border-0 border-b-2 border-gray-300 placeholder-gray-300 placeholder:italic text-gray-900 focus:outline-none focus:ring-0 focus:border-primary transition-colors duration-200"
             >
-              <option value="FR">France</option>
-              <option value="BE">Belgique</option>
-              <option value="CH">Suisse</option>
-              <option value="CA">Canada</option>
-              <option value="MA">Maroc</option>
-              <option value="TN">Tunisie</option>
-              <option value="DZ">Algérie</option>
-              <option value="US">États-Unis</option>
-              <option value="GB">Royaume-Uni</option>
-              <option value="DE">Allemagne</option>
+              <option value="">Selectionnez un pays</option>
+              <option v-for="c in countries" :key="c.code" :value="c.code">{{ c.name }}</option>
             </select>
           </div>
         </div>
@@ -725,6 +717,9 @@ const showPaypalConfig = ref(false)
 const monerooConfig = ref({ api_key: '', is_active: false })
 const paypalConfig = ref({ client_id: '', client_secret: '', is_active: false })
 
+// Liste des pays
+const countries = ref<{code: string, name: string}[]>([])
+
 // Section Statut
 const isUpdatingStatus = ref(false)
 const statusSuccessMessage = ref('')
@@ -911,8 +906,21 @@ const togglePaymentMethod = async (method: string) => {
   }
 }
 
-// Initialiser les données au montage
-onMounted(() => {
+// Initialiser les donnees au montage
+onMounted(async () => {
+  const config = useRuntimeConfig()
+  
+  // Charger les pays
+  try {
+    const response = await fetch(`${config.public.apiBase}/countries`)
+    const data = await response.json()
+    if (data.success) {
+      countries.value = data.countries
+    }
+  } catch (error) {
+    console.error('Erreur chargement pays:', error)
+  }
+  
   // Initialiser le formulaire utilisateur
   if (user.value) {
     profileForm.name = user.value.name || ''
@@ -921,14 +929,14 @@ onMounted(() => {
     profileForm.country = user.value.country || 'FR'
   }
   
-  // Initialiser les données de domaine
+  // Initialiser les donnees de domaine
   if (currentShop.value) {
     currentShopSubdomain.value = currentShop.value.subdomain || ''
     customDomain.value = currentShop.value.custom_domain || null
     customDomainInput.value = customDomain.value || ''
   }
   
-  // Charger les méthodes de paiement
+  // Charger les methodes de paiement
   loadPaymentMethods()
   
   // Initialiser le formulaire de statut

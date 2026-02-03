@@ -171,11 +171,12 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, reactive } from 'vue'
+import { ref, computed, reactive, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import type { RegisterData } from '~/types/auth'
 import { useAuth } from '~/composables/useAuth'
 
+const config = useRuntimeConfig()
 const router = useRouter()
 const { register } = useAuth()
 
@@ -201,19 +202,21 @@ const errors = reactive({
   acceptTerms: ''
 })
 
-// Liste des pays (simplifiée pour l'exemple)
-const countries = [
-  { code: 'FR', name: 'France' },
-  { code: 'BE', name: 'Belgique' },
-  { code: 'CH', name: 'Suisse' },
-  { code: 'CA', name: 'Canada' },
-  { code: 'MA', name: 'Maroc' },
-  { code: 'TN', name: 'Tunisie' },
-  { code: 'DZ', name: 'Algérie' },
-  { code: 'US', name: 'États-Unis' },
-  { code: 'GB', name: 'Royaume-Uni' },
-  { code: 'DE', name: 'Allemagne' }
-]
+// Liste des pays (chargee depuis l'API)
+const countries = ref<{code: string, name: string}[]>([])
+
+// Charger les pays au montage
+onMounted(async () => {
+  try {
+    const response = await fetch(`${config.public.apiBase}/countries`)
+    const data = await response.json()
+    if (data.success) {
+      countries.value = data.countries
+    }
+  } catch (error) {
+    console.error('Erreur chargement pays:', error)
+  }
+})
 
 // Validation du formulaire
 const isFormValid = computed(() => {

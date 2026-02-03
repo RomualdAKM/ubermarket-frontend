@@ -61,17 +61,8 @@
               :class="{'border-red-500': errors.country}"
               class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md  focus:outline-none focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-100 disabled:cursor-not-allowed"
             >
-              <option value="">Sélectionnez un pays</option>
-              <option value="FR">France</option>
-              <option value="BE">Belgique</option>
-              <option value="CH">Suisse</option>
-              <option value="CA">Canada</option>
-              <option value="MA">Maroc</option>
-              <option value="TN">Tunisie</option>
-              <option value="DZ">Algérie</option>
-              <option value="US">États-Unis</option>
-              <option value="GB">Royaume-Uni</option>
-              <option value="DE">Allemagne</option>
+              <option value="">Selectionnez un pays</option>
+              <option v-for="c in countries" :key="c.code" :value="c.code">{{ c.name }}</option>
             </select>
             <p v-if="errors.country" class="mt-1 text-sm text-red-600">{{ errors.country }}</p>
           </div>
@@ -136,18 +127,33 @@ import { useRouter } from 'vue-router'
 import { useUpgrade } from '~/composables/useUpgrade'
 import { useAuth } from '~/composables/useAuth'
 
+const config = useRuntimeConfig()
 const router = useRouter()
 const { upgradeToVendor, canUpgrade } = useUpgrade()
 const { user } = useAuth()
 
-// Rediriger si l'utilisateur n'est pas un client
-onMounted(() => {
+// Liste des pays
+const countries = ref<{code: string, name: string}[]>([])
+
+// Rediriger si l'utilisateur n'est pas un client + charger les pays
+onMounted(async () => {
   if (!canUpgrade.value) {
     if (!user.value) {
       router.push('/connexion')
     } else if (user.value.role === 'vendor') {
       router.push('/mes-boutiques')
     }
+  }
+  
+  // Charger les pays
+  try {
+    const response = await fetch(`${config.public.apiBase}/countries`)
+    const data = await response.json()
+    if (data.success) {
+      countries.value = data.countries
+    }
+  } catch (error) {
+    console.error('Erreur chargement pays:', error)
   }
 })
 
