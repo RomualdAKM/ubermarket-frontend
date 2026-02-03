@@ -210,7 +210,7 @@ definePageMeta({
 const route = useRoute()
 const shopSlug = route.params.slug as string
 
-const { fetchShops, shops } = useShops()
+const { fetchShops, shops, currentShop } = useShops()
 const { deliveryZones, isLoading, error, fetchDeliveryZones, createDeliveryZone, updateDeliveryZone, deleteDeliveryZone } = useDeliveryZones()
 
 // État
@@ -228,15 +228,7 @@ const formData = ref<CreateDeliveryZoneData>({
   is_active: true
 })
 
-// Computed pour la boutique courante
-const currentShop = computed(() => {
-  if (!shops.value || !Array.isArray(shops.value)) {
-    return undefined
-  }
-  return shops.value.find(s => s.subdomain === shopSlug || s.slug === shopSlug)
-})
-
-// Computed pour l'ID de la boutique
+// Utiliser currentShop du composable
 const currentShopId = computed(() => currentShop.value?.id)
 
 // Charger les zones

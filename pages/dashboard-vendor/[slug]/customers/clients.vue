@@ -338,18 +338,12 @@ let searchTimeout: NodeJS.Timeout | null = null
 
 // Charger les données au montage
 onMounted(async () => {
-  // Charger les boutiques si nécessaire
+  // Charger les boutiques si necessaire
   if (shops.value.length === 0) {
     await fetchShops()
   }
   
-  // Trouver la boutique correspondant au slug
-  const shop = shops.value.find(s => s.subdomain === shopSlug || s.slug === shopSlug)
-  if (shop) {
-    setCurrentShop(shop)
-  }
-  
-  // Charger les clients
+  // Charger les clients (currentShop est deja defini par le middleware)
   if (shopId.value) {
     await loadCustomers()
   }

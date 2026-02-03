@@ -347,12 +347,61 @@
             </svg>
           </button>
 
-          <button class="p-2 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition-colors relative">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M14.857 17.082a23.848 23.848 0 0 0 5.454-1.31A8.967 8.967 0 0 1 18 9.75V9A6 6 0 0 0 6 9v.75a8.967 8.967 0 0 1-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 0 1-5.714 0m5.714 0a3 3 0 1 1-5.714 0"/>
-            </svg>
-            <span class="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full"></span>
-          </button>
+          <div class="flex items-center gap-3">
+            <!-- Notifications -->
+            <button class="p-2 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition-colors relative">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M14.857 17.082a23.848 23.848 0 0 0 5.454-1.31A8.967 8.967 0 0 1 18 9.75V9A6 6 0 0 0 6 9v.75a8.967 8.967 0 0 1-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 0 1-5.714 0m5.714 0a3 3 0 1 1-5.714 0"/>
+              </svg>
+              <span class="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full"></span>
+            </button>
+
+            <!-- Menu utilisateur -->
+            <div class="relative">
+              <button 
+                @click="showUserMenu = !showUserMenu"
+                class="flex items-center gap-2 p-1.5 rounded-lg hover:bg-slate-100 transition-colors"
+              >
+                <div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center">
+                  <span class="text-white text-sm font-medium">{{ getUserInitials() }}</span>
+                </div>
+                <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="m19 9-7 7-7-7"/>
+                </svg>
+              </button>
+
+              <!-- Dropdown menu -->
+              <div 
+                v-if="showUserMenu"
+                class="absolute right-0 mt-2 w-56 bg-white rounded-lg shadow-lg border border-slate-200 py-1 z-50"
+              >
+                <div class="px-4 py-3 border-b border-slate-100">
+                  <p class="text-sm font-medium text-slate-900">{{ user?.name }}</p>
+                  <p class="text-xs text-slate-500 truncate">{{ user?.email }}</p>
+                </div>
+                <NuxtLink 
+                  :to="getDashboardLink('settings/parametres')" 
+                  class="flex items-center gap-2 px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 transition-colors"
+                  @click="showUserMenu = false"
+                >
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M9.594 3.94c.09-.542.56-.94 1.11-.94h2.593c.55 0 1.02.398 1.11.94l.213 1.281c.063.374.313.686.645.87.074.04.147.083.22.127.325.196.72.257 1.075.124l1.217-.456a1.125 1.125 0 0 1 1.37.49l1.296 2.247a1.125 1.125 0 0 1-.26 1.431l-1.003.827c-.293.241-.438.613-.43.992a7.723 7.723 0 0 1 0 .255c-.008.378.137.75.43.991l1.004.827c.424.35.534.955.26 1.43l-1.298 2.247a1.125 1.125 0 0 1-1.369.491l-1.217-.456c-.355-.133-.75-.072-1.076.124a6.47 6.47 0 0 1-.22.128c-.331.183-.581.495-.644.869l-.213 1.281c-.09.543-.56.94-1.11.94h-2.594c-.55 0-1.019-.398-1.11-.94l-.213-1.281c-.062-.374-.312-.686-.644-.87a6.52 6.52 0 0 1-.22-.127c-.325-.196-.72-.257-1.076-.124l-1.217.456a1.125 1.125 0 0 1-1.369-.49l-1.297-2.247a1.125 1.125 0 0 1 .26-1.431l1.004-.827c.292-.24.437-.613.43-.991a6.932 6.932 0 0 1 0-.255c.007-.38-.138-.751-.43-.992l-1.004-.827a1.125 1.125 0 0 1-.26-1.43l1.297-2.247a1.125 1.125 0 0 1 1.37-.491l1.216.456c.356.133.751.072 1.076-.124.072-.044.146-.086.22-.128.332-.183.582-.495.644-.869l.214-1.28Z"/>
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"/>
+                  </svg>
+                  Parametres
+                </NuxtLink>
+                <button 
+                  @click="handleLogout"
+                  class="w-full flex items-center gap-2 px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors"
+                >
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0 0 13.5 3h-6a2.25 2.25 0 0 0-2.25 2.25v13.5A2.25 2.25 0 0 0 7.5 21h6a2.25 2.25 0 0 0 2.25-2.25V15m3 0 3-3m0 0-3-3m3 3H9"/>
+                  </svg>
+                  Se deconnecter
+                </button>
+              </div>
+            </div>
+          </div>
         </div>
       </header>
 
@@ -378,9 +427,39 @@
 import { ref, onMounted, onUnmounted, computed } from 'vue'
 import { useSubscription } from '~/composables/useSubscription'
 
-// Récupération de la boutique courante
+// Recuperation de la boutique courante et de l'utilisateur
 const { currentShop } = useShops()
+const { user, logout } = useAuth()
+const router = useRouter()
 const config = useRuntimeConfig()
+
+// Menu utilisateur
+const showUserMenu = ref(false)
+
+// Fermer le menu si on clique ailleurs
+const closeUserMenu = (event: MouseEvent) => {
+  const target = event.target as HTMLElement
+  if (!target.closest('.relative')) {
+    showUserMenu.value = false
+  }
+}
+
+// Obtenir les initiales de l'utilisateur
+const getUserInitials = () => {
+  if (!user.value?.name) return 'U'
+  const words = user.value.name.trim().split(' ')
+  if (words.length >= 2) {
+    return (words[0][0] + words[1][0]).toUpperCase()
+  }
+  return user.value.name.substring(0, 2).toUpperCase()
+}
+
+// Gerer la deconnexion
+const handleLogout = async () => {
+  showUserMenu.value = false
+  await logout()
+  router.push('/connexion-vendeur')
+}
 
 // Abonnement
 const { currentSubscription, fetchCurrentSubscription, hasModule } = useSubscription()
@@ -503,16 +582,18 @@ const checkScreenSize = () => {
   isSidebarOpen.value = isLargeScreen.value
 }
 
-// Gérer le redimensionnement de la fenêtre
+// Gerer le redimensionnement de la fenetre
 onMounted(() => {
   checkScreenSize()
   window.addEventListener('resize', checkScreenSize)
+  window.addEventListener('click', closeUserMenu)
   // Charger l'abonnement de l'utilisateur
   fetchCurrentSubscription().catch(() => {})
 })
 
 onUnmounted(() => {
   window.removeEventListener('resize', checkScreenSize)
+  window.removeEventListener('click', closeUserMenu)
 })
 </script>
 

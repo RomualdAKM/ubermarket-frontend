@@ -185,7 +185,7 @@ const route = useRoute()
 const slug = route.params.slug as string
 const config = useRuntimeConfig()
 
-const { shops, fetchShops } = useShops()
+const { shops, currentShop, fetchShops } = useShops()
 const { 
   dashboardData, 
   isLoading, 
@@ -207,16 +207,14 @@ const getImageUrl = (path: string | null) => {
 }
 
 const loadDashboard = async () => {
-  // Récupérer les boutiques si pas déjà chargées
+  // Recuperer les boutiques si pas deja chargees
   if (shops.value.length === 0) {
     await fetchShops()
   }
   
-  // Trouver la boutique correspondant au slug
-  const currentShop = shops.value.find(shop => shop.slug === slug || shop.subdomain === slug)
-  
-  if (currentShop) {
-    await fetchDashboardStats(currentShop.id)
+  // Utiliser currentShop du composable (defini par le middleware)
+  if (currentShop.value) {
+    await fetchDashboardStats(currentShop.value.id)
   }
 }
 

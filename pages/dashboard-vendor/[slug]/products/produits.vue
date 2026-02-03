@@ -413,7 +413,7 @@ const {
   fetchProductDetails 
 } = useProducts()
 
-const { shops, fetchShops } = useShops()
+const { shops, currentShop, fetchShops } = useShops()
 
 // États réactifs
 const filters = ref({
@@ -492,7 +492,7 @@ const visiblePages = computed(() => {
 const availableSubcategories = computed(() => {
   const subcategoryNames = new Set<string>()
   
-  // Vérifier que products.value existe et est un tableau
+  // Verifier que products.value existe et est un tableau
   if (!products.value || !Array.isArray(products.value)) {
     return []
   }
@@ -504,17 +504,6 @@ const availableSubcategories = computed(() => {
   })
   
   return Array.from(subcategoryNames).sort()
-})
-
-// Computed pour obtenir la boutique courante
-const currentShop = computed(() => {
-  const shopSlug = route.params.slug as string
-  
-  if (!shops.value || !Array.isArray(shops.value)) {
-    return undefined
-  }
-  
-  return shops.value.find(s => s.subdomain === shopSlug)
 })
 
 // Computed pour obtenir l'ID de la boutique actuelle
@@ -643,26 +632,20 @@ function closeProductModal() {
 
 // Fonction de chargement des produits
 async function loadProducts() {
-  // Charger d'abord les boutiques si elles ne sont pas déjà chargées
+  // Charger d'abord les boutiques si elles ne sont pas deja chargees
   if (!shops.value || shops.value.length === 0) {
-    console.log('📦 Chargement des boutiques...')
+    console.log('Chargement des boutiques...')
     await fetchShops()
   }
   
-  // Calculer l'ID de la boutique après avoir chargé les boutiques
-  const shopSlug = route.params.slug as string
-  const shop = shops.value?.find(s => s.subdomain === shopSlug)
-  
-  if (!shop) {
-    console.error('❌ Impossible de trouver la boutique avec le slug:', shopSlug)
-    console.log('📊 Boutiques disponibles:', shops.value?.map(s => s.subdomain))
+  // Utiliser currentShop du composable (defini par le middleware)
+  if (!currentShop.value) {
+    console.log('Attente de currentShop...')
     return
   }
   
-  console.log('✅ Boutique trouvée:', shop.name, '(ID:', shop.id, ')')
-  console.log('🚀 Chargement des produits pour la boutique ID:', shop.id)
-  
-  await fetchShopProducts(shop.id)
+  console.log('Boutique trouvee:', currentShop.value.name, '(ID:', currentShop.value.id, ')')
+  await fetchShopProducts(currentShop.value.id)
 }
 
 // Watchers pour réinitialiser la pagination lors des filtres

@@ -201,17 +201,9 @@ definePageMeta({
 
 const route = useRoute()
 const shopSlug = route.params.slug as string
-const { shops, fetchShops } = useShops()
+const { shops, currentShop, fetchShops } = useShops()
 
-// Computed pour la boutique courante
-const currentShop = computed(() => {
-  if (!shops.value || !Array.isArray(shops.value)) {
-    return undefined
-  }
-  return shops.value.find(s => s.subdomain === shopSlug || s.slug === shopSlug)
-})
-
-// Données réactives
+// Donnees reactives
 const selectedPeriod = ref('month')
 const selectedCountry = ref('all')
 const visits = ref(1242)

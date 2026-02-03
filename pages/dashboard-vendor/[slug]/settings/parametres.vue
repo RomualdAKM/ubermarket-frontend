@@ -698,7 +698,7 @@ definePageMeta({
 })
 
 const route = useRoute()
-const { shops, checkCustomDomainAvailability, updateShop } = useShops()
+const { shops, currentShop, checkCustomDomainAvailability, updateShop } = useShops()
 const { user, updateProfile, token } = useAuth()
 
 const activeTab = ref('general')
@@ -806,13 +806,7 @@ const profileForm = reactive({
   country: 'FR'
 })
 
-// Récupérer la boutique actuelle
-const currentShop = computed(() => {
-  const slug = route.params.slug as string
-  return shops.value.find(s => s.slug === slug) || null
-})
-
-// Mettre à jour les paramètres généraux
+// Mettre a jour les parametres generaux
 const updateGeneralSettings = async () => {
   isUpdatingGeneral.value = true
   generalErrorMessage.value = ''

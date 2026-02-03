@@ -1,43 +1,54 @@
 export default defineNuxtRouteMiddleware(async (to) => {
-  // Vérifier si nous sommes sur une route dashboard-vendor avec slug
+  // Verifier si nous sommes sur une route dashboard-vendor avec slug
   if (!to.params.slug) {
     return
   }
 
-  const { isAuthenticated } = useAuth()
-  const { shops, fetchShops } = useShops()
+  const { isAuthenticated, token, initAuth } = useAuth()
+  const { shops, fetchShops, setCurrentShop } = useShops()
 
-  // Rediriger vers la connexion si non authentifié
+  // Cote client : s'assurer que l'auth est initialisee depuis localStorage
+  if (process.client) {
+    // Verifier si le token n'est pas encore charge mais existe dans localStorage
+    if (!token.value) {
+      const storedToken = localStorage.getItem('auth_token')
+      if (storedToken) {
+        // Initialiser l'auth depuis localStorage
+        await initAuth()
+      }
+    }
+  }
+
+  // Rediriger vers la connexion si non authentifie
   if (!isAuthenticated.value) {
     return navigateTo('/connexion-vendeur')
   }
 
   try {
-    // Récupérer les boutiques de l'utilisateur si pas encore fait
+    // Recuperer les boutiques de l'utilisateur si pas encore fait
     if (shops.value.length === 0) {
       await fetchShops()
     }
 
-    // Vérifier que l'utilisateur a accès à cette boutique
+    // Verifier que l'utilisateur a acces a cette boutique
     const requestedSlug = to.params.slug as string
     const userShop = shops.value.find(shop => shop.slug === requestedSlug)
 
     if (!userShop) {
-      // L'utilisateur n'a pas accès à cette boutique
+      // L'utilisateur n'a pas acces a cette boutique
       throw createError({
         statusCode: 403,
-        statusMessage: 'Accès non autorisé à cette boutique'
+        statusMessage: 'Acces non autorise a cette boutique'
       })
     }
 
-    // Stocker la boutique courante dans le contexte
-    const { setCurrentShop } = useShops()
+    // Stocker la boutique courante
     setCurrentShop(userShop)
 
   } catch (error) {
     console.error('Erreur lors de la validation du slug:', error)
     
-    // Rediriger vers la page de sélection des boutiques
+    // Rediriger vers la page de selection des boutiques
     return navigateTo('/mes-boutiques')
   }
 })

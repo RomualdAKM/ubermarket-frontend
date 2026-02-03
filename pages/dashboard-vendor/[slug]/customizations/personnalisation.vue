@@ -723,7 +723,7 @@ definePageMeta({
 })
 
 const route = useRoute()
-const { shops } = useShops()
+const { shops, currentShop } = useShops()
 const { 
   customizations, 
   isLoading: isLoadingCustomizations, 
@@ -732,9 +732,8 @@ const {
   saveCustomization: saveCustomizationAPI 
 } = useCustomization()
 
-// Récupérer l'ID de la boutique depuis le slug
+// Recuperer l'ID de la boutique depuis le slug
 const shopSlug = route.params.slug as string
-const currentShop = computed(() => shops.value?.find(s => s.subdomain === shopSlug))
 const shopId = computed(() => currentShop.value?.id)
 
 // Onglet actif

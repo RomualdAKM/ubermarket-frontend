@@ -235,21 +235,12 @@ const formData = reactive({
 
 // Charger les codes promo au montage
 onMounted(async () => {
-  // Charger les boutiques si elles ne sont pas déjà chargées
+  // Charger les boutiques si elles ne sont pas deja chargees
   if (shops.value.length === 0) {
     await fetchShops()
   }
   
-  // Trouver la boutique correspondant au slug
-  const shop = shops.value.find(s => s.subdomain === shopSlug || s.slug === shopSlug)
-  if (shop) {
-    setCurrentShop(shop)
-    console.log('Boutique trouvée:', shop)
-  } else {
-    console.error('Boutique non trouvée pour le slug:', shopSlug)
-  }
-  
-  // Charger les codes promo
+  // Charger les codes promo (currentShop est deja defini par le middleware)
   if (shopId.value) {
     await fetchPromoCodes(shopId.value)
   }

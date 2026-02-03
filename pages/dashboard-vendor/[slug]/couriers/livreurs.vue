@@ -303,7 +303,7 @@ import { useCouriers } from '~/composables/useCouriers'
 const route = useRoute()
 const slug = route.params.slug as string
 
-const { shops, fetchShops } = useShops()
+const { shops, currentShop, fetchShops } = useShops()
 const {
   couriers,
   platformCouriers,
@@ -335,11 +335,8 @@ const formData = ref({
 
 const searchQuery = ref('')
 const searchZone = ref('')
-const currentShop = computed(() => {
-  return shops.value.find(shop => shop.slug === slug || shop.subdomain === slug)
-})
 
-// Séparer les livreurs par type
+// Separer les livreurs par type
 const ownCouriers = computed(() => {
   return couriers.value.filter(c => c.is_own === true)
 })
@@ -349,16 +346,13 @@ const platformCouriersAvailable = computed(() => {
 })
 
 const loadCouriers = async () => {
-  if (!currentShop.value) {
-    if (shops.value.length === 0) {
-      await fetchShops()
-    }
-    
-    const shop = shops.value.find(s => s.slug === slug || s.subdomain === slug)
-    if (shop) {
-      await fetchCouriers(shop.id)
-    }
-  } else {
+  // S'assurer que les boutiques sont chargees
+  if (shops.value.length === 0) {
+    await fetchShops()
+  }
+  
+  // currentShop est defini par le middleware
+  if (currentShop.value) {
     await fetchCouriers(currentShop.value.id)
   }
 }

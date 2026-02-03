@@ -244,7 +244,7 @@ const route = useRoute()
 const config = useRuntimeConfig()
 const shopSlug = route.params.slug as string
 
-const { fetchShops, shops } = useShops()
+const { fetchShops, shops, currentShop } = useShops()
 const { products, isLoading, error, fetchShopProducts } = useProducts()
 const { token } = useAuth()
 
@@ -307,14 +307,8 @@ const updateNotes = ref('')
 const isUpdating = ref(false)
 const updateError = ref('')
 
-// Computed pour l'ID de la boutique
-const currentShopId = computed(() => {
-  if (!shops.value || !Array.isArray(shops.value)) {
-    return undefined
-  }
-  const shop = shops.value.find(s => s.subdomain === shopSlug || s.slug === shopSlug)
-  return shop?.id
-})
+// Computed pour l'ID de la boutique (utilise currentShop du composable)
+const currentShopId = computed(() => currentShop.value?.id)
 
 // Charger les produits
 const loadProducts = async () => {

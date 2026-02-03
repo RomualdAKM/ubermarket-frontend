@@ -415,19 +415,13 @@ const config = useRuntimeConfig()
 const shopSlug = route.params.slug as string
 
 const { fetchShopOrders, fetchOrderDetails, updateOrderStatus, updateTracking, orders, ordersMeta, currentOrder, isLoading, error } = useVendorOrders()
-const { shops, fetchShops } = useShops()
+const { shops, currentShop, fetchShops } = useShops()
 const { couriers, fetchCouriers, assignToOrder } = useCouriers()
 
-// Computed pour obtenir l'ID de la boutique actuelle
-const currentShopId = computed(() => {
-  if (!shops.value || !Array.isArray(shops.value)) {
-    return undefined
-  }
-  const shop = shops.value.find(s => s.subdomain === shopSlug || s.slug === shopSlug)
-  return shop?.id
-})
+// Computed pour obtenir l'ID de la boutique actuelle (utilise currentShop du composable)
+const currentShopId = computed(() => currentShop.value?.id)
 
-// État
+// Etat
 const filters = ref({
   status: '',
   payment_status: '',
