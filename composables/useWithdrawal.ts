@@ -113,12 +113,14 @@ export const useWithdrawal = () => {
   }
 
   // Récupérer le solde du vendeur
-  const fetchBalance = async (currency: string = 'EUR'): Promise<WithdrawalBalance> => {
+  const fetchBalance = async (currency?: string): Promise<WithdrawalBalance> => {
     loading.value = true
     error.value = null
     try {
+      // Utiliser la devise passée en paramètre, sinon pas de filtre (le backend utilisera sa config)
+      const queryParam = currency ? `?currency=${currency}` : ''
       const response = await apiRequest<{ success: boolean, balance: WithdrawalBalance }>(
-        `/vendor/withdrawals/balance?currency=${currency}`
+        `/vendor/withdrawals/balance${queryParam}`
       )
       balance.value = response.balance
       return response.balance
@@ -197,8 +199,8 @@ export const useWithdrawal = () => {
       )
       // Ajouter à la liste locale
       withdrawals.value = [response.withdrawal, ...withdrawals.value]
-      // Rafraîchir le solde
-      await fetchBalance(data.currency || 'EUR')
+      // Rafraîchir le solde avec la devise du retrait
+      await fetchBalance(data.currency)
       return response.withdrawal
     } catch (e: any) {
       error.value = e.message

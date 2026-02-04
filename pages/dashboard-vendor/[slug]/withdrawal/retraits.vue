@@ -81,7 +81,7 @@
             <!-- Montant -->
             <div>
               <label for="amount" class="block text-sm font-medium text-gray-700">
-                Montant ({{ balance?.currency || 'EUR' }})
+                Montant ({{ balance?.currency || shopCurrency }})
               </label>
               <input 
                 v-model.number="form.amount" 
@@ -92,7 +92,7 @@
                 step="0.01"
                 required
                 class="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-secondary focus:border-secondary" 
-                :placeholder="`Minimum ${withdrawalConfig?.min_amount || 10} ${balance?.currency || 'EUR'}`"
+                :placeholder="`Minimum ${withdrawalConfig?.min_amount || 10} ${balance?.currency || shopCurrency}`"
               >
               <p v-if="balance" class="mt-1 text-xs text-gray-500">
                 Disponible: {{ formatAmount(balance.available, balance.currency) }}
@@ -191,19 +191,19 @@
             <div class="space-y-1 text-sm">
               <div class="flex justify-between">
                 <span class="text-gray-500">Montant demandé:</span>
-                <span class="font-medium">{{ formatAmount(feesPreview.amount, balance?.currency || 'EUR') }}</span>
+                <span class="font-medium">{{ formatAmount(feesPreview.amount, balance?.currency || shopCurrency) }}</span>
               </div>
               <div class="flex justify-between">
                 <span class="text-gray-500">Frais agrégateur:</span>
-                <span class="text-red-600">- {{ formatAmount(feesPreview.aggregator_fee, balance?.currency || 'EUR') }}</span>
+                <span class="text-red-600">- {{ formatAmount(feesPreview.aggregator_fee, balance?.currency || shopCurrency) }}</span>
               </div>
               <div class="flex justify-between">
                 <span class="text-gray-500">Frais plateforme:</span>
-                <span class="text-red-600">- {{ formatAmount(feesPreview.platform_fee, balance?.currency || 'EUR') }}</span>
+                <span class="text-red-600">- {{ formatAmount(feesPreview.platform_fee, balance?.currency || shopCurrency) }}</span>
               </div>
               <div class="flex justify-between border-t border-gray-200 pt-1 mt-1">
                 <span class="font-medium text-gray-700">Vous recevrez:</span>
-                <span class="font-bold text-green-600">{{ formatAmount(feesPreview.net_amount, balance?.currency || 'EUR') }}</span>
+                <span class="font-bold text-green-600">{{ formatAmount(feesPreview.net_amount, balance?.currency || shopCurrency) }}</span>
               </div>
             </div>
           </div>
@@ -358,6 +358,15 @@ definePageMeta({
   middleware: ['shop-access']
 })
 
+const route = useRoute()
+const shopSlug = route.params.slug as string
+
+// Récupérer la boutique actuelle pour avoir la devise
+const { currentShop, shops, fetchShops, setCurrentShop } = useShops()
+
+// Devise de la boutique (par défaut XOF si non définie)
+const shopCurrency = computed(() => currentShop.value?.currency || 'XOF')
+
 const {
   balance,
   withdrawalConfig,
@@ -501,8 +510,20 @@ const confirmCancel = async () => {
 
 // Charger les données au montage
 onMounted(async () => {
+  // D'abord charger les boutiques pour avoir la devise
+  await fetchShops()
+  
+  // Trouver et définir la boutique actuelle
+  if (shops.value.length > 0) {
+    const shop = shops.value.find(s => s.slug === shopSlug || s.subdomain === shopSlug)
+    if (shop) {
+      setCurrentShop(shop)
+    }
+  }
+  
+  // Ensuite charger les données de retrait avec la bonne devise
   await Promise.all([
-    fetchBalance(),
+    fetchBalance(shopCurrency.value),
     fetchConfig(),
     fetchWithdrawals()
   ])
