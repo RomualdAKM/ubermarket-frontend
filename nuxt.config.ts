@@ -24,8 +24,8 @@ export default defineNuxtConfig({
   },
   runtimeConfig: {
     public: {
-      apiBase: process.env.NUXT_PUBLIC_API_BASE || 'https://backend.uber-market.com/api',
-      backendUrl: process.env.NUXT_PUBLIC_BACKEND_URL || 'https://backend.uber-market.com'
+      apiBase: process.env.NUXT_PUBLIC_API_BASE || 'https://ubermarket.fga-numerik.fr/api',
+      backendUrl: process.env.NUXT_PUBLIC_BACKEND_URL || 'https://ubermarket.fga-numerik.fr'
     }
   },
   typescript: {
