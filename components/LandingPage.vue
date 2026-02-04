@@ -7,6 +7,7 @@
           <img alt="UberMarket Logo" class="h-14 md:h-16" src="/uber-market.png">
         </NuxtLink>
         <div class="hidden md:flex gap-3">
+          <NuxtLink to="/marketplace" class="py-1 px-3 hover:text-zinc-500">Marketplace</NuxtLink>
           <a href="#fonctionnalites" class="py-1 px-3 hover:text-zinc-500">Fonctionnalités</a>
           <a href="#temoignages" class="py-1 px-3 hover:text-zinc-500">Témoignages</a>
           <a href="#tarifs" class="py-1 px-3 hover:text-zinc-500">Tarifs</a>
@@ -29,6 +30,7 @@
         </button>
       </div>
       <div class="flex flex-col gap-4 p-4 text-base">
+        <NuxtLink to="/marketplace" @click="closeMobileMenu" class="py-1 px-3">Marketplace</NuxtLink>
         <a href="#fonctionnalites" @click="closeMobileMenu" class="py-1 px-3">Fonctionnalités</a>
         <a href="#temoignages" @click="closeMobileMenu" class="py-1 px-3">Témoignages</a>
         <a href="#tarifs" @click="closeMobileMenu" class="py-1 px-3">Tarifs</a>
