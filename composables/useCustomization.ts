@@ -51,6 +51,7 @@ export interface ShopCustomizations {
   about?: AboutCustomization
   testimonials?: any
   terms?: { text: string }
+  sales_terms?: { text: string }
   footer?: FooterCustomization
 }
 
@@ -141,7 +142,7 @@ export const useCustomization = () => {
    */
   const saveCustomization = async (
     shopId: number,
-    pageType: 'home' | 'about' | 'testimonials' | 'terms' | 'footer',
+    pageType: 'home' | 'about' | 'testimonials' | 'terms' | 'sales_terms' | 'footer',
     content: any,
     files?: { banner_images?: File[], about_image?: File }
   ): Promise<boolean> => {
@@ -216,7 +217,7 @@ export const useCustomization = () => {
    */
   const deleteCustomization = async (
     shopId: number,
-    pageType: 'home' | 'about' | 'testimonials' | 'terms' | 'footer'
+    pageType: 'home' | 'about' | 'testimonials' | 'terms' | 'sales_terms' | 'footer'
   ): Promise<boolean> => {
     try {
       const response = await apiRequest<any>(

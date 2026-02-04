@@ -138,7 +138,7 @@
           </div>
           <div class="ml-3 text-sm">
             <label for="terms" class="font-medium text-gray-700">
-              J'accepte les <a href="#" class="text-primary hover:text-secondary">conditions générales d'utilisation</a>
+              J'accepte les <NuxtLink to="/conditions" target="_blank" class="text-primary hover:text-secondary">conditions générales d'utilisation et d'inscription (CGU & CGI)</NuxtLink>
             </label>
             <p v-if="errors.acceptTerms" class="mt-1 text-sm text-red-600">{{ errors.acceptTerms }}</p>
           </div>
@@ -175,6 +175,37 @@ import { ref, computed, reactive, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import type { RegisterData } from '~/types/auth'
 import { useAuth } from '~/composables/useAuth'
+
+// Métadonnées SEO
+useHead({
+  title: 'Inscription Vendeur - Lancez votre site en 1m30s | Uber-Market',
+  meta: [
+    {
+      name: 'description',
+      content: 'Lancer votre site en 1mn 30S -- solution clé en main pour site web et e-commerce : rapide, simple, complet.'
+    },
+    {
+      name: 'keywords',
+      content: 'inscription vendeur, créer boutique, site e-commerce, solution clé en main, rapide, simple'
+    },
+    {
+      property: 'og:title',
+      content: 'Inscription Vendeur - Lancez votre site en 1m30s | Uber-Market'
+    },
+    {
+      property: 'og:description',
+      content: 'Lancer votre site en 1mn 30S -- solution clé en main pour site web et e-commerce : rapide, simple, complet.'
+    },
+    {
+      property: 'og:type',
+      content: 'website'
+    },
+    {
+      name: 'robots',
+      content: 'index, follow'
+    }
+  ]
+})
 
 const config = useRuntimeConfig()
 const router = useRouter()

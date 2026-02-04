@@ -15,6 +15,7 @@
           <NuxtLink :to="productsUrl" class="text-gray-600 hover:text-gray-900">Produits</NuxtLink>
           <NuxtLink :to="`${homeUrl}/a-propos`" class="text-gray-600 hover:text-gray-900">À propos</NuxtLink>
           <NuxtLink :to="`${homeUrl}/cgu`" class="text-gray-600 hover:text-gray-900">CGU</NuxtLink>
+          <NuxtLink :to="`${homeUrl}/cgv`" class="text-gray-600 hover:text-gray-900">CGV</NuxtLink>
         </nav>
 
         <!-- Actions -->
@@ -183,6 +184,13 @@
           class="block px-3 py-2 text-gray-600 hover:bg-gray-100 rounded-md"
         >
           CGU
+        </NuxtLink>
+        <NuxtLink 
+          :to="`${homeUrl}/cgv`" 
+          @click="closeMobileMenu"
+          class="block px-3 py-2 text-gray-600 hover:bg-gray-100 rounded-md"
+        >
+          CGV
         </NuxtLink>
         
         <!-- Séparateur -->

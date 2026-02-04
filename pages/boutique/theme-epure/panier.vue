@@ -361,6 +361,28 @@
                 <p v-if="promoError" class="mt-2 text-xs text-red-600">{{ promoError }}</p>
               </div>
               
+              <!-- Acceptation CGV -->
+              <div class="mb-6">
+                <label class="flex items-start cursor-pointer">
+                  <input 
+                    type="checkbox" 
+                    v-model="acceptCGV"
+                    class="mt-0.5 h-4 w-4 text-primary focus:ring-primary border-gray-300 rounded"
+                  >
+                  <span class="ml-2 text-sm text-gray-700">
+                    J'accepte les 
+                    <NuxtLink 
+                      :to="`/boutique/${shopSubdomain}/cgv`" 
+                      target="_blank"
+                      class="text-primary hover:underline font-medium"
+                    >
+                      Conditions Générales de Vente
+                    </NuxtLink>
+                  </span>
+                </label>
+                <p v-if="!acceptCGV && cgvError" class="mt-1 text-xs text-red-600">{{ cgvError }}</p>
+              </div>
+              
               <!-- Bouton commander -->
               <div>
                 <button 
@@ -375,7 +397,8 @@
                   {{ isCreatingOrder ? 'Création en cours...' : 'Valider la commande' }}
                 </button>
                 <p v-if="!isFormValid" class="mt-2 text-xs text-red-600 text-center">
-                  Veuillez remplir tous les champs obligatoires
+                  <span v-if="!acceptCGV">Veuillez accepter les CGV</span>
+                  <span v-else>Veuillez remplir tous les champs obligatoires</span>
                 </p>
               </div>
             </div>
@@ -473,6 +496,10 @@ const appliedPromoCode = ref<any>(null)
 const promoError = ref('')
 const isValidatingPromo = ref(false)
 
+// Acceptation CGV
+const acceptCGV = ref(false)
+const cgvError = ref('')
+
 // Formulaire de commande
 const orderForm = ref({
   customer_name: '',
@@ -564,6 +591,11 @@ const isFormValid = computed(() => {
   
   // Champs obligatoires de base
   if (!form.customer_name || !form.customer_email || !form.customer_phone) {
+    return false
+  }
+  
+  // Vérifier acceptation CGV
+  if (!acceptCGV.value) {
     return false
   }
   

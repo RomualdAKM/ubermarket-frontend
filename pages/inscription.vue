@@ -85,7 +85,27 @@
             class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300"
           >
           <label for="terms" class="ml-2 block text-sm text-gray-900">
-            J'accepte les <a href="#" class="font-medium text-blue-600 hover:text-blue-500">conditions générales d'utilisation</a>
+            J'accepte les 
+            <NuxtLink 
+              v-if="shopSubdomain" 
+              :to="`/boutique/${shopSubdomain}/cgu`" 
+              target="_blank"
+              class="font-medium text-blue-600 hover:text-blue-500"
+            >
+              CGU
+            </NuxtLink>
+            <span v-else class="font-medium text-gray-600">CGU</span>
+            <!-- et 
+            <NuxtLink 
+              v-if="shopSubdomain" 
+              :to="`/boutique/${shopSubdomain}/cgv`" 
+              target="_blank"
+              class="font-medium text-blue-600 hover:text-blue-500"
+            >
+              CGV
+            </NuxtLink>
+            <span v-else class="font-medium text-gray-600">CGV</span> -->
+            <span v-if="shopSubdomain"> de la boutique</span>
           </label>
         </div>
 
@@ -113,7 +133,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 
 const router = useRouter()
@@ -127,6 +147,16 @@ const passwordConfirm = ref('')
 const acceptTerms = ref(false)
 const isLoading = ref(false)
 const errorMessage = ref('')
+
+// Extraire le subdomain depuis le paramètre redirect
+const shopSubdomain = computed(() => {
+  const redirect = route.query.redirect as string
+  if (!redirect) return null
+  
+  // Chercher le pattern /boutique/{subdomain}
+  const match = redirect.match(/\/boutique\/([^\/]+)/)
+  return match ? match[1] : null
+})
 
 const handleSignup = async () => {
   // Vérifier que les mots de passe correspondent
@@ -174,6 +204,14 @@ const handleSignup = async () => {
       
       // Récupérer l'URL de redirection depuis les query params
       const redirectTo = route.query.redirect as string
+      
+      // Sauvegarder l'URL de la boutique dans le localStorage si applicable
+      if (redirectTo && redirectTo.includes('/boutique/')) {
+        const match = redirectTo.match(/(\/boutique\/[^\/]+)/)
+        if (match && process.client) {
+          localStorage.setItem('last_shop_url', match[1])
+        }
+      }
       
       // Redirection vers l'URL demandée ou vers le dashboard client
       await router.push(redirectTo || '/dashboard-client/profil')

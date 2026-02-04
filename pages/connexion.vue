@@ -141,6 +141,14 @@ const handleLogin = async () => {
       // Récupérer l'URL de redirection depuis les query params
       const redirectTo = route.query.redirect as string
       
+      // Sauvegarder l'URL de la boutique dans le localStorage si applicable
+      if (redirectTo && redirectTo.includes('/boutique/')) {
+        const match = redirectTo.match(/(\/boutique\/[^\/]+)/)
+        if (match && process.client) {
+          localStorage.setItem('last_shop_url', match[1])
+        }
+      }
+      
       // Redirection vers l'URL demandée ou vers le dashboard client
       await router.push(redirectTo || '/dashboard-client/profil')
     } else {

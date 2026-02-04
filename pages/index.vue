@@ -363,13 +363,65 @@ onMounted(() => {
 })
 
 // Metadata pour SEO
-useHead(() => ({
-  title: shop.value ? `${shop.value.name} - Boutique` : 'Accueil',
-  meta: [
-    {
-      name: 'description',
-      content: shop.value?.description || 'Découvrez notre boutique en ligne'
+useHead(() => {
+  // Si on est sur une boutique
+  if (shop.value) {
+    return {
+      title: `${shop.value.name} - Boutique`,
+      meta: [
+        {
+          name: 'description',
+          content: shop.value?.description || 'Découvrez notre boutique en ligne'
+        },
+        {
+          property: 'og:title',
+          content: `${shop.value.name} - Boutique`
+        },
+        {
+          property: 'og:description',
+          content: shop.value?.description || 'Découvrez notre boutique en ligne'
+        }
+      ]
     }
-  ]
-}))
+  }
+  
+  // Page d'accueil principale Uber-Market
+  return {
+    title: 'Uber-Market - Créez votre boutique en ligne en 1m30s',
+    meta: [
+      {
+        name: 'description',
+        content: 'Uber-market une plate-forme intuitive, une solution clé en main qui vous permet de créer ou de développer votre activité en ligne sans aucune connaissance en programmation.'
+      },
+      {
+        name: 'keywords',
+        content: 'créer boutique en ligne, e-commerce, site web, marketplace, sans code, solution clé en main'
+      },
+      {
+        property: 'og:title',
+        content: 'Uber-Market - Créez votre boutique en ligne en 1m30s'
+      },
+      {
+        property: 'og:description',
+        content: 'Uber-market une plate-forme intuitive, une solution clé en main qui vous permet de créer ou de développer votre activité en ligne sans aucune connaissance en programmation.'
+      },
+      {
+        property: 'og:type',
+        content: 'website'
+      },
+      {
+        name: 'twitter:card',
+        content: 'summary_large_image'
+      },
+      {
+        name: 'twitter:title',
+        content: 'Uber-Market - Créez votre boutique en ligne en 1m30s'
+      },
+      {
+        name: 'twitter:description',
+        content: 'Uber-market une plate-forme intuitive, une solution clé en main qui vous permet de créer ou de développer votre activité en ligne sans aucune connaissance en programmation.'
+      }
+    ]
+  }
+})
 </script>

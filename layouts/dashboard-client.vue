@@ -1,11 +1,22 @@
 <template>
   <div class="min-h-screen bg-white">
     <!-- Header simple -->
-    <header class="bg-white">
+    <header class="bg-white border-b border-gray-200">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex justify-between items-center py-4">
           <h1 class="text-2xl font-light text-gray-900">Mon Compte</h1>
           <div class="flex items-center space-x-4">
+            <!-- Bouton Continuer mes achats -->
+            <NuxtLink 
+              v-if="shopUrl" 
+              :to="shopUrl"
+              class="inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-primary rounded-lg hover:bg-primary/90 transition-colors"
+            >
+              <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"></path>
+              </svg>
+              Continuer mes achats
+            </NuxtLink>
             <span class="text-sm text-gray-600">Bonjour, {{ user.name }}</span>
             <button @click="handleLogout" class="text-sm text-gray-500 hover:text-gray-700">Déconnexion</button>
           </div>
@@ -62,14 +73,38 @@
   </div>
 </template>
 
-<script setup>
-import { ref, onMounted } from 'vue'
-import { useRouter } from 'vue-router'
+<script setup lang="ts">
+import { ref, computed, onMounted } from 'vue'
+import { useRouter, useRoute } from 'vue-router'
 
 const router = useRouter()
+const route = useRoute()
 const { user: currentUser, fetchUser, logout, token } = useAuth()
 const user = ref({
   name: 'Client'
+})
+
+// Détecter l'URL de la boutique depuis le paramètre redirect ou localStorage
+const shopUrl = computed(() => {
+  // Vérifier dans le query param redirect
+  const redirect = route.query.redirect as string
+  if (redirect && redirect.includes('/boutique/')) {
+    const match = redirect.match(/(\/boutique\/[^\/]+)/)
+    if (match) {
+      return match[1]
+    }
+  }
+  
+  // Vérifier dans le localStorage
+  if (process.client) {
+    const lastShop = localStorage.getItem('last_shop_url')
+    if (lastShop) {
+      return lastShop
+    }
+  }
+  
+  // Par défaut, retourner vers la marketplace
+  return '/'
 })
 
 // Charger les informations de l'utilisateur
