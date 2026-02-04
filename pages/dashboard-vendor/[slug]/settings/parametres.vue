@@ -121,6 +121,79 @@
           </button>
         </div>
       </form>
+      
+      <!-- Section Modification du mot de passe -->
+      <div class="mt-10 pt-8 border-t border-gray-200">
+        <h3 class="text-lg font-medium text-gray-900 mb-4">Modifier le mot de passe</h3>
+        
+        <!-- Messages -->
+        <div v-if="passwordSuccessMessage" class="mb-4 p-3 bg-green-50 border border-green-200 rounded-md">
+          <p class="text-sm text-green-800">{{ passwordSuccessMessage }}</p>
+        </div>
+        
+        <div v-if="passwordErrorMessage" class="mb-4 p-3 bg-red-50 border border-red-200 rounded-md">
+          <p class="text-sm text-red-800">{{ passwordErrorMessage }}</p>
+        </div>
+        
+        <form @submit.prevent="updatePassword" class="space-y-6">
+          <div class="grid grid-cols-1 gap-6 sm:grid-cols-3">
+            <div>
+              <label for="current_password" class="block text-sm font-medium text-gray-700">Mot de passe actuel</label>
+              <input 
+                type="password" 
+                id="current_password" 
+                v-model="passwordForm.current_password"
+                required
+                class="mt-1 block w-full px-3 py-2 border-0 border-b-2 border-gray-300 placeholder-gray-300 placeholder:italic text-gray-900 focus:outline-none focus:ring-0 focus:border-primary transition-colors duration-200" 
+              >
+            </div>
+            
+            <div>
+              <label for="new_password" class="block text-sm font-medium text-gray-700">Nouveau mot de passe</label>
+              <input 
+                type="password" 
+                id="new_password" 
+                v-model="passwordForm.new_password"
+                required
+                minlength="8"
+                class="mt-1 block w-full px-3 py-2 border-0 border-b-2 border-gray-300 placeholder-gray-300 placeholder:italic text-gray-900 focus:outline-none focus:ring-0 focus:border-primary transition-colors duration-200" 
+              >
+              <p class="mt-1 text-xs text-gray-500">Min. 8 caractères, 1 majuscule, 1 minuscule, 1 chiffre</p>
+            </div>
+            
+            <div>
+              <label for="new_password_confirmation" class="block text-sm font-medium text-gray-700">Confirmer le nouveau mot de passe</label>
+              <input 
+                type="password" 
+                id="new_password_confirmation" 
+                v-model="passwordForm.new_password_confirmation"
+                required
+                class="mt-1 block w-full px-3 py-2 border-0 border-b-2 border-gray-300 placeholder-gray-300 placeholder:italic text-gray-900 focus:outline-none focus:ring-0 focus:border-primary transition-colors duration-200" 
+              >
+            </div>
+          </div>
+          
+          <div class="flex justify-end">
+            <button 
+              type="submit" 
+              :disabled="isUpdatingPassword"
+              :class="[
+                'px-4 py-2 text-white text-sm font-medium rounded focus:outline-none focus:ring-2 focus:ring-offset-2',
+                isUpdatingPassword ? 'bg-gray-300 cursor-not-allowed' : 'bg-primary hover:bg-secondary focus:ring-secondary'
+              ]"
+            >
+              <span v-if="isUpdatingPassword" class="flex items-center">
+                <svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                  <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                  <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                Mise à jour...
+              </span>
+              <span v-else>Modifier le mot de passe</span>
+            </button>
+          </div>
+        </form>
+      </div>
     </div>
 
     <!-- Section Domaine -->
@@ -806,6 +879,16 @@ const profileForm = reactive({
   country: 'FR'
 })
 
+// Section Mot de passe
+const isUpdatingPassword = ref(false)
+const passwordSuccessMessage = ref('')
+const passwordErrorMessage = ref('')
+const passwordForm = reactive({
+  current_password: '',
+  new_password: '',
+  new_password_confirmation: ''
+})
+
 // Mettre a jour les parametres generaux
 const updateGeneralSettings = async () => {
   isUpdatingGeneral.value = true
@@ -830,6 +913,44 @@ const updateGeneralSettings = async () => {
     generalErrorMessage.value = error.message || 'Erreur lors de la mise à jour du profil'
   } finally {
     isUpdatingGeneral.value = false
+  }
+}
+
+// Mettre a jour le mot de passe
+const updatePassword = async () => {
+  isUpdatingPassword.value = true
+  passwordErrorMessage.value = ''
+  passwordSuccessMessage.value = ''
+  
+  try {
+    const config = useRuntimeConfig()
+    const response: any = await $fetch(`${config.public.apiBase}/vendor/password`, {
+      method: 'PUT',
+      headers: { 
+        Authorization: `Bearer ${token.value}`,
+        Accept: 'application/json'
+      },
+      body: {
+        current_password: passwordForm.current_password,
+        new_password: passwordForm.new_password,
+        new_password_confirmation: passwordForm.new_password_confirmation
+      }
+    })
+    
+    if (response.success) {
+      passwordSuccessMessage.value = 'Mot de passe modifié avec succès'
+      // Réinitialiser le formulaire
+      passwordForm.current_password = ''
+      passwordForm.new_password = ''
+      passwordForm.new_password_confirmation = ''
+      setTimeout(() => passwordSuccessMessage.value = '', 3000)
+    } else {
+      passwordErrorMessage.value = response.message || 'Erreur lors de la modification'
+    }
+  } catch (error: any) {
+    passwordErrorMessage.value = error.data?.message || error.message || 'Erreur lors de la modification du mot de passe'
+  } finally {
+    isUpdatingPassword.value = false
   }
 }
 
