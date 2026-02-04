@@ -395,7 +395,14 @@ const removeZone = (index: number) => {
 }
 
 const handleSubmit = async () => {
-  if (!currentShop.value) return
+  // Debug: Vérifier currentShop
+  console.log('handleSubmit - currentShop:', currentShop.value)
+  
+  if (!currentShop.value) {
+    console.error('currentShop est null - impossible de créer le livreur')
+    error.value = 'Erreur: Boutique non trouvée. Veuillez rafraîchir la page.'
+    return
+  }
 
   const data = {
     name: formData.value.name,
@@ -466,7 +473,8 @@ onMounted(() => {
 })
 
 definePageMeta({
-  layout: 'dashboard'
+  layout: 'dashboard',
+  middleware: ['shop-access']
 })
 </script>
 
