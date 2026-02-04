@@ -225,14 +225,31 @@ export const useMarketplace = () => {
     return '/placeholder-product.png'
   }
 
-  // Obtenir l'URL de la boutique
+  // Obtenir l'URL de la boutique (sous-domaine)
   const getShopUrl = (shop: MarketplaceShop): string => {
-    return `/boutique/${shop.subdomain}`
+    // Construire l'URL du sous-domaine
+    if (process.client) {
+      const currentHost = window.location.host
+      // Extraire le domaine principal (ex: uber-market.com ou fga-numerik.fr)
+      const mainDomain = currentHost.replace(/^[^.]+\./, '')
+      const protocol = window.location.protocol
+      return `${protocol}//${shop.subdomain}.${mainDomain}`
+    }
+    // Fallback pour SSR
+    return `https://${shop.subdomain}.uber-market.com`
   }
 
-  // Obtenir l'URL du produit dans sa boutique
+  // Obtenir l'URL du produit dans sa boutique (sous-domaine)
   const getProductUrl = (product: MarketplaceProduct): string => {
-    return `/boutique/${product.shop.subdomain}/produit/${product.id}`
+    // Construire l'URL du sous-domaine avec le produit
+    if (process.client) {
+      const currentHost = window.location.host
+      const mainDomain = currentHost.replace(/^[^.]+\./, '')
+      const protocol = window.location.protocol
+      return `${protocol}//${product.shop.subdomain}.${mainDomain}/produit/${product.id}`
+    }
+    // Fallback pour SSR
+    return `https://${product.shop.subdomain}.uber-market.com/produit/${product.id}`
   }
 
   // Tronquer la description

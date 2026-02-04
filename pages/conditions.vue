@@ -1,599 +1,364 @@
 <template>
-  <div class="min-h-screen bg-gradient-to-b from-gray-50 to-white">
-    <!-- Header simple -->
-    <header class="border-b border-gray-200 bg-white/80 backdrop-blur-sm sticky top-0 z-50">
-      <div class="max-w-5xl mx-auto px-6 py-4 flex justify-between items-center">
-        <NuxtLink to="/" class="flex items-center space-x-3">
-          <div class="w-10 h-10 bg-gradient-to-br from-primary to-primary-dark rounded-lg flex items-center justify-center">
-            <span class="text-white font-bold text-lg">UM</span>
-          </div>
-          <span class="text-xl font-semibold text-gray-900">Uber-Market</span>
+  <div class="landing-page antialiased text-sm text-gray-900">
+    <!-- Navbar (même que landing page) -->
+    <nav class="fixed w-full top-0 z-50 px-4 md:px-16 lg:px-24 xl:px-32 py-4 border-b border-neutral-300 bg-white/80 backdrop-blur">
+      <div class="max-w-7xl mx-auto flex items-center justify-between">
+        <NuxtLink to="/">
+          <img alt="UberMarket Logo" class="h-14 md:h-16" src="/uber-market.png">
         </NuxtLink>
-        <NuxtLink to="/" class="text-sm text-gray-600 hover:text-gray-900 transition-colors">
-          ← Retour à l'accueil
+        <div class="hidden md:flex gap-3">
+          <NuxtLink to="/marketplace" class="py-1 px-3 hover:text-zinc-500">Marketplace</NuxtLink>
+          <NuxtLink to="/#fonctionnalites" class="py-1 px-3 hover:text-zinc-500">Fonctionnalités</NuxtLink>
+          <NuxtLink to="/#tarifs" class="py-1 px-3 hover:text-zinc-500">Tarifs</NuxtLink>
+        </div>
+        <button @click="toggleMobileMenu" class="md:hidden">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="size-6"><path d="M4 5h16"></path><path d="M4 12h16"></path><path d="M4 19h16"></path></svg>
+        </button>
+        <NuxtLink to="/inscription-vendeur" class="hidden md:inline-block py-2.5 px-6 shadow-[inset_0_2px_4px_rgba(255,255,255,0.6)] bg-primary text-white rounded-full hover:opacity-90 transition-opacity">
+          Commencer gratuitement
         </NuxtLink>
       </div>
-    </header>
+    </nav>
+
+    <!-- Mobile Menu -->
+    <div :class="['fixed top-0 right-0 z-50 w-full bg-white shadow-xl shadow-black/5 transition-all duration-300 ease-in-out overflow-hidden', mobileMenuOpen ? 'h-72' : 'h-0']">
+      <div class="flex items-center justify-between p-4">
+        <img alt="UberMarket Logo" class="h-14" src="/uber-market.png">
+        <button @click="toggleMobileMenu">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="size-6"><path d="M18 6 6 18"></path><path d="m6 6 12 12"></path></svg>
+        </button>
+      </div>
+      <div class="flex flex-col gap-4 p-4 text-base">
+        <NuxtLink to="/marketplace" @click="closeMobileMenu" class="py-1 px-3">Marketplace</NuxtLink>
+        <NuxtLink to="/#fonctionnalites" @click="closeMobileMenu" class="py-1 px-3">Fonctionnalités</NuxtLink>
+        <NuxtLink to="/#tarifs" @click="closeMobileMenu" class="py-1 px-3">Tarifs</NuxtLink>
+        <NuxtLink to="/inscription-vendeur" @click="closeMobileMenu" class="py-2.5 px-6 w-max text-sm shadow-[inset_0_2px_4px_rgba(255,255,255,0.6)] bg-primary text-white rounded-full">
+          Commencer gratuitement
+        </NuxtLink>
+      </div>
+    </div>
 
     <!-- Contenu principal -->
-    <main class="max-w-4xl mx-auto px-6 py-16">
-      <!-- En-tête de page -->
-      <div class="text-center mb-16">
-        <div class="inline-flex items-center justify-center px-4 py-1.5 bg-blue-50 rounded-full mb-6">
-          <svg class="w-4 h-4 text-blue-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path>
-          </svg>
-          <span class="text-sm font-medium text-blue-600">Cadre juridique</span>
-        </div>
-        
-        <h1 class="text-4xl md:text-5xl font-bold text-gray-900 mb-4 leading-tight">
-          Conditions Générales<br/>d'Utilisation & d'Inscription
-        </h1>
-        
-        <p class="text-lg text-gray-600 max-w-2xl mx-auto">
-          Plateforme Uber-Market.com
-        </p>
-        
-        <div class="mt-6 flex items-center justify-center space-x-4 text-sm text-gray-500">
-          <span class="flex items-center">
-            <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
-            </svg>
-            Version 1.0
-          </span>
-          <span class="text-gray-300">•</span>
-          <span>Dernière mise à jour : {{ lastUpdate }}</span>
-        </div>
-      </div>
+    <main class="pt-28 pb-16 max-w-3xl mx-auto px-4 md:px-8">
+      <h1 class="text-2xl md:text-3xl font-urbanist font-semibold text-gray-900 mb-2">
+        Conditions Générales d'Utilisation et d'Inscription
+      </h1>
+      <p class="text-sm text-gray-500 mb-10">
+        Dernière mise à jour : {{ lastUpdate }}
+      </p>
 
-      <!-- Navigation des sections -->
-      <nav class="mb-12 bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
-        <h2 class="text-sm font-semibold text-gray-900 uppercase tracking-wide mb-4">Sommaire</h2>
-        <div class="grid md:grid-cols-2 gap-3">
-          <a 
-            v-for="section in sections" 
-            :key="section.id"
-            :href="`#${section.id}`"
-            class="flex items-center px-4 py-3 text-sm text-gray-700 hover:text-primary hover:bg-gray-50 rounded-lg transition-colors group"
-          >
-            <svg class="w-4 h-4 mr-3 text-gray-400 group-hover:text-primary transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
-            </svg>
-            {{ section.title }}
-          </a>
-        </div>
+      <!-- Sommaire -->
+      <nav class="mb-10 pb-8 border-b border-gray-200">
+        <h2 class="text-xs font-medium text-gray-400 uppercase tracking-wide mb-4">Sommaire</h2>
+        <ul class="space-y-1 text-sm">
+          <li v-for="section in sections" :key="section.id">
+            <a :href="`#${section.id}`" class="text-gray-600 hover:text-primary">{{ section.title }}</a>
+          </li>
+        </ul>
       </nav>
 
       <!-- Préambule -->
-      <section class="mb-16 bg-gradient-to-br from-blue-50 to-indigo-50 rounded-2xl p-8 border border-blue-100">
-        <div class="flex items-start">
-          <div class="flex-shrink-0">
-            <div class="w-12 h-12 bg-blue-600 rounded-xl flex items-center justify-center">
-              <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-              </svg>
-            </div>
-          </div>
-          <div class="ml-6">
-            <h2 class="text-2xl font-bold text-gray-900 mb-4">Préambule</h2>
-            <div class="prose prose-blue max-w-none text-gray-700 leading-relaxed space-y-4">
-              <p>
-                La plateforme <strong>Uber-Market.com</strong> est une solution numérique de type marketplace permettant la mise en relation entre vendeurs (professionnels, PME, créateurs, artisans) et acheteurs, en vue de la commercialisation de produits et services.
-              </p>
-              <p>
-                Les présentes Conditions Générales d'Utilisation (CGU) et Conditions Générales d'Inscription (CGI) sont établies conformément :
-              </p>
-              <ul class="space-y-2 ml-6">
-                <li class="flex items-start">
-                  <svg class="w-5 h-5 text-blue-600 mr-2 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
-                  </svg>
-                  <span>au Code du numérique de la République du Bénin (Loi n°2017-20 et textes subséquents),</span>
-                </li>
-                <li class="flex items-start">
-                  <svg class="w-5 h-5 text-blue-600 mr-2 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
-                  </svg>
-                  <span>au droit OHADA,</span>
-                </li>
-                <li class="flex items-start">
-                  <svg class="w-5 h-5 text-blue-600 mr-2 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
-                  </svg>
-                  <span>au droit français applicable au commerce électronique (LCEN, RGPD à titre de référence),</span>
-                </li>
-                <li class="flex items-start">
-                  <svg class="w-5 h-5 text-blue-600 mr-2 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
-                  </svg>
-                  <span>et aux principes généraux du droit des contrats.</span>
-                </li>
-              </ul>
-              <div class="mt-6 p-4 bg-white rounded-lg border border-blue-200">
-                <p class="text-sm font-medium text-blue-900">
-                  ⚠️ L'utilisation et/ou l'inscription sur la plateforme implique l'acceptation pleine et entière des présentes conditions.
-                </p>
-              </div>
-            </div>
-          </div>
+      <section class="mb-10">
+        <h2 class="text-lg font-semibold text-gray-900 mb-4">Préambule</h2>
+        <div class="text-gray-600 leading-relaxed space-y-4">
+          <p>La plateforme Uber-Market.com est une solution numérique de type marketplace permettant la mise en relation entre vendeurs (professionnels, PME, créateurs, artisans) et acheteurs, en vue de la commercialisation de produits et services.</p>
+          <p>Les présentes Conditions Générales d'Utilisation (CGU) et Conditions Générales d'Inscription (CGI) sont établies conformément :</p>
+          <ul class="list-disc pl-5 space-y-1">
+            <li>au Code du numérique de la République du Bénin (Loi n°2017-20 et textes subséquents),</li>
+            <li>au droit OHADA,</li>
+            <li>au droit français applicable au commerce électronique (LCEN, RGPD à titre de référence),</li>
+            <li>et aux principes généraux du droit des contrats.</li>
+          </ul>
+          <p class="text-sm text-gray-500 italic">L'utilisation et/ou l'inscription sur la plateforme implique l'acceptation pleine et entière des présentes conditions.</p>
         </div>
       </section>
 
       <!-- PARTIE I - CGU -->
-      <section id="cgu" class="mb-16">
-        <div class="flex items-center mb-8">
-          <div class="flex-grow border-t border-gray-300"></div>
-          <div class="px-6 py-3 bg-gradient-to-r from-primary to-primary-dark text-white rounded-full text-sm font-bold uppercase tracking-wider">
-            Partie I – CGU
+      <section class="mb-10">
+        <h2 id="cgu" class="text-xl font-semibold text-gray-900 mb-6 pb-2 border-b border-gray-200">Partie I – Conditions Générales d'Utilisation</h2>
+
+        <article id="definitions" class="mb-8">
+          <h3 class="text-base font-semibold text-gray-900 mb-3">Article 1 – Définitions</h3>
+          <dl class="text-gray-600 leading-relaxed space-y-2">
+            <div><dt class="inline font-medium">Plateforme :</dt> <dd class="inline">site web et services numériques Uber-Market.com</dd></div>
+            <div><dt class="inline font-medium">Utilisateur :</dt> <dd class="inline">toute personne accédant à la plateforme</dd></div>
+            <div><dt class="inline font-medium">Vendeur :</dt> <dd class="inline">utilisateur proposant des produits ou services</dd></div>
+            <div><dt class="inline font-medium">Acheteur :</dt> <dd class="inline">utilisateur effectuant un achat</dd></div>
+            <div><dt class="inline font-medium">Compte :</dt> <dd class="inline">espace personnel créé sur la plateforme</dd></div>
+          </dl>
+        </article>
+
+        <article id="objet" class="mb-8">
+          <h3 class="text-base font-semibold text-gray-900 mb-3">Article 2 – Objet des CGU</h3>
+          <p class="text-gray-600 leading-relaxed">Les présentes CGU ont pour objet de définir les modalités d'accès, de navigation et d'utilisation de la plateforme Uber-Market.com.</p>
+        </article>
+
+        <article id="acces" class="mb-8">
+          <h3 class="text-base font-semibold text-gray-900 mb-3">Article 3 – Accès à la plateforme</h3>
+          <div class="text-gray-600 leading-relaxed space-y-3">
+            <p>La plateforme est accessible à toute personne disposant d'un accès à Internet. Certains services sont réservés aux utilisateurs inscrits.</p>
+            <p>Uber-Market se réserve le droit de suspendre ou limiter l'accès pour maintenance, mise à jour ou en cas de force majeure.</p>
           </div>
-          <div class="flex-grow border-t border-gray-300"></div>
-        </div>
+        </article>
 
-        <!-- Articles CGU -->
-        <div class="space-y-8">
-          <article id="definitions" class="bg-white rounded-2xl shadow-sm border border-gray-100 p-8 hover:shadow-md transition-shadow">
-            <h3 class="text-xl font-bold text-gray-900 mb-4 flex items-center">
-              <span class="w-8 h-8 bg-primary/10 text-primary rounded-lg flex items-center justify-center text-sm font-bold mr-3">1</span>
-              Définitions
-            </h3>
-            <dl class="space-y-3 text-gray-700">
-              <div class="flex">
-                <dt class="font-semibold min-w-[140px]">Plateforme :</dt>
-                <dd>site web et services numériques Uber-Market.com</dd>
-              </div>
-              <div class="flex">
-                <dt class="font-semibold min-w-[140px]">Utilisateur :</dt>
-                <dd>toute personne accédant à la plateforme</dd>
-              </div>
-              <div class="flex">
-                <dt class="font-semibold min-w-[140px]">Vendeur :</dt>
-                <dd>utilisateur proposant des produits ou services</dd>
-              </div>
-              <div class="flex">
-                <dt class="font-semibold min-w-[140px]">Acheteur :</dt>
-                <dd>utilisateur effectuant un achat</dd>
-              </div>
-              <div class="flex">
-                <dt class="font-semibold min-w-[140px]">Compte :</dt>
-                <dd>espace personnel créé sur la plateforme</dd>
-              </div>
-            </dl>
-          </article>
+        <article id="services" class="mb-8">
+          <h3 class="text-base font-semibold text-gray-900 mb-3">Article 4 – Services proposés</h3>
+          <div class="text-gray-600 leading-relaxed space-y-3">
+            <p>La plateforme propose notamment :</p>
+            <ul class="list-disc pl-5 space-y-1">
+              <li>La création de site web et de boutiques en ligne</li>
+              <li>La mise en relation vendeurs / acheteurs</li>
+              <li>Des outils de paiement, marketing et logistique</li>
+              <li>Des services visuels et audiovisuels partenaires</li>
+              <li>Un accompagnement à la vente internationale</li>
+            </ul>
+            <p class="text-sm text-gray-500">Uber-Market agit en qualité d'intermédiaire technique.</p>
+          </div>
+        </article>
 
-          <article id="objet" class="bg-white rounded-2xl shadow-sm border border-gray-100 p-8 hover:shadow-md transition-shadow">
-            <h3 class="text-xl font-bold text-gray-900 mb-4 flex items-center">
-              <span class="w-8 h-8 bg-primary/10 text-primary rounded-lg flex items-center justify-center text-sm font-bold mr-3">2</span>
-              Objet des CGU
-            </h3>
-            <p class="text-gray-700 leading-relaxed">
-              Les présentes CGU ont pour objet de définir les modalités d'accès, de navigation et d'utilisation de la plateforme Uber-Market.com.
-            </p>
-          </article>
+        <article id="responsabilite" class="mb-8">
+          <h3 class="text-base font-semibold text-gray-900 mb-3">Article 5 – Responsabilité</h3>
+          <div class="text-gray-600 leading-relaxed space-y-3">
+            <p>Uber-Market n'est pas partie aux contrats conclus entre vendeurs et acheteurs.</p>
+            <p>La responsabilité de la plateforme ne saurait être engagée en cas de :</p>
+            <ul class="list-disc pl-5 space-y-1">
+              <li>Litige commercial entre utilisateurs</li>
+              <li>Contenu illicite publié par un vendeur</li>
+              <li>Indisponibilité temporaire du service</li>
+            </ul>
+            <p class="text-sm text-gray-500">Conformément au Code du numérique béninois, Uber-Market agit en hébergeur de contenus.</p>
+          </div>
+        </article>
 
-          <article id="acces" class="bg-white rounded-2xl shadow-sm border border-gray-100 p-8 hover:shadow-md transition-shadow">
-            <h3 class="text-xl font-bold text-gray-900 mb-4 flex items-center">
-              <span class="w-8 h-8 bg-primary/10 text-primary rounded-lg flex items-center justify-center text-sm font-bold mr-3">3</span>
-              Accès à la plateforme
-            </h3>
-            <div class="text-gray-700 leading-relaxed space-y-3">
-              <p>La plateforme est accessible à toute personne disposant d'un accès à Internet. Certains services sont réservés aux utilisateurs inscrits.</p>
-              <p>Uber-Market se réserve le droit de suspendre ou limiter l'accès pour maintenance, mise à jour ou en cas de force majeure.</p>
-            </div>
-          </article>
+        <article id="obligations" class="mb-8">
+          <h3 class="text-base font-semibold text-gray-900 mb-3">Article 6 – Obligations des utilisateurs</h3>
+          <div class="text-gray-600 leading-relaxed space-y-3">
+            <p>Les utilisateurs s'engagent à :</p>
+            <ul class="list-disc pl-5 space-y-1">
+              <li>Fournir des informations exactes</li>
+              <li>Respecter les lois en vigueur</li>
+              <li>Ne pas publier de contenus illicites</li>
+              <li>Utiliser la plateforme loyalement</li>
+            </ul>
+          </div>
+        </article>
 
-          <article id="services" class="bg-white rounded-2xl shadow-sm border border-gray-100 p-8 hover:shadow-md transition-shadow">
-            <h3 class="text-xl font-bold text-gray-900 mb-4 flex items-center">
-              <span class="w-8 h-8 bg-primary/10 text-primary rounded-lg flex items-center justify-center text-sm font-bold mr-3">4</span>
-              Services proposés
-            </h3>
-            <div class="text-gray-700 leading-relaxed space-y-4">
-              <p>La plateforme propose notamment :</p>
-              <ul class="space-y-2 ml-6">
-                <li class="flex items-start">
-                  <svg class="w-5 h-5 text-primary mr-2 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
-                  </svg>
-                  <span>La création de site web et de boutiques en ligne</span>
-                </li>
-                <li class="flex items-start">
-                  <svg class="w-5 h-5 text-primary mr-2 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
-                  </svg>
-                  <span>La mise en relation vendeurs / acheteurs</span>
-                </li>
-                <li class="flex items-start">
-                  <svg class="w-5 h-5 text-primary mr-2 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
-                  </svg>
-                  <span>Des outils de paiement, marketing et logistique</span>
-                </li>
-                <li class="flex items-start">
-                  <svg class="w-5 h-5 text-primary mr-2 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
-                  </svg>
-                  <span>Des services visuels et audiovisuels partenaires</span>
-                </li>
-                <li class="flex items-start">
-                  <svg class="w-5 h-5 text-primary mr-2 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
-                  </svg>
-                  <span>Un accompagnement à la vente internationale</span>
-                </li>
-              </ul>
-              <div class="mt-4 p-4 bg-gray-50 rounded-lg border border-gray-200">
-                <p class="text-sm text-gray-700">
-                  <strong>Important :</strong> Uber-Market agit en qualité d'intermédiaire technique.
-                </p>
-              </div>
-            </div>
-          </article>
+        <article id="propriete" class="mb-8">
+          <h3 class="text-base font-semibold text-gray-900 mb-3">Article 7 – Propriété intellectuelle</h3>
+          <p class="text-gray-600 leading-relaxed">Tous les éléments de la plateforme (marques, logos, design, contenus) sont protégés. Toute reproduction sans autorisation est interdite.</p>
+        </article>
 
-          <article id="responsabilite" class="bg-white rounded-2xl shadow-sm border border-gray-100 p-8 hover:shadow-md transition-shadow">
-            <h3 class="text-xl font-bold text-gray-900 mb-4 flex items-center">
-              <span class="w-8 h-8 bg-primary/10 text-primary rounded-lg flex items-center justify-center text-sm font-bold mr-3">5</span>
-              Responsabilité
-            </h3>
-            <div class="text-gray-700 leading-relaxed space-y-4">
-              <p>Uber-Market n'est pas partie aux contrats conclus entre vendeurs et acheteurs.</p>
-              <p>La responsabilité de la plateforme ne saurait être engagée en cas de :</p>
-              <ul class="space-y-2 ml-6">
-                <li>• Litige commercial entre utilisateurs</li>
-                <li>• Contenu illicite publié par un vendeur</li>
-                <li>• Indisponibilité temporaire du service</li>
-              </ul>
-              <div class="mt-4 p-4 bg-amber-50 rounded-lg border border-amber-200">
-                <p class="text-sm text-amber-900">
-                  Conformément au Code du numérique béninois, Uber-Market agit en hébergeur de contenus.
-                </p>
-              </div>
-            </div>
-          </article>
+        <article id="donnees" class="mb-8">
+          <h3 class="text-base font-semibold text-gray-900 mb-3">Article 8 – Données personnelles</h3>
+          <div class="text-gray-600 leading-relaxed space-y-3">
+            <p>Uber-Market collecte et traite les données personnelles conformément :</p>
+            <ul class="list-disc pl-5 space-y-1">
+              <li>Au Code du numérique béninois</li>
+              <li>Aux principes du RGPD (information, consentement, sécurité, droits des personnes)</li>
+            </ul>
+            <p>Les utilisateurs disposent d'un droit d'accès, de rectification et de suppression.</p>
+          </div>
+        </article>
 
-          <article id="obligations" class="bg-white rounded-2xl shadow-sm border border-gray-100 p-8 hover:shadow-md transition-shadow">
-            <h3 class="text-xl font-bold text-gray-900 mb-4 flex items-center">
-              <span class="w-8 h-8 bg-primary/10 text-primary rounded-lg flex items-center justify-center text-sm font-bold mr-3">6</span>
-              Obligations des utilisateurs
-            </h3>
-            <div class="text-gray-700 leading-relaxed">
-              <p class="mb-3">Les utilisateurs s'engagent à :</p>
-              <div class="grid md:grid-cols-2 gap-4">
-                <div class="flex items-start p-4 bg-green-50 rounded-lg border border-green-100">
-                  <svg class="w-5 h-5 text-green-600 mr-3 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                    <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
-                  </svg>
-                  <span class="text-sm">Fournir des informations exactes</span>
-                </div>
-                <div class="flex items-start p-4 bg-green-50 rounded-lg border border-green-100">
-                  <svg class="w-5 h-5 text-green-600 mr-3 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                    <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
-                  </svg>
-                  <span class="text-sm">Respecter les lois en vigueur</span>
-                </div>
-                <div class="flex items-start p-4 bg-green-50 rounded-lg border border-green-100">
-                  <svg class="w-5 h-5 text-green-600 mr-3 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                    <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
-                  </svg>
-                  <span class="text-sm">Ne pas publier de contenus illicites</span>
-                </div>
-                <div class="flex items-start p-4 bg-green-50 rounded-lg border border-green-100">
-                  <svg class="w-5 h-5 text-green-600 mr-3 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                    <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
-                  </svg>
-                  <span class="text-sm">Utiliser la plateforme loyalement</span>
-                </div>
-              </div>
-            </div>
-          </article>
+        <article id="suspension" class="mb-8">
+          <h3 class="text-base font-semibold text-gray-900 mb-3">Article 9 – Suspension / Résiliation</h3>
+          <div class="text-gray-600 leading-relaxed space-y-3">
+            <p>Uber-Market se réserve le droit de suspendre ou supprimer un compte en cas de :</p>
+            <ul class="list-disc pl-5 space-y-1">
+              <li>Violation des CGU/CGI</li>
+              <li>Activité frauduleuse</li>
+              <li>Atteinte à l'image ou à la sécurité de la plateforme</li>
+            </ul>
+          </div>
+        </article>
 
-          <article id="propriete" class="bg-white rounded-2xl shadow-sm border border-gray-100 p-8 hover:shadow-md transition-shadow">
-            <h3 class="text-xl font-bold text-gray-900 mb-4 flex items-center">
-              <span class="w-8 h-8 bg-primary/10 text-primary rounded-lg flex items-center justify-center text-sm font-bold mr-3">7</span>
-              Propriété intellectuelle
-            </h3>
-            <p class="text-gray-700 leading-relaxed">
-              Tous les éléments de la plateforme (marques, logos, design, contenus) sont protégés. Toute reproduction sans autorisation est interdite.
-            </p>
-          </article>
-
-          <article id="donnees" class="bg-white rounded-2xl shadow-sm border border-gray-100 p-8 hover:shadow-md transition-shadow">
-            <h3 class="text-xl font-bold text-gray-900 mb-4 flex items-center">
-              <span class="w-8 h-8 bg-primary/10 text-primary rounded-lg flex items-center justify-center text-sm font-bold mr-3">8</span>
-              Données personnelles
-            </h3>
-            <div class="text-gray-700 leading-relaxed space-y-3">
-              <p>Uber-Market collecte et traite les données personnelles conformément :</p>
-              <ul class="space-y-2 ml-6">
-                <li>• Au Code du numérique béninois</li>
-                <li>• Aux principes du RGPD (information, consentement, sécurité, droits des personnes)</li>
-              </ul>
-              <div class="mt-4 p-4 bg-blue-50 rounded-lg border border-blue-200">
-                <p class="text-sm font-medium text-blue-900">
-                  Les utilisateurs disposent d'un droit d'accès, de rectification et de suppression.
-                </p>
-              </div>
-            </div>
-          </article>
-
-          <article id="suspension" class="bg-white rounded-2xl shadow-sm border border-gray-100 p-8 hover:shadow-md transition-shadow">
-            <h3 class="text-xl font-bold text-gray-900 mb-4 flex items-center">
-              <span class="w-8 h-8 bg-primary/10 text-primary rounded-lg flex items-center justify-center text-sm font-bold mr-3">9</span>
-              Suspension / Résiliation
-            </h3>
-            <div class="text-gray-700 leading-relaxed space-y-3">
-              <p>Uber-Market se réserve le droit de suspendre ou supprimer un compte en cas de :</p>
-              <div class="space-y-2">
-                <div class="flex items-start p-3 bg-red-50 rounded-lg border border-red-100">
-                  <svg class="w-5 h-5 text-red-600 mr-2 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"></path>
-                  </svg>
-                  <span class="text-sm">Violation des CGU/CGI</span>
-                </div>
-                <div class="flex items-start p-3 bg-red-50 rounded-lg border border-red-100">
-                  <svg class="w-5 h-5 text-red-600 mr-2 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"></path>
-                  </svg>
-                  <span class="text-sm">Activité frauduleuse</span>
-                </div>
-                <div class="flex items-start p-3 bg-red-50 rounded-lg border border-red-100">
-                  <svg class="w-5 h-5 text-red-600 mr-2 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"></path>
-                  </svg>
-                  <span class="text-sm">Atteinte à l'image ou à la sécurité de la plateforme</span>
-                </div>
-              </div>
-            </div>
-          </article>
-
-          <article id="droit" class="bg-white rounded-2xl shadow-sm border border-gray-100 p-8 hover:shadow-md transition-shadow">
-            <h3 class="text-xl font-bold text-gray-900 mb-4 flex items-center">
-              <span class="w-8 h-8 bg-primary/10 text-primary rounded-lg flex items-center justify-center text-sm font-bold mr-3">10</span>
-              Droit applicable & Litiges
-            </h3>
-            <div class="text-gray-700 leading-relaxed space-y-3">
-              <p>Les présentes CGU sont régies par le droit béninois, le droit OHADA, et à titre supplétif par les principes du droit français.</p>
-              <div class="mt-4 p-4 bg-purple-50 rounded-lg border border-purple-200">
-                <p class="text-sm text-purple-900">
-                  Tout litige fera l'objet d'une tentative de règlement amiable avant saisie des juridictions compétentes.
-                </p>
-              </div>
-            </div>
-          </article>
-        </div>
+        <article id="droit" class="mb-8">
+          <h3 class="text-base font-semibold text-gray-900 mb-3">Article 10 – Droit applicable et Litiges</h3>
+          <div class="text-gray-600 leading-relaxed space-y-3">
+            <p>Les présentes CGU sont régies par le droit béninois, le droit OHADA, et à titre supplétif par les principes du droit français.</p>
+            <p>Tout litige fera l'objet d'une tentative de règlement amiable avant saisie des juridictions compétentes.</p>
+          </div>
+        </article>
       </section>
 
       <!-- PARTIE II - CGI -->
-      <section id="cgi" class="mb-16">
-        <div class="flex items-center mb-8">
-          <div class="flex-grow border-t border-gray-300"></div>
-          <div class="px-6 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-full text-sm font-bold uppercase tracking-wider">
-            Partie II – CGI
+      <section class="mb-10">
+        <h2 id="cgi" class="text-xl font-semibold text-gray-900 mb-6 pb-2 border-b border-gray-200">Partie II – Conditions Générales d'Inscription</h2>
+
+        <article id="conditions-inscription" class="mb-8">
+          <h3 class="text-base font-semibold text-gray-900 mb-3">Article 11 – Conditions d'inscription</h3>
+          <div class="text-gray-600 leading-relaxed space-y-3">
+            <p>L'inscription est ouverte à toute personne majeure juridiquement capable.</p>
+            <p>Pour les vendeurs professionnels, des documents justificatifs peuvent être exigés.</p>
           </div>
-          <div class="flex-grow border-t border-gray-300"></div>
-        </div>
+        </article>
 
-        <!-- Articles CGI -->
-        <div class="space-y-8">
-          <article id="conditions-inscription" class="bg-white rounded-2xl shadow-sm border border-gray-100 p-8 hover:shadow-md transition-shadow">
-            <h3 class="text-xl font-bold text-gray-900 mb-4 flex items-center">
-              <span class="w-8 h-8 bg-indigo-100 text-indigo-600 rounded-lg flex items-center justify-center text-sm font-bold mr-3">11</span>
-              Conditions d'inscription
-            </h3>
-            <div class="text-gray-700 leading-relaxed space-y-3">
-              <p>L'inscription est ouverte à toute personne majeure juridiquement capable.</p>
-              <p>Pour les vendeurs professionnels, des documents justificatifs peuvent être exigés.</p>
-            </div>
-          </article>
+        <article id="creation-compte" class="mb-8">
+          <h3 class="text-base font-semibold text-gray-900 mb-3">Article 12 – Création de compte</h3>
+          <div class="text-gray-600 leading-relaxed space-y-3">
+            <p>L'utilisateur s'engage à fournir des informations exactes et à maintenir leur mise à jour.</p>
+            <p>Chaque utilisateur est responsable de la confidentialité de ses identifiants.</p>
+          </div>
+        </article>
 
-          <article id="creation-compte" class="bg-white rounded-2xl shadow-sm border border-gray-100 p-8 hover:shadow-md transition-shadow">
-            <h3 class="text-xl font-bold text-gray-900 mb-4 flex items-center">
-              <span class="w-8 h-8 bg-indigo-100 text-indigo-600 rounded-lg flex items-center justify-center text-sm font-bold mr-3">12</span>
-              Création de compte
-            </h3>
-            <div class="text-gray-700 leading-relaxed space-y-3">
-              <p>L'utilisateur s'engage à fournir des informations exactes et à maintenir leur mise à jour.</p>
-              <div class="mt-4 p-4 bg-orange-50 rounded-lg border border-orange-200">
-                <p class="text-sm font-medium text-orange-900">
-                  ⚠️ Chaque utilisateur est responsable de la confidentialité de ses identifiants.
-                </p>
-              </div>
-            </div>
-          </article>
+        <article id="inscription-vendeurs" class="mb-8">
+          <h3 class="text-base font-semibold text-gray-900 mb-3">Article 13 – Inscription des vendeurs</h3>
+          <div class="text-gray-600 leading-relaxed space-y-3">
+            <p>Les vendeurs doivent :</p>
+            <ul class="list-disc pl-5 space-y-1">
+              <li>Détenir les droits sur les produits proposés</li>
+              <li>Respecter la réglementation commerciale et fiscale applicable</li>
+              <li>Garantir la conformité et la qualité des produits</li>
+            </ul>
+            <p class="text-sm text-gray-500">Uber-Market se réserve le droit de refuser ou suspendre un vendeur.</p>
+          </div>
+        </article>
 
-          <article id="inscription-vendeurs" class="bg-white rounded-2xl shadow-sm border border-gray-100 p-8 hover:shadow-md transition-shadow">
-            <h3 class="text-xl font-bold text-gray-900 mb-4 flex items-center">
-              <span class="w-8 h-8 bg-indigo-100 text-indigo-600 rounded-lg flex items-center justify-center text-sm font-bold mr-3">13</span>
-              Inscription des vendeurs
-            </h3>
-            <div class="text-gray-700 leading-relaxed space-y-4">
-              <p>Les vendeurs doivent :</p>
-              <ul class="space-y-2 ml-6">
-                <li>• Détenir les droits sur les produits proposés</li>
-                <li>• Respecter la réglementation commerciale et fiscale applicable</li>
-                <li>• Garantir la conformité et la qualité des produits</li>
-              </ul>
-              <p class="text-sm italic text-gray-600">Uber-Market se réserve le droit de refuser ou suspendre un vendeur.</p>
-            </div>
-          </article>
+        <article id="tarification" class="mb-8">
+          <h3 class="text-base font-semibold text-gray-900 mb-3">Article 14 – Tarification et Commissions</h3>
+          <div class="text-gray-600 leading-relaxed space-y-3">
+            <p>L'inscription peut être gratuite ou payante selon les offres.</p>
+            <p>Uber-Market peut percevoir :</p>
+            <ul class="list-disc pl-5 space-y-1">
+              <li>Des frais d'abonnement</li>
+              <li>Des commissions sur ventes</li>
+              <li>Des frais pour services additionnels</li>
+            </ul>
+            <p class="text-sm text-gray-500">Les conditions tarifaires sont précisées sur la plateforme.</p>
+          </div>
+        </article>
 
-          <article id="tarification" class="bg-white rounded-2xl shadow-sm border border-gray-100 p-8 hover:shadow-md transition-shadow">
-            <h3 class="text-xl font-bold text-gray-900 mb-4 flex items-center">
-              <span class="w-8 h-8 bg-indigo-100 text-indigo-600 rounded-lg flex items-center justify-center text-sm font-bold mr-3">14</span>
-              Tarification & Commissions
-            </h3>
-            <div class="text-gray-700 leading-relaxed space-y-4">
-              <p>L'inscription peut être gratuite ou payante selon les offres.</p>
-              <p>Uber-Market peut percevoir :</p>
-              <div class="grid md:grid-cols-3 gap-4 mt-4">
-                <div class="p-4 bg-gradient-to-br from-green-50 to-emerald-50 rounded-lg border border-green-200">
-                  <div class="text-2xl mb-2">💰</div>
-                  <p class="text-sm font-medium text-gray-900">Frais d'abonnement</p>
-                </div>
-                <div class="p-4 bg-gradient-to-br from-blue-50 to-cyan-50 rounded-lg border border-blue-200">
-                  <div class="text-2xl mb-2">📊</div>
-                  <p class="text-sm font-medium text-gray-900">Commissions sur ventes</p>
-                </div>
-                <div class="p-4 bg-gradient-to-br from-purple-50 to-pink-50 rounded-lg border border-purple-200">
-                  <div class="text-2xl mb-2">⚡</div>
-                  <p class="text-sm font-medium text-gray-900">Services additionnels</p>
-                </div>
-              </div>
-              <p class="text-sm text-gray-600">Les conditions tarifaires sont précisées sur la plateforme.</p>
-            </div>
-          </article>
+        <article id="engagements-vendeur" class="mb-8">
+          <h3 class="text-base font-semibold text-gray-900 mb-3">Article 15 – Engagements du vendeur</h3>
+          <div class="text-gray-600 leading-relaxed space-y-3">
+            <p>Le vendeur s'engage à :</p>
+            <ul class="list-disc pl-5 space-y-1">
+              <li>Honorer les commandes</li>
+              <li>Assurer le service après-vente</li>
+              <li>Respecter les délais de livraison</li>
+              <li>Gérer les litiges avec les acheteurs</li>
+            </ul>
+          </div>
+        </article>
 
-          <article id="engagements-vendeur" class="bg-white rounded-2xl shadow-sm border border-gray-100 p-8 hover:shadow-md transition-shadow">
-            <h3 class="text-xl font-bold text-gray-900 mb-4 flex items-center">
-              <span class="w-8 h-8 bg-indigo-100 text-indigo-600 rounded-lg flex items-center justify-center text-sm font-bold mr-3">15</span>
-              Engagements du vendeur
-            </h3>
-            <div class="text-gray-700 leading-relaxed">
-              <p class="mb-3">Le vendeur s'engage à :</p>
-              <div class="space-y-2">
-                <div class="flex items-center p-3 bg-gray-50 rounded-lg">
-                  <svg class="w-5 h-5 text-indigo-600 mr-3 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                    <path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z"></path>
-                    <path fill-rule="evenodd" d="M4 5a2 2 0 012-2 3 3 0 003 3h2a3 3 0 003-3 2 2 0 012 2v11a2 2 0 01-2 2H6a2 2 0 01-2-2V5zm3 4a1 1 0 000 2h.01a1 1 0 100-2H7zm3 0a1 1 0 000 2h3a1 1 0 100-2h-3zm-3 4a1 1 0 100 2h.01a1 1 0 100-2H7zm3 0a1 1 0 100 2h3a1 1 0 100-2h-3z" clip-rule="evenodd"></path>
-                  </svg>
-                  <span class="text-sm">Honorer les commandes</span>
-                </div>
-                <div class="flex items-center p-3 bg-gray-50 rounded-lg">
-                  <svg class="w-5 h-5 text-indigo-600 mr-3 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                    <path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z"></path>
-                    <path fill-rule="evenodd" d="M4 5a2 2 0 012-2 3 3 0 003 3h2a3 3 0 003-3 2 2 0 012 2v11a2 2 0 01-2 2H6a2 2 0 01-2-2V5zm3 4a1 1 0 000 2h.01a1 1 0 100-2H7zm3 0a1 1 0 000 2h3a1 1 0 100-2h-3zm-3 4a1 1 0 100 2h.01a1 1 0 100-2H7zm3 0a1 1 0 100 2h3a1 1 0 100-2h-3z" clip-rule="evenodd"></path>
-                  </svg>
-                  <span class="text-sm">Assurer le service après-vente</span>
-                </div>
-                <div class="flex items-center p-3 bg-gray-50 rounded-lg">
-                  <svg class="w-5 h-5 text-indigo-600 mr-3 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                    <path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z"></path>
-                    <path fill-rule="evenodd" d="M4 5a2 2 0 012-2 3 3 0 003 3h2a3 3 0 003-3 2 2 0 012 2v11a2 2 0 01-2 2H6a2 2 0 01-2-2V5zm3 4a1 1 0 000 2h.01a1 1 0 100-2H7zm3 0a1 1 0 000 2h3a1 1 0 100-2h-3zm-3 4a1 1 0 100 2h.01a1 1 0 100-2H7zm3 0a1 1 0 100 2h3a1 1 0 100-2h-3z" clip-rule="evenodd"></path>
-                  </svg>
-                  <span class="text-sm">Respecter les délais de livraison</span>
-                </div>
-                <div class="flex items-center p-3 bg-gray-50 rounded-lg">
-                  <svg class="w-5 h-5 text-indigo-600 mr-3 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                    <path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z"></path>
-                    <path fill-rule="evenodd" d="M4 5a2 2 0 012-2 3 3 0 003 3h2a3 3 0 003-3 2 2 0 012 2v11a2 2 0 01-2 2H6a2 2 0 01-2-2V5zm3 4a1 1 0 000 2h.01a1 1 0 100-2H7zm3 0a1 1 0 000 2h3a1 1 0 100-2h-3zm-3 4a1 1 0 100 2h.01a1 1 0 100-2H7zm3 0a1 1 0 100 2h3a1 1 0 100-2h-3z" clip-rule="evenodd"></path>
-                  </svg>
-                  <span class="text-sm">Gérer les litiges avec les acheteurs</span>
-                </div>
-              </div>
-            </div>
-          </article>
+        <article id="resiliation-compte" class="mb-8">
+          <h3 class="text-base font-semibold text-gray-900 mb-3">Article 16 – Résiliation du compte</h3>
+          <div class="text-gray-600 leading-relaxed space-y-3">
+            <p>L'utilisateur peut résilier son compte à tout moment.</p>
+            <p>Uber-Market peut résilier un compte en cas de manquement grave.</p>
+          </div>
+        </article>
 
-          <article id="resiliation-compte" class="bg-white rounded-2xl shadow-sm border border-gray-100 p-8 hover:shadow-md transition-shadow">
-            <h3 class="text-xl font-bold text-gray-900 mb-4 flex items-center">
-              <span class="w-8 h-8 bg-indigo-100 text-indigo-600 rounded-lg flex items-center justify-center text-sm font-bold mr-3">16</span>
-              Résiliation du compte
-            </h3>
-            <div class="text-gray-700 leading-relaxed space-y-3">
-              <p>L'utilisateur peut résilier son compte à tout moment.</p>
-              <p>Uber-Market peut résilier un compte en cas de manquement grave.</p>
-            </div>
-          </article>
+        <article id="modification" class="mb-8">
+          <h3 class="text-base font-semibold text-gray-900 mb-3">Article 17 – Modification des CGU / CGI</h3>
+          <div class="text-gray-600 leading-relaxed space-y-3">
+            <p>Uber-Market se réserve le droit de modifier les présentes conditions.</p>
+            <p>Les utilisateurs seront informés par tout moyen approprié.</p>
+          </div>
+        </article>
 
-          <article id="modification" class="bg-white rounded-2xl shadow-sm border border-gray-100 p-8 hover:shadow-md transition-shadow">
-            <h3 class="text-xl font-bold text-gray-900 mb-4 flex items-center">
-              <span class="w-8 h-8 bg-indigo-100 text-indigo-600 rounded-lg flex items-center justify-center text-sm font-bold mr-3">17</span>
-              Modification des CGU / CGI
-            </h3>
-            <div class="text-gray-700 leading-relaxed space-y-3">
-              <p>Uber-Market se réserve le droit de modifier les présentes conditions.</p>
-              <div class="mt-4 p-4 bg-blue-50 rounded-lg border border-blue-200">
-                <p class="text-sm text-blue-900">
-                  Les utilisateurs seront informés par tout moyen approprié.
-                </p>
-              </div>
-            </div>
-          </article>
-
-          <article id="acceptation" class="bg-white rounded-2xl shadow-sm border border-gray-100 p-8 hover:shadow-md transition-shadow">
-            <h3 class="text-xl font-bold text-gray-900 mb-4 flex items-center">
-              <span class="w-8 h-8 bg-indigo-100 text-indigo-600 rounded-lg flex items-center justify-center text-sm font-bold mr-3">18</span>
-              Acceptation
-            </h3>
-            <div class="p-6 bg-gradient-to-br from-indigo-50 to-purple-50 rounded-xl border-2 border-indigo-200">
-              <p class="text-gray-900 font-medium leading-relaxed">
-                L'inscription et l'utilisation de la plateforme valent acceptation expresse des présentes CGU et CGI.
-              </p>
-            </div>
-          </article>
-        </div>
+        <article id="acceptation" class="mb-8">
+          <h3 class="text-base font-semibold text-gray-900 mb-3">Article 18 – Acceptation</h3>
+          <p class="text-gray-600 leading-relaxed">L'inscription et l'utilisation de la plateforme valent acceptation expresse des présentes CGU et CGI.</p>
+        </article>
       </section>
+    </main>
 
-      <!-- Footer de la page -->
-      <div class="mt-20 pt-12 border-t border-gray-200">
-        <div class="text-center">
-          <div class="inline-flex items-center justify-center space-x-4 mb-6">
-            <a href="mailto:contact@uber-market.com" class="flex items-center text-gray-600 hover:text-primary transition-colors">
-              <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
-              </svg>
-              Contact
-            </a>
-            <span class="text-gray-300">•</span>
-            <NuxtLink to="/" class="text-gray-600 hover:text-primary transition-colors">
-              Retour à l'accueil
-            </NuxtLink>
+    <!-- Footer (même que landing page) -->
+    <footer class="px-4 md:px-16 lg:px-24 xl:px-32 border-t border-gray-200">
+      <div class="border-x border-gray-200 px-4 md:px-12 max-w-7xl mx-auto pt-16">
+        <div class="flex flex-col md:flex-row items-start justify-between gap-8 p-8 md:p-12 bg-gradient-to-t from-primary/10 to-primary/5 rounded-t-2xl">
+          <div class="max-w-72">
+            <img alt="Logo" class="h-9" src="/uber-market.png">
+            <p class="text-zinc-500 mt-4 pb-6">La plateforme e-commerce la plus simple pour lancer votre boutique en ligne.</p>
           </div>
-          <p class="text-sm text-gray-500">
-            © {{ new Date().getFullYear() }} Uber-Market. Tous droits réservés.
-          </p>
+          <div>
+            <p class="uppercase font-semibold text-primary text-sm">Réseaux sociaux</p>
+            <div class="flex flex-col mt-4 gap-2">
+              <a href="#" class="flex items-center gap-2 text-primary hover:opacity-70 text-sm">
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 4s-.7 2.1-2 3.4c1.6 10-9.4 17.3-18 11.6 2.2.1 4.4-.6 6-2C3 15.5.5 9.6 3 5c2.2 2.6 5.6 4.1 9 4-.9-4.2 4-6.6 7-3.8 1.1 0 3-1.2 3-1.2z"></path></svg>
+                Twitter
+              </a>
+              <a href="#" class="flex items-center gap-2 text-primary hover:opacity-70 text-sm">
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="20" height="20" x="2" y="2" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" x2="17.51" y1="6.5" y2="6.5"></line></svg>
+                Instagram
+              </a>
+              <a href="mailto:contact@uber-market.com" class="flex items-center gap-2 text-primary hover:opacity-70 text-sm">
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="20" height="16" x="2" y="4" rx="2"></rect><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"></path></svg>
+                Email
+              </a>
+            </div>
+          </div>
+          <div>
+            <p class="uppercase font-semibold text-primary text-sm">Légal</p>
+            <div class="flex flex-col mt-4 gap-2">
+              <NuxtLink to="/conditions" class="flex items-center gap-2 text-primary hover:opacity-70 text-sm">
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
+                CGU & CGI
+              </NuxtLink>
+            </div>
+          </div>
+        </div>
+        <div class="py-6 text-center text-sm text-gray-500">
+          © {{ new Date().getFullYear() }} Uber-Market. Tous droits réservés.
         </div>
       </div>
-    </main>
+    </footer>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue'
-
-definePageMeta({
-  layout: false
-})
+definePageMeta({ layout: false })
 
 useHead({
-  title: 'Conditions Générales d\'Utilisation & d\'Inscription - Uber-Market',
-  meta: [
-    { name: 'description', content: 'Consultez les conditions générales d\'utilisation (CGU) et d\'inscription (CGI) de la plateforme Uber-Market.' }
-  ]
+  title: 'Conditions Générales - Uber-Market',
+  meta: [{ name: 'description', content: 'Conditions générales d\'utilisation et d\'inscription de la plateforme Uber-Market.' }],
+  link: [{ rel: 'stylesheet', href: 'https://fonts.googleapis.com/css2?family=Urbanist:wght@400;500;600;700&display=swap' }]
 })
+
+const mobileMenuOpen = ref(false)
+const toggleMobileMenu = () => { mobileMenuOpen.value = !mobileMenuOpen.value }
+const closeMobileMenu = () => { mobileMenuOpen.value = false }
 
 const lastUpdate = computed(() => {
   const date = new Date()
   return date.toLocaleDateString('fr-FR', { year: 'numeric', month: 'long', day: 'numeric' })
 })
 
-const sections = ref([
+const sections = [
   { id: 'cgu', title: 'Partie I – CGU' },
-  { id: 'definitions', title: 'Article 1 – Définitions' },
-  { id: 'objet', title: 'Article 2 – Objet des CGU' },
-  { id: 'acces', title: 'Article 3 – Accès à la plateforme' },
-  { id: 'services', title: 'Article 4 – Services proposés' },
-  { id: 'responsabilite', title: 'Article 5 – Responsabilité' },
-  { id: 'obligations', title: 'Article 6 – Obligations des utilisateurs' },
-  { id: 'propriete', title: 'Article 7 – Propriété intellectuelle' },
-  { id: 'donnees', title: 'Article 8 – Données personnelles' },
-  { id: 'suspension', title: 'Article 9 – Suspension / Résiliation' },
-  { id: 'droit', title: 'Article 10 – Droit applicable & Litiges' },
+  { id: 'definitions', title: '1. Définitions' },
+  { id: 'objet', title: '2. Objet des CGU' },
+  { id: 'acces', title: '3. Accès à la plateforme' },
+  { id: 'services', title: '4. Services proposés' },
+  { id: 'responsabilite', title: '5. Responsabilité' },
+  { id: 'obligations', title: '6. Obligations des utilisateurs' },
+  { id: 'propriete', title: '7. Propriété intellectuelle' },
+  { id: 'donnees', title: '8. Données personnelles' },
+  { id: 'suspension', title: '9. Suspension / Résiliation' },
+  { id: 'droit', title: '10. Droit applicable et Litiges' },
   { id: 'cgi', title: 'Partie II – CGI' },
-  { id: 'conditions-inscription', title: 'Article 11 – Conditions d\'inscription' },
-  { id: 'creation-compte', title: 'Article 12 – Création de compte' },
-  { id: 'inscription-vendeurs', title: 'Article 13 – Inscription des vendeurs' },
-  { id: 'tarification', title: 'Article 14 – Tarification & Commissions' },
-  { id: 'engagements-vendeur', title: 'Article 15 – Engagements du vendeur' },
-  { id: 'resiliation-compte', title: 'Article 16 – Résiliation du compte' },
-  { id: 'modification', title: 'Article 17 – Modification des CGU / CGI' },
-  { id: 'acceptation', title: 'Article 18 – Acceptation' }
-])
+  { id: 'conditions-inscription', title: '11. Conditions d\'inscription' },
+  { id: 'creation-compte', title: '12. Création de compte' },
+  { id: 'inscription-vendeurs', title: '13. Inscription des vendeurs' },
+  { id: 'tarification', title: '14. Tarification et Commissions' },
+  { id: 'engagements-vendeur', title: '15. Engagements du vendeur' },
+  { id: 'resiliation-compte', title: '16. Résiliation du compte' },
+  { id: 'modification', title: '17. Modification des CGU / CGI' },
+  { id: 'acceptation', title: '18. Acceptation' }
+]
 </script>
 
 <style scoped>
-html {
-  scroll-behavior: smooth;
-}
-
-.prose {
-  max-width: none;
-}
+html { scroll-behavior: smooth; }
+.landing-page { --color-primary: #5B6AC5; }
+.font-urbanist { font-family: 'Urbanist', sans-serif; }
+.text-primary { color: var(--color-primary); }
+.bg-primary { background-color: var(--color-primary); }
+.bg-primary\/10 { background-color: rgba(91, 106, 197, 0.1); }
+.bg-primary\/5 { background-color: rgba(91, 106, 197, 0.05); }
+.from-primary\/10 { --tw-gradient-from: rgba(91, 106, 197, 0.1); }
+.to-primary\/5 { --tw-gradient-to: rgba(91, 106, 197, 0.05); }
+.size-6 { width: 1.5rem; height: 1.5rem; }
+.h-72 { height: 18rem; }
 </style>
