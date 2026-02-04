@@ -728,6 +728,14 @@ const removePromoCode = () => {
 
 // Créer la commande
 const handleCreateOrder = async () => {
+  // Vérifier si l'utilisateur est connecté
+  if (!user.value) {
+    // Rediriger vers la page de connexion
+    const loginUrl = getLoginUrl()
+    router.push(loginUrl)
+    return
+  }
+  
   if (!isFormValid.value || isCreatingOrder.value) return
   
   isCreatingOrder.value = true
