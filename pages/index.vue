@@ -1,59 +1,47 @@
 <template>
   <div v-if="isOnShopSubdomain()">
     <!-- Page de maintenance -->
-    <div v-if="isInMaintenance" class="min-h-screen flex items-center justify-center" :style="maintenancePageStyle">
-      <div class="text-center max-w-md mx-auto px-6">
+    <div v-if="isInMaintenance" class="min-h-screen flex items-center justify-center bg-slate-50">
+      <div class="text-center max-w-sm mx-auto px-6">
         <!-- Logo de la boutique -->
-        <div class="mb-6">
+        <div class="mb-8">
           <img 
             v-if="maintenanceData.shop_logo" 
             :src="maintenanceData.shop_logo" 
             :alt="maintenanceData.shop_name"
-            class="w-20 h-20 mx-auto rounded-full object-cover border-4 border-white shadow-lg"
+            class="w-16 h-16 mx-auto rounded-full object-cover ring-2 ring-slate-200"
           >
-          <div v-else class="w-20 h-20 mx-auto rounded-full bg-white shadow-lg flex items-center justify-center">
-            <svg class="w-10 h-10 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+          <div v-else class="w-16 h-16 mx-auto rounded-full bg-white ring-2 ring-slate-200 flex items-center justify-center">
+            <svg class="w-7 h-7 text-slate-400" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 21v-7.5a.75.75 0 0 1 .75-.75h3a.75.75 0 0 1 .75.75V21m-4.5 0H2.36m11.14 0H18m0 0h3.64m-1.39 0V9.349M3.75 21V9.349m0 0a3.001 3.001 0 0 0 3.75-.615A2.993 2.993 0 0 0 9.75 9.75c.896 0 1.7-.393 2.25-1.016a2.993 2.993 0 0 0 2.25 1.016c.896 0 1.7-.393 2.25-1.015a3.001 3.001 0 0 0 3.75.614m-16.5 0a3.004 3.004 0 0 1-.621-4.72l1.189-1.19A1.5 1.5 0 0 1 5.378 3h13.243a1.5 1.5 0 0 1 1.06.44l1.19 1.189a3 3 0 0 1-.621 4.72M6.75 18h3.75a.75.75 0 0 0 .75-.75V13.5a.75.75 0 0 0-.75-.75H6.75a.75.75 0 0 0-.75.75v3.75c0 .414.336.75.75.75Z" />
             </svg>
           </div>
         </div>
         
         <!-- Nom de la boutique -->
-        <h1 class="text-2xl font-bold text-white mb-4">
+        <h1 class="text-lg font-semibold text-slate-900 mb-2">
           {{ maintenanceData.shop_name || 'Boutique' }}
         </h1>
         
-        <!-- Icône maintenance -->
-        <div class="mb-6">
-          <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-white/20 backdrop-blur-sm">
-            <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
-            </svg>
-          </div>
+        <!-- Statut maintenance -->
+        <div class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-amber-50 text-amber-700 text-xs font-medium mb-6">
+          <span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
+          Maintenance
         </div>
         
-        <!-- Message de maintenance -->
-        <div class="bg-white/10 backdrop-blur-sm rounded-lg p-6 mb-6">
-          <h2 class="text-lg font-semibold text-white mb-2">Maintenance en cours</h2>
-          <p class="text-white/90">
-            {{ maintenanceData.maintenance_message || 'Cette boutique est temporairement indisponible.' }}
-          </p>
-        </div>
+        <!-- Message -->
+        <p class="text-slate-600 text-sm leading-relaxed mb-6">
+          {{ maintenanceData.maintenance_message || 'Cette boutique est temporairement indisponible. Nous serons bientôt de retour.' }}
+        </p>
         
         <!-- Date de fin -->
-        <div v-if="maintenanceData.maintenance_end_date" class="text-white/80 text-sm">
-          <p class="flex items-center justify-center gap-2">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-            </svg>
-            Retour prévu : {{ formatMaintenanceEndDate(maintenanceData.maintenance_end_date) }}
-          </p>
-        </div>
+        <p v-if="maintenanceData.maintenance_end_date" class="text-slate-500 text-xs">
+          Retour prévu le {{ formatMaintenanceEndDate(maintenanceData.maintenance_end_date) }}
+        </p>
         
         <!-- Lien vers UberMarket -->
-        <div class="mt-8 pt-6 border-t border-white/20">
-          <a href="https://uber-market.com" class="text-white/60 text-xs hover:text-white transition-colors">
+        <div class="mt-12 pt-6 border-t border-slate-200">
+          <a href="https://uber-market.com" class="text-slate-400 text-xs hover:text-slate-600 transition-colors">
             Propulsé par UberMarket
           </a>
         </div>
@@ -61,48 +49,42 @@
     </div>
     
     <!-- Page boutique fermée (inactive) -->
-    <div v-else-if="isInactive" class="min-h-screen flex items-center justify-center" :style="inactivePageStyle">
-      <div class="text-center max-w-md mx-auto px-6">
+    <div v-else-if="isInactive" class="min-h-screen flex items-center justify-center bg-slate-50">
+      <div class="text-center max-w-sm mx-auto px-6">
         <!-- Logo de la boutique -->
-        <div class="mb-6">
+        <div class="mb-8">
           <img 
             v-if="inactiveData.shop_logo" 
             :src="inactiveData.shop_logo" 
             :alt="inactiveData.shop_name"
-            class="w-20 h-20 mx-auto rounded-full object-cover border-4 border-white shadow-lg"
+            class="w-16 h-16 mx-auto rounded-full object-cover ring-2 ring-slate-200 grayscale opacity-60"
           >
-          <div v-else class="w-20 h-20 mx-auto rounded-full bg-white shadow-lg flex items-center justify-center">
-            <svg class="w-10 h-10 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
+          <div v-else class="w-16 h-16 mx-auto rounded-full bg-white ring-2 ring-slate-200 flex items-center justify-center">
+            <svg class="w-7 h-7 text-slate-400" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 21v-7.5a.75.75 0 0 1 .75-.75h3a.75.75 0 0 1 .75.75V21m-4.5 0H2.36m11.14 0H18m0 0h3.64m-1.39 0V9.349M3.75 21V9.349m0 0a3.001 3.001 0 0 0 3.75-.615A2.993 2.993 0 0 0 9.75 9.75c.896 0 1.7-.393 2.25-1.016a2.993 2.993 0 0 0 2.25 1.016c.896 0 1.7-.393 2.25-1.015a3.001 3.001 0 0 0 3.75.614m-16.5 0a3.004 3.004 0 0 1-.621-4.72l1.189-1.19A1.5 1.5 0 0 1 5.378 3h13.243a1.5 1.5 0 0 1 1.06.44l1.19 1.189a3 3 0 0 1-.621 4.72M6.75 18h3.75a.75.75 0 0 0 .75-.75V13.5a.75.75 0 0 0-.75-.75H6.75a.75.75 0 0 0-.75.75v3.75c0 .414.336.75.75.75Z" />
             </svg>
           </div>
         </div>
         
         <!-- Nom de la boutique -->
-        <h1 class="text-2xl font-bold text-white mb-4">
+        <h1 class="text-lg font-semibold text-slate-900 mb-2">
           {{ inactiveData.shop_name || 'Boutique' }}
         </h1>
         
-        <!-- Icône boutique fermée -->
-        <div class="mb-6">
-          <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-white/20 backdrop-blur-sm">
-            <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
-            </svg>
-          </div>
+        <!-- Statut fermée -->
+        <div class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-slate-100 text-slate-600 text-xs font-medium mb-6">
+          <span class="w-1.5 h-1.5 rounded-full bg-slate-400"></span>
+          Fermée
         </div>
         
-        <!-- Message boutique fermée -->
-        <div class="bg-white/10 backdrop-blur-sm rounded-lg p-6 mb-6">
-          <h2 class="text-lg font-semibold text-white mb-2">Boutique fermée</h2>
-          <p class="text-white/90">
-            Cette boutique est actuellement fermée. Veuillez revenir plus tard.
-          </p>
-        </div>
+        <!-- Message -->
+        <p class="text-slate-600 text-sm leading-relaxed">
+          Cette boutique est actuellement fermée. Veuillez revenir plus tard.
+        </p>
         
         <!-- Lien vers UberMarket -->
-        <div class="mt-8 pt-6 border-t border-white/20">
-          <a href="https://uber-market.com" class="text-white/60 text-xs hover:text-white transition-colors">
+        <div class="mt-12 pt-6 border-t border-slate-200">
+          <a href="https://uber-market.com" class="text-slate-400 text-xs hover:text-slate-600 transition-colors">
             Propulsé par UberMarket
           </a>
         </div>
