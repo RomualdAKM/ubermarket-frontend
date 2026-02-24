@@ -5,6 +5,7 @@ export interface RegisterData {
   country: string
   password: string
   password_confirmation: string
+  referral_code?: string // Code parrain optionnel
 }
 
 export interface LoginData {

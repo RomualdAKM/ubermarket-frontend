@@ -84,6 +84,46 @@
             <p v-if="errors.country" class="mt-1 text-sm text-red-600">{{ errors.country }}</p>
           </div>
           
+          <!-- Code parrain (optionnel) -->
+          <div>
+            <label for="referral-code" class="block text-sm font-medium text-gray-700">
+              Code parrain <span class="text-gray-400 font-normal">(optionnel)</span>
+            </label>
+            <div class="relative">
+              <input 
+                id="referral-code" 
+                name="referral_code" 
+                type="text" 
+                v-model="referralCode" 
+                @blur="validateReferralCode" 
+                @input="referralCode = referralCode.toUpperCase()"
+                :class="{
+                  'border-red-500': referralCodeError,
+                  'border-green-500': referralCodeValid
+                }" 
+                class="mt-1 block w-full px-3 py-2 border-0 border-b-2 border-gray-300 placeholder-gray-300 placeholder:italic text-gray-900 focus:outline-none focus:ring-0 focus:border-primary transition-colors duration-200 uppercase" 
+                placeholder="Ex : JEAN7X3K"
+                maxlength="10"
+              >
+              <!-- Indicateur de validation -->
+              <span v-if="isValidatingReferral" class="absolute right-2 top-1/2 -translate-y-1/2">
+                <svg class="animate-spin h-4 w-4 text-gray-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                  <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                  <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+              </span>
+              <span v-else-if="referralCodeValid" class="absolute right-2 top-1/2 -translate-y-1/2 text-green-500">
+                <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                </svg>
+              </span>
+            </div>
+            <p v-if="referralCodeError" class="mt-1 text-sm text-red-600">{{ referralCodeError }}</p>
+            <p v-else-if="referralCodeValid && referrerName" class="mt-1 text-sm text-green-600">
+              Parrain : {{ referrerName }}
+            </p>
+          </div>
+          
           <div>
             <label for="password" class="block text-sm font-medium text-gray-700">Mot de passe</label>
             <input 
@@ -222,6 +262,13 @@ const acceptTerms = ref(false)
 const isSubmitting = ref(false)
 const submitError = ref('')
 
+// Code parrain (affiliation)
+const referralCode = ref('')
+const referralCodeError = ref('')
+const referralCodeValid = ref(false)
+const referrerName = ref('')
+const isValidatingReferral = ref(false)
+
 // Erreurs de validation
 const errors = reactive({
   name: '',
@@ -328,6 +375,45 @@ const validateField = (field: string) => {
   }
 }
 
+// Valider le code parrain
+const validateReferralCode = async () => {
+  // Réinitialiser
+  referralCodeError.value = ''
+  referralCodeValid.value = false
+  referrerName.value = ''
+  
+  // Si vide, pas de validation nécessaire (optionnel)
+  if (!referralCode.value.trim()) {
+    return
+  }
+  
+  isValidatingReferral.value = true
+  
+  try {
+    const response = await fetch(`${config.public.apiBase}/referral/validate`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json'
+      },
+      body: JSON.stringify({ code: referralCode.value.trim() })
+    })
+    
+    const data = await response.json()
+    
+    if (data.valid) {
+      referralCodeValid.value = true
+      referrerName.value = data.referrer?.name || ''
+    } else {
+      referralCodeError.value = 'Code d\'affiliation invalide'
+    }
+  } catch (error) {
+    console.error('Erreur validation code parrain:', error)
+  } finally {
+    isValidatingReferral.value = false
+  }
+}
+
 // Valider tous les champs
 const validateForm = () => {
   validateField('name')
@@ -366,7 +452,8 @@ const handleSignup = async () => {
       phone: phone.value,
       country: country.value,
       password: password.value,
-      password_confirmation: passwordConfirm.value
+      password_confirmation: passwordConfirm.value,
+      ...(referralCode.value.trim() && { referral_code: referralCode.value.trim() })
     }
     
     const response = await register(registerData)
