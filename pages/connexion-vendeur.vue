@@ -7,7 +7,7 @@
         </h2>
         <p class="mt-2 text-center text-sm text-gray-600">
           Ou
-          <NuxtLink to="/inscription-vendeur" class="font-medium text-primary hover:text-secondary">
+          <NuxtLink :to="inscriptionLink" class="font-medium text-primary hover:text-secondary">
             créez un compte vendeur
           </NuxtLink>
         </p>
@@ -171,19 +171,41 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive } from 'vue'
-import { useRouter } from 'vue-router'
+import { ref, reactive, computed, watch } from 'vue'
+import { useRouter, useRoute } from 'vue-router'
 import { useAuth } from '~/composables/useAuth'
 import type { LoginData } from '~/types/auth'
 
+const route = useRoute()
 const router = useRouter()
 const { login } = useAuth()
+
+// Récupérer l'URL de redirection et l'email depuis les query params
+const redirectTo = computed(() => route.query.redirect as string || '')
+const prefillEmail = computed(() => route.query.email as string || '')
+
+// Lien inscription qui préserve les query params
+const inscriptionLink = computed(() => {
+  let link = '/inscription-vendeur'
+  const params: string[] = []
+  if (redirectTo.value) params.push(`redirect=${encodeURIComponent(redirectTo.value)}`)
+  if (prefillEmail.value) params.push(`email=${encodeURIComponent(prefillEmail.value)}`)
+  if (params.length) link += '?' + params.join('&')
+  return link
+})
 
 const email = ref('')
 const password = ref('')
 const rememberMe = ref(false)
 const isSubmitting = ref(false)
 const loginError = ref('')
+
+// Pré-remplir l'email depuis les query params (après hydration)
+watch(prefillEmail, (newVal) => {
+  if (newVal && !email.value) {
+    email.value = newVal
+  }
+}, { immediate: true })
 
 // Modal mot de passe oublié
 const showForgotModal = ref(false)
@@ -284,8 +306,9 @@ const handleLogin = async () => {
     const response = await login(loginData)
     
     if (response.success) {
-      // Redirection vers la page des boutiques
-      await router.push('/mes-boutiques')
+      // Redirection vers l'URL de redirection ou la page des boutiques
+      const destination = redirectTo.value || '/mes-boutiques'
+      await router.push(destination)
     }
   } catch (error: any) {
     loginError.value = error.message || 'Une erreur est survenue lors de la connexion. Veuillez réessayer.'

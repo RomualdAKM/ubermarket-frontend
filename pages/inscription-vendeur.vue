@@ -7,7 +7,7 @@
         </h2>
         <p class="mt-2 text-center text-sm text-gray-600">
           Ou
-          <NuxtLink to="/connexion-vendeur" class="font-medium text-primary hover:text-secondary">
+          <NuxtLink :to="connexionLink" class="font-medium text-primary hover:text-secondary">
             connectez-vous à votre compte vendeur
           </NuxtLink>
         </p>
@@ -211,7 +211,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, reactive, onMounted } from 'vue'
+import { ref, computed, reactive, onMounted, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import type { RegisterData } from '~/types/auth'
 import { useAuth } from '~/composables/useAuth'
@@ -248,8 +248,23 @@ useHead({
 })
 
 const config = useRuntimeConfig()
+const route = useRoute()
 const router = useRouter()
 const { register } = useAuth()
+
+// Récupérer l'URL de redirection et l'email depuis les query params
+const redirectTo = computed(() => route.query.redirect as string || '')
+const prefillEmail = computed(() => route.query.email as string || '')
+
+// Lien connexion qui préserve les query params
+const connexionLink = computed(() => {
+  let link = '/connexion-vendeur'
+  const params: string[] = []
+  if (redirectTo.value) params.push(`redirect=${encodeURIComponent(redirectTo.value)}`)
+  if (prefillEmail.value) params.push(`email=${encodeURIComponent(prefillEmail.value)}`)
+  if (params.length) link += '?' + params.join('&')
+  return link
+})
 
 // Données du formulaire
 const name = ref('')
@@ -261,6 +276,13 @@ const passwordConfirm = ref('')
 const acceptTerms = ref(false)
 const isSubmitting = ref(false)
 const submitError = ref('')
+
+// Pré-remplir l'email depuis les query params (après hydration)
+watch(prefillEmail, (newVal) => {
+  if (newVal && !email.value) {
+    email.value = newVal
+  }
+}, { immediate: true })
 
 // Code parrain (affiliation)
 const referralCode = ref('')
@@ -459,8 +481,9 @@ const handleSignup = async () => {
     const response = await register(registerData)
     
     if (response.success) {
-      // Redirection vers la page des boutiques
-      await router.push('/mes-boutiques')
+      // Redirection vers l'URL de redirection ou la page des boutiques
+      const destination = redirectTo.value || '/mes-boutiques'
+      await router.push(destination)
     }
   } catch (error: any) {
     submitError.value = error.message || 'Une erreur est survenue lors de l\'inscription.'
