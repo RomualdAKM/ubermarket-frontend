@@ -5,6 +5,19 @@
       <p class="text-gray-600">Connectez vos outils de suivi marketing</p>
     </div>
 
+    <!-- Avertissement si module non disponible -->
+    <div v-if="!hasMarketingAccess" class="mb-4 p-4 bg-amber-50 border border-amber-200 rounded-md">
+      <div class="flex items-start gap-3">
+        <svg class="w-5 h-5 text-amber-600 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+        </svg>
+        <div>
+          <p class="text-sm font-medium text-amber-800">Module 'Marketing' non disponible</p>
+          <p class="text-sm text-amber-700 mt-1">Les intégrations marketing ne sont pas incluses dans votre plan actuel. Mettez à niveau votre abonnement pour accéder à cette fonctionnalité.</p>
+        </div>
+      </div>
+    </div>
+
     <!-- Messages -->
     <div v-if="successMessage" class="mb-4 p-3 bg-green-50 border-l-4 border-green-500 text-green-700">
       {{ successMessage }}
@@ -48,7 +61,13 @@
               </span>
               <button 
                 @click="togglePlatformForm('facebook_pixel')"
-                class="text-sm font-medium text-gray-700 hover:text-gray-900"
+                :disabled="!hasMarketingAccess"
+                :class="[
+                  'text-sm font-medium transition-colors',
+                  !hasMarketingAccess 
+                    ? 'text-gray-400 cursor-not-allowed' 
+                    : 'text-gray-700 hover:text-gray-900'
+                ]"
               >
                 {{ showForms.facebook_pixel ? 'Masquer' : 'Configurer' }}
               </button>
@@ -113,7 +132,13 @@
               </span>
               <button 
                 @click="togglePlatformForm('google_analytics')"
-                class="text-sm font-medium text-gray-700 hover:text-gray-900"
+                :disabled="!hasMarketingAccess"
+                :class="[
+                  'text-sm font-medium transition-colors',
+                  !hasMarketingAccess 
+                    ? 'text-gray-400 cursor-not-allowed' 
+                    : 'text-gray-700 hover:text-gray-900'
+                ]"
               >
                 {{ showForms.google_analytics ? 'Masquer' : 'Configurer' }}
               </button>
@@ -178,7 +203,13 @@
               </span>
               <button 
                 @click="togglePlatformForm('systeme_io')"
-                class="text-sm font-medium text-gray-700 hover:text-gray-900"
+                :disabled="!hasMarketingAccess"
+                :class="[
+                  'text-sm font-medium transition-colors',
+                  !hasMarketingAccess 
+                    ? 'text-gray-400 cursor-not-allowed' 
+                    : 'text-gray-700 hover:text-gray-900'
+                ]"
               >
                 {{ showForms.systeme_io ? 'Masquer' : 'Configurer' }}
               </button>
@@ -235,6 +266,10 @@ definePageMeta({
 const route = useRoute()
 const { integrations, isLoading, error, fetchIntegrations, createIntegration, updateIntegration, deleteIntegration } = useMarketing()
 
+// Vérification de l'abonnement
+const { hasModule } = useSubscription()
+const hasMarketingAccess = computed(() => hasModule('marketing'))
+
 // État pour les formulaires
 const showForms = reactive({
   facebook_pixel: false,
@@ -277,6 +312,9 @@ onMounted(async () => {
 
 // Basculer l'affichage d'un formulaire
 const togglePlatformForm = (platform: 'facebook_pixel' | 'google_analytics' | 'systeme_io') => {
+  // Ne pas ouvrir si le module n'est pas disponible
+  if (!hasMarketingAccess.value) return
+  
   showForms[platform] = !showForms[platform]
   clearMessages()
 }

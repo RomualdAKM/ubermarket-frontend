@@ -1,5 +1,10 @@
 <template>
   <div>
+    <!-- Avertissement si module non disponible -->
+    <div v-if="!hasPromoAccess" class="mb-4 p-4 bg-amber-50 border border-amber-200 rounded-md">
+      <p class="text-sm text-amber-800">Le module 'Codes promo' n'est pas disponible avec votre plan actuel.</p>
+    </div>
+    
     <!-- Messages de notification -->
     <div v-if="successMessage" class="mb-4 p-4 bg-green-50 border border-green-200 rounded-md">
       <p class="text-sm text-green-800">{{ successMessage }}</p>
@@ -14,7 +19,12 @@
         <h1 class="text-2xl font-semibold text-gray-800">Codes promo</h1>
         <p class="text-gray-600">Gérez vos codes de réduction</p>
       </div>
-      <button @click="openCreateModal" class="px-4 py-2 bg-primary text-white text-sm font-medium hover:bg-secondary focus:outline-none focus:ring-2 focus:ring-secondary rounded-md focus:ring-offset-2">
+      <button 
+        @click="openCreateModal" 
+        :disabled="!hasPromoAccess"
+        :class="!hasPromoAccess ? 'opacity-50 cursor-not-allowed bg-gray-400' : 'bg-primary hover:bg-secondary'"
+        class="px-4 py-2 text-white text-sm font-medium focus:outline-none focus:ring-2 focus:ring-secondary rounded-md focus:ring-offset-2"
+      >
         Créer un code promo
       </button>
     </div>
@@ -28,7 +38,12 @@
     <!-- Liste vide -->
     <div v-else-if="!isLoading && !promoCodes.length" class="bg-white p-12 text-center">
       <p class="text-gray-600">Aucun code promo pour le moment.</p>
-      <button @click="openCreateModal" class="mt-4 px-4 py-2 bg-primary text-white text-sm font-medium rounded-md hover:bg-secondary">
+      <button 
+        @click="openCreateModal" 
+        :disabled="!hasPromoAccess"
+        :class="!hasPromoAccess ? 'opacity-50 cursor-not-allowed bg-gray-400' : 'bg-primary hover:bg-secondary'"
+        class="mt-4 px-4 py-2 text-white text-sm font-medium rounded-md"
+      >
         Créer votre premier code promo
       </button>
     </div>
@@ -215,6 +230,10 @@ const shopSlug = route.params.slug as string
 const { currentShop, shops, fetchShops, setCurrentShop } = useShops()
 const shopId = computed(() => currentShop.value?.id)
 
+// Vérification de l'abonnement
+const { hasModule } = useSubscription()
+const hasPromoAccess = computed(() => hasModule('promo'))
+
 const { promoCodes, isLoading, error, fetchPromoCodes, createPromoCode, updatePromoCode, deletePromoCode } = usePromoCodes()
 
 const showModal = ref(false)
@@ -297,6 +316,9 @@ const getStatusClass = (status: string) => {
 
 // Gestion des modals
 const openCreateModal = () => {
+  // Bloquer si le module n'est pas disponible
+  if (!hasPromoAccess.value) return
+  
   isEditMode.value = false
   currentPromoCode.value = null
   resetForm()

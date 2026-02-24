@@ -228,6 +228,19 @@
         <h3 class="text-sm font-medium text-gray-900 mb-2">Domaine personnalisé</h3>
         <p class="text-sm text-gray-600 mb-4">Connectez votre propre nom de domaine</p>
         
+        <!-- Avertissement si module non disponible -->
+        <div v-if="!hasCustomDomainAccess" class="mb-4 p-4 bg-amber-50 border border-amber-200 rounded-md">
+          <div class="flex items-start gap-3">
+            <svg class="w-5 h-5 text-amber-600 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+            </svg>
+            <div>
+              <p class="text-sm font-medium text-amber-800">Module 'Domaine personnalisé' non disponible</p>
+              <p class="text-sm text-amber-700 mt-1">Cette fonctionnalité n'est pas incluse dans votre plan actuel. Mettez à niveau votre abonnement pour connecter votre propre domaine.</p>
+            </div>
+          </div>
+        </div>
+        
         <!-- Domaine actif -->
         <div v-if="customDomain" class="mb-6 p-4 bg-white border border-gray-300 rounded">
           <div class="flex items-center justify-between mb-2">
@@ -244,7 +257,7 @@
         </div>
         
         <!-- Formulaire -->
-        <div class="space-y-4">
+        <div class="space-y-4" :class="{ 'opacity-50 pointer-events-none': !hasCustomDomainAccess }">
           <div>
             <label for="custom_domain" class="block text-sm font-medium text-gray-700 mb-2">
               Nouveau domaine
@@ -255,13 +268,13 @@
                 id="custom_domain" 
                 v-model="customDomainInput"
                 @input="domainCheckMessage = ''"
-                :disabled="isUpdating"
+                :disabled="isUpdating || !hasCustomDomainAccess"
                 placeholder="www.maboutique.com"
                 class="mt-1 block w-full px-2 py-1 border-0 border-b-2 border-gray-300 placeholder-gray-300 placeholder:italic text-gray-900 focus:outline-none focus:ring-0 focus:border-primary transition-colors duration-200"
               >
               <button 
                 @click="checkDomain"
-                :disabled="!customDomainInput || isChecking"
+                :disabled="!customDomainInput || isChecking || !hasCustomDomainAccess"
                 class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {{ isChecking ? 'Vérification...' : 'Vérifier' }}
@@ -278,7 +291,7 @@
           
           <button 
             @click="updateDomain"
-            :disabled="!customDomainInput || isUpdating || !domainAvailable"
+            :disabled="!customDomainInput || isUpdating || !domainAvailable || !hasCustomDomainAccess"
             class="w-full px-4 py-2 text-sm font-medium text-white bg-gray-900 rounded hover:bg-gray-800 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors"
           >
             {{ isUpdating ? 'Mise à jour...' : (customDomain ? 'Changer le domaine' : 'Configurer le domaine') }}
@@ -311,8 +324,21 @@
 <div v-if="activeTab === 'paiement'" class="bg-white p-6 border-t border-gray-200">
   <h2 class="text-lg font-medium text-gray-900 mb-6">Configuration des paiements</h2>
   
+  <!-- Avertissement si module non disponible -->
+  <div v-if="!hasCustomPaymentKeysAccess" class="mb-4 p-4 bg-amber-50 border border-amber-200 rounded-md">
+    <div class="flex items-start gap-3">
+      <svg class="w-5 h-5 text-amber-600 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+      </svg>
+      <div>
+        <p class="text-sm font-medium text-amber-800">Module 'Clés de paiement personnalisées' non disponible</p>
+        <p class="text-sm text-amber-700 mt-1">Cette fonctionnalité n'est pas incluse dans votre plan actuel. Mettez à niveau votre abonnement pour utiliser vos propres clés API de paiement.</p>
+      </div>
+    </div>
+  </div>
+  
   <!-- Moneroo -->
-  <div class="mb-6 border border-gray-200 rounded overflow-hidden">
+  <div class="mb-6 border border-gray-200 rounded overflow-hidden" :class="{ 'opacity-50': !hasCustomPaymentKeysAccess }">
     <div class="flex items-center justify-between p-4 bg-gray-50">
       <div class="flex items-center gap-3">
         <div class="w-10 h-10 rounded bg-white border border-gray-200 flex items-center justify-center">
@@ -323,7 +349,14 @@
           <p class="text-xs text-gray-500">Mobile Money & Cartes bancaires</p>
         </div>
       </div>
-      <button @click="toggleMonerooConfig" class="text-sm font-medium text-gray-700 hover:text-gray-900">
+      <button 
+        @click="toggleMonerooConfig" 
+        :disabled="!hasCustomPaymentKeysAccess"
+        :class="[
+          'text-sm font-medium transition-colors',
+          !hasCustomPaymentKeysAccess ? 'text-gray-400 cursor-not-allowed' : 'text-gray-700 hover:text-gray-900'
+        ]"
+      >
         {{ showMonerooConfig ? 'Masquer' : 'Configurer' }}
       </button>
     </div>
@@ -349,7 +382,7 @@
   </div>
   
   <!-- PayPal -->
-  <div class="border border-gray-200 rounded overflow-hidden">
+  <div class="border border-gray-200 rounded overflow-hidden" :class="{ 'opacity-50': !hasCustomPaymentKeysAccess }">
     <div class="flex items-center justify-between p-4 bg-gray-50">
       <div class="flex items-center gap-3">
         <div class="w-10 h-10 rounded bg-white border border-gray-200 flex items-center justify-center">
@@ -360,7 +393,14 @@
           <p class="text-xs text-gray-500">Compte PayPal & Cartes bancaires</p>
         </div>
       </div>
-      <button @click="togglePaypalConfig" class="text-sm font-medium text-gray-700 hover:text-gray-900">
+      <button 
+        @click="togglePaypalConfig" 
+        :disabled="!hasCustomPaymentKeysAccess"
+        :class="[
+          'text-sm font-medium transition-colors',
+          !hasCustomPaymentKeysAccess ? 'text-gray-400 cursor-not-allowed' : 'text-gray-700 hover:text-gray-900'
+        ]"
+      >
         {{ showPaypalConfig ? 'Masquer' : 'Configurer' }}
       </button>
     </div>
@@ -774,6 +814,11 @@ const route = useRoute()
 const { shops, currentShop, checkCustomDomainAvailability, updateShop } = useShops()
 const { user, updateProfile, token } = useAuth()
 
+// Vérification de l'abonnement
+const { hasModule } = useSubscription()
+const hasCustomDomainAccess = computed(() => hasModule('custom_domain'))
+const hasCustomPaymentKeysAccess = computed(() => hasModule('custom_payment_keys'))
+
 const activeTab = ref('general')
 const customDomainInput = ref('')
 const customDomain = ref<string | null>(null)
@@ -954,8 +999,14 @@ const updatePassword = async () => {
   }
 }
 
-const toggleMonerooConfig = () => showMonerooConfig.value = !showMonerooConfig.value
-const togglePaypalConfig = () => showPaypalConfig.value = !showPaypalConfig.value
+const toggleMonerooConfig = () => {
+  if (!hasCustomPaymentKeysAccess.value) return
+  showMonerooConfig.value = !showMonerooConfig.value
+}
+const togglePaypalConfig = () => {
+  if (!hasCustomPaymentKeysAccess.value) return
+  showPaypalConfig.value = !showPaypalConfig.value
+}
 const savePaymentConfig = async (method: string, credentials: any) => {
   if (!currentShop.value) return
   try {

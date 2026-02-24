@@ -1,5 +1,10 @@
 <template>
   <div>
+    <!-- Avertissement si module non disponible -->
+    <div v-if="!hasDeliveryAccess" class="mb-4 p-4 bg-amber-50 border border-amber-200 rounded-md">
+      <p class="text-sm text-amber-800">Le module 'Livraisons' n'est pas disponible avec votre plan actuel.</p>
+    </div>
+    
     <div class="mb-6">
       <h1 class="text-2xl font-semibold text-gray-800">Livraisons</h1>
       <p class="text-gray-600">Gérez les zones de livraison et les frais</p>
@@ -28,7 +33,12 @@
     <div v-else class="bg-white p-6 mb-6">
       <div class="flex justify-between items-center mb-4">
         <h2 class="text-lg font-medium text-gray-900">Zones de livraison</h2>
-        <button @click="openAddModal" class="px-4 py-2 bg-primary text-white text-sm font-medium rounded-md hover:bg-secondary focus:outline-none focus:ring-2 focus:ring-secondary focus:ring-offset-2">
+        <button 
+          @click="openAddModal" 
+          :disabled="!hasDeliveryAccess"
+          :class="!hasDeliveryAccess ? 'opacity-50 cursor-not-allowed bg-gray-400' : 'bg-primary hover:bg-secondary'"
+          class="px-4 py-2 text-white text-sm font-medium rounded-md focus:outline-none focus:ring-2 focus:ring-secondary focus:ring-offset-2"
+        >
           Ajouter une zone
         </button>
       </div>
@@ -39,7 +49,12 @@
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"></path>
         </svg>
         <p class="text-gray-600 mb-4">Aucune zone de livraison configurée</p>
-        <button @click="openAddModal" class="px-4 py-2 bg-primary text-white rounded-md hover:bg-secondary">
+        <button 
+          @click="openAddModal" 
+          :disabled="!hasDeliveryAccess"
+          :class="!hasDeliveryAccess ? 'opacity-50 cursor-not-allowed bg-gray-400' : 'bg-primary hover:bg-secondary'"
+          class="px-4 py-2 text-white rounded-md"
+        >
           Ajouter la première zone
         </button>
       </div>
@@ -213,6 +228,10 @@ const shopSlug = route.params.slug as string
 const { fetchShops, shops, currentShop } = useShops()
 const { deliveryZones, isLoading, error, fetchDeliveryZones, createDeliveryZone, updateDeliveryZone, deleteDeliveryZone } = useDeliveryZones()
 
+// Vérification de l'abonnement
+const { hasModule } = useSubscription()
+const hasDeliveryAccess = computed(() => hasModule('delivery'))
+
 // État
 const showAddModal = ref(false)
 const showEditModal = ref(false)
@@ -243,6 +262,9 @@ const loadZones = async () => {
 
 // Ouvrir modal ajout
 const openAddModal = () => {
+  // Bloquer si le module n'est pas disponible
+  if (!hasDeliveryAccess.value) return
+  
   formData.value = {
     country: '',
     city: '',
