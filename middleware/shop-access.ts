@@ -6,6 +6,7 @@ export default defineNuxtRouteMiddleware(async (to) => {
 
   const { isAuthenticated, token, initAuth } = useAuth()
   const { shops, fetchShops, setCurrentShop } = useShops()
+  const { myCollaborations, fetchMyCollaborations } = useCollaborators()
 
   // Cote client : s'assurer que l'auth est initialisee depuis localStorage
   if (process.client) {
@@ -25,14 +26,44 @@ export default defineNuxtRouteMiddleware(async (to) => {
   }
 
   try {
-    // Recuperer les boutiques de l'utilisateur si pas encore fait
+    // Recuperer les boutiques proprietaires et collaboratives si pas encore fait
+    const promises: Promise<any>[] = []
+    
     if (shops.value.length === 0) {
-      await fetchShops()
+      promises.push(fetchShops())
+    }
+    
+    if (myCollaborations.value.length === 0) {
+      promises.push(fetchMyCollaborations())
+    }
+    
+    if (promises.length > 0) {
+      await Promise.all(promises)
     }
 
     // Verifier que l'utilisateur a acces a cette boutique
     const requestedSlug = to.params.slug as string
-    const userShop = shops.value.find(shop => shop.slug === requestedSlug)
+    
+    // Chercher dans les boutiques proprietaires
+    let userShop = shops.value.find(shop => shop.slug === requestedSlug)
+    
+    // Si pas trouve, chercher dans les collaborations
+    if (!userShop) {
+      const collaboration = myCollaborations.value.find(c => c.shop.slug === requestedSlug)
+      if (collaboration) {
+        // Creer un objet shop compatible depuis la collaboration
+        userShop = {
+          id: collaboration.shop.id,
+          name: collaboration.shop.name,
+          slug: collaboration.shop.slug,
+          logo: collaboration.shop.logo,
+          // Marquer comme collaboration pour reference
+          is_collaboration: true,
+          collaboration_role: collaboration.role,
+          collaboration_permissions: collaboration.permissions
+        } as any
+      }
+    }
 
     if (!userShop) {
       // L'utilisateur n'a pas acces a cette boutique

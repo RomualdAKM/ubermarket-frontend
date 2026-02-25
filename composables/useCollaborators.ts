@@ -118,15 +118,15 @@ export function useCollaborators() {
     return data
   }
 
-  // State
-  const collaborators = ref<Collaborator[]>([])
-  const stats = ref<CollaboratorStats | null>(null)
-  const limits = ref<CollaboratorLimits | null>(null)
-  const roles = ref<RoleInfo[]>([])
-  const permissions = ref<Record<string, Permission[]>>({})
-  const myCollaborations = ref<CollaborationShop[]>([])
-  const loading = ref(false)
-  const error = ref<string | null>(null)
+  // State - utiliser useState pour partager l'état globalement
+  const collaborators = useState<Collaborator[]>('collaborators.list', () => [])
+  const stats = useState<CollaboratorStats | null>('collaborators.stats', () => null)
+  const limits = useState<CollaboratorLimits | null>('collaborators.limits', () => null)
+  const roles = useState<RoleInfo[]>('collaborators.roles', () => [])
+  const permissions = useState<Record<string, Permission[]>>('collaborators.permissions', () => ({}))
+  const myCollaborations = useState<CollaborationShop[]>('collaborators.myCollaborations', () => [])
+  const loading = useState<boolean>('collaborators.loading', () => false)
+  const error = useState<string | null>('collaborators.error', () => null)
 
   /**
    * Obtenir la liste des rôles disponibles
