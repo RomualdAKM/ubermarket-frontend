@@ -31,7 +31,9 @@
       <nav class="h-[calc(100vh-4rem)] overflow-y-auto py-4 px-3">
         <!-- Menu principal -->
         <div class="space-y-1">
+          <!-- Tableau de bord -->
           <NuxtLink 
+            v-if="canViewDashboard"
             :to="getDashboardLink()" 
             class="sidebar-link group flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-all"
             :class="[isSidebarOpen ? '' : 'justify-center', 'text-slate-600 hover:text-slate-900 hover:bg-white']"
@@ -57,7 +59,7 @@
 
           <!-- Pages (Website) -->
           <NuxtLink 
-            v-if="isWebsiteShop"
+            v-if="isWebsiteShop && canViewPages"
             :to="getDashboardLink('pages')" 
             class="sidebar-link group flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-all"
             :class="[isSidebarOpen ? '' : 'justify-center', 'text-slate-600 hover:text-slate-900 hover:bg-white']"
@@ -71,7 +73,7 @@
 
           <!-- Produits (E-commerce) -->
           <NuxtLink 
-            v-if="!isWebsiteShop"
+            v-if="!isWebsiteShop && canViewProducts"
             :to="getDashboardLink('products/produits')" 
             class="sidebar-link group flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-all"
             :class="[isSidebarOpen ? '' : 'justify-center', 'text-slate-600 hover:text-slate-900 hover:bg-white']"
@@ -105,7 +107,9 @@
             :class="expandedSections.gestion ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'"
           >
             <div class="space-y-1 pt-1">
+              <!-- Commandes -->
               <NuxtLink 
+                v-if="canViewOrders"
                 :to="getDashboardLink('orders/commandes')" 
                 class="sidebar-link group flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-all"
                 :class="[isSidebarOpen ? '' : 'justify-center', 'text-slate-600 hover:text-slate-900 hover:bg-white']"
@@ -117,7 +121,9 @@
                 <span :class="isSidebarOpen ? '' : 'lg:hidden'">Commandes</span>
               </NuxtLink>
 
+              <!-- Clients -->
               <NuxtLink 
+                v-if="canViewCustomers"
                 :to="getDashboardLink('customers/clients')" 
                 class="sidebar-link group flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-all"
                 :class="[isSidebarOpen ? '' : 'justify-center', 'text-slate-600 hover:text-slate-900 hover:bg-white']"
@@ -129,7 +135,9 @@
                 <span :class="isSidebarOpen ? '' : 'lg:hidden'">Clients</span>
               </NuxtLink>
 
+              <!-- Codes promo -->
               <NuxtLink 
+                v-if="canViewPromoCodes"
                 :to="getDashboardLink('discount-code/codes-promo')" 
                 class="sidebar-link group flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-all"
                 :class="[isSidebarOpen ? '' : 'justify-center', hasPromoModule ? 'text-slate-600 hover:text-slate-900 hover:bg-white' : 'text-slate-400']"
@@ -145,8 +153,9 @@
                 </span>
               </NuxtLink>
 
+              <!-- Stocks -->
               <NuxtLink 
-                v-if="isPhysicalShop"
+                v-if="isPhysicalShop && canViewStock"
                 :to="getDashboardLink('inventory/stocks')" 
                 class="sidebar-link group flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-all"
                 :class="[isSidebarOpen ? '' : 'justify-center', 'text-slate-600 hover:text-slate-900 hover:bg-white']"
@@ -158,7 +167,9 @@
                 <span :class="isSidebarOpen ? '' : 'lg:hidden'">Stocks</span>
               </NuxtLink>
 
+              <!-- Avis clients -->
               <NuxtLink 
+                v-if="canViewReviews"
                 :to="getDashboardLink('feedback/avis')" 
                 class="sidebar-link group flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-all"
                 :class="[isSidebarOpen ? '' : 'justify-center', 'text-slate-600 hover:text-slate-900 hover:bg-white']"
@@ -194,7 +205,9 @@
             :class="expandedSections.livraison ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'"
           >
             <div class="space-y-1 pt-1">
+              <!-- Livraisons -->
               <NuxtLink 
+                v-if="canViewDeliveries"
                 :to="getDashboardLink('deliveries/livraisons')" 
                 class="sidebar-link group flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-all"
                 :class="[isSidebarOpen ? '' : 'justify-center', hasDeliveryModule ? 'text-slate-600 hover:text-slate-900 hover:bg-white' : 'text-slate-400']"
@@ -209,7 +222,9 @@
                 </span>
               </NuxtLink>
 
+              <!-- Livreurs -->
               <NuxtLink 
+                v-if="canViewCouriers"
                 :to="getDashboardLink('couriers/livreurs')" 
                 class="sidebar-link group flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-all"
                 :class="[isSidebarOpen ? '' : 'justify-center', 'text-slate-600 hover:text-slate-900 hover:bg-white']"
@@ -245,7 +260,9 @@
             :class="expandedSections.parametres ? 'max-h-[500px] opacity-100' : 'max-h-0 opacity-0'"
           >
             <div class="space-y-1 pt-1">
+            <!-- Personnalisation -->
             <NuxtLink 
+              v-if="canViewCustomization"
               :to="getDashboardLink('customizations/personnalisation')" 
               class="sidebar-link group flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-all"
               :class="[isSidebarOpen ? '' : 'justify-center', 'text-slate-600 hover:text-slate-900 hover:bg-white']"
@@ -257,7 +274,9 @@
               <span :class="isSidebarOpen ? '' : 'lg:hidden'">Personnalisation</span>
             </NuxtLink>
 
+            <!-- Abonnement (propriétaire uniquement) -->
             <NuxtLink 
+              v-if="canViewSubscription"
               :to="getDashboardLink('subscription/abonnement')" 
               class="sidebar-link group flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-all"
               :class="[isSidebarOpen ? '' : 'justify-center', 'text-slate-600 hover:text-slate-900 hover:bg-white']"
@@ -269,7 +288,9 @@
               <span :class="isSidebarOpen ? '' : 'lg:hidden'">Abonnement</span>
             </NuxtLink>
 
+            <!-- Marketing -->
             <NuxtLink 
+              v-if="canViewMarketing"
               :to="getDashboardLink('marketing/marketing')" 
               class="sidebar-link group flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-all"
               :class="[isSidebarOpen ? '' : 'justify-center', hasMarketingModule ? 'text-slate-600 hover:text-slate-900 hover:bg-white' : 'text-slate-400']"
@@ -284,7 +305,9 @@
               </span>
             </NuxtLink>
 
+            <!-- Retraits -->
             <NuxtLink 
+              v-if="canViewWithdrawals"
               :to="getDashboardLink('withdrawal/retraits')" 
               class="sidebar-link group flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-all"
               :class="[isSidebarOpen ? '' : 'justify-center', 'text-slate-600 hover:text-slate-900 hover:bg-white']"
@@ -296,7 +319,9 @@
               <span :class="isSidebarOpen ? '' : 'lg:hidden'">Retraits</span>
             </NuxtLink>
 
+            <!-- Affiliation (propriétaire uniquement) -->
             <NuxtLink 
+              v-if="canViewAffiliation"
               :to="getDashboardLink('affiliation')"
               class="sidebar-link group flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-all"
               :class="[isSidebarOpen ? '' : 'justify-center', 'text-slate-600 hover:text-slate-900 hover:bg-white']"
@@ -308,7 +333,9 @@
               <span :class="isSidebarOpen ? '' : 'lg:hidden'">Affiliation</span>
             </NuxtLink>
 
+            <!-- Équipe -->
             <NuxtLink 
+              v-if="canViewTeam"
               :to="getDashboardLink('team/collaborateurs')" 
               class="sidebar-link group flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-all"
               :class="[isSidebarOpen ? '' : 'justify-center', hasCollaboratorsAccess ? 'text-slate-600 hover:text-slate-900 hover:bg-white' : 'text-slate-400']"
@@ -323,7 +350,9 @@
               </span>
             </NuxtLink>
 
+            <!-- Paramètres -->
             <NuxtLink 
+              v-if="canViewSettings"
               :to="getDashboardLink('settings/parametres')" 
               class="sidebar-link group flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-all"
               :class="[isSidebarOpen ? '' : 'justify-center', 'text-slate-600 hover:text-slate-900 hover:bg-white']"
@@ -452,10 +481,34 @@ import { ref, onMounted, onUnmounted, computed } from 'vue'
 import { useSubscription } from '~/composables/useSubscription'
 
 // Recuperation de la boutique courante et de l'utilisateur
-const { currentShop } = useShops()
+const { currentShop, currentAccess, hasPermission, hasAnyPermission } = useShops()
 const { user, logout } = useAuth()
 const router = useRouter()
 const config = useRuntimeConfig()
+
+// ===== Vérifications de permissions pour les menus =====
+// Le propriétaire a accès à tout, les collaborateurs selon leurs permissions
+
+const canViewDashboard = computed(() => hasAnyPermission(['analytics.view', 'orders.view']))
+const canViewProducts = computed(() => hasPermission('products.view'))
+const canViewOrders = computed(() => hasPermission('orders.view'))
+const canViewCustomers = computed(() => hasPermission('customers.view'))
+const canViewPromoCodes = computed(() => hasPermission('promos.view'))
+const canViewStock = computed(() => hasPermission('products.view')) // Stock lié aux produits
+const canViewReviews = computed(() => hasPermission('reviews.view'))
+const canViewDeliveries = computed(() => hasPermission('deliveries.view'))
+const canViewCouriers = computed(() => hasPermission('deliveries.view'))
+const canViewCustomization = computed(() => hasPermission('settings.view'))
+const canViewSubscription = computed(() => currentAccess.value?.is_owner ?? false) // Propriétaire uniquement
+const canViewMarketing = computed(() => hasPermission('settings.view'))
+const canViewWithdrawals = computed(() => hasPermission('withdrawals.view'))
+const canViewAffiliation = computed(() => currentAccess.value?.is_owner ?? false) // Propriétaire uniquement
+const canViewTeam = computed(() => hasPermission('collaborators.view'))
+const canViewSettings = computed(() => hasPermission('settings.view'))
+const canViewPages = computed(() => hasPermission('pages.view'))
+
+// Indicateur si c'est un collaborateur (pour afficher les restrictions)
+const isCollaborator = computed(() => currentAccess.value?.is_collaborator ?? false)
 
 // Menu utilisateur
 const showUserMenu = ref(false)

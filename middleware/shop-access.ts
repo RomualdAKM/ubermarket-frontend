@@ -5,7 +5,7 @@ export default defineNuxtRouteMiddleware(async (to) => {
   }
 
   const { isAuthenticated, token, initAuth } = useAuth()
-  const { shops, fetchShops, setCurrentShop } = useShops()
+  const { shops, fetchShops, setCurrentShop, fetchShopDetails, currentAccess } = useShops()
   const { myCollaborations, fetchMyCollaborations } = useCollaborators()
 
   // Cote client : s'assurer que l'auth est initialisee depuis localStorage
@@ -26,55 +26,77 @@ export default defineNuxtRouteMiddleware(async (to) => {
   }
 
   try {
-    // Recuperer les boutiques proprietaires et collaboratives si pas encore fait
-    const promises: Promise<any>[] = []
-    
-    if (shops.value.length === 0) {
-      promises.push(fetchShops())
-    }
-    
-    if (myCollaborations.value.length === 0) {
-      promises.push(fetchMyCollaborations())
-    }
-    
-    if (promises.length > 0) {
-      await Promise.all(promises)
-    }
-
-    // Verifier que l'utilisateur a acces a cette boutique
     const requestedSlug = to.params.slug as string
     
-    // Chercher dans les boutiques proprietaires
-    let userShop = shops.value.find(shop => shop.slug === requestedSlug)
+    // Charger les détails de la boutique avec les permissions depuis l'API
+    // Cette méthode appelle le backend qui vérifie l'accès et retourne les permissions
+    let accessLoaded = false
+    try {
+      accessLoaded = await fetchShopDetails(requestedSlug)
+    } catch (apiError) {
+      // L'API a retourné une erreur (probablement 403 non autorisé)
+      console.warn('API fetchShopDetails échoué, tentative de fallback...', apiError)
+    }
     
-    // Si pas trouve, chercher dans les collaborations
-    if (!userShop) {
-      const collaboration = myCollaborations.value.find(c => c.shop.slug === requestedSlug)
-      if (collaboration) {
-        // Creer un objet shop compatible depuis la collaboration
-        userShop = {
-          id: collaboration.shop.id,
-          name: collaboration.shop.name,
-          slug: collaboration.shop.slug,
-          logo: collaboration.shop.logo,
-          // Marquer comme collaboration pour reference
-          is_collaboration: true,
-          collaboration_role: collaboration.role,
-          collaboration_permissions: collaboration.permissions
-        } as any
+    // Vérifier si les permissions ont été chargées
+    if (!accessLoaded || !currentAccess.value) {
+      // Fallback : vérifier l'accès localement
+      const promises: Promise<any>[] = []
+      
+      if (shops.value.length === 0) {
+        promises.push(fetchShops())
       }
-    }
+      
+      if (myCollaborations.value.length === 0) {
+        promises.push(fetchMyCollaborations())
+      }
+      
+      if (promises.length > 0) {
+        await Promise.all(promises)
+      }
 
-    if (!userShop) {
-      // L'utilisateur n'a pas acces a cette boutique
-      throw createError({
-        statusCode: 403,
-        statusMessage: 'Acces non autorise a cette boutique'
-      })
-    }
+      // Chercher dans les boutiques proprietaires
+      let userShop = shops.value.find(shop => shop.slug === requestedSlug)
+      let access = null
+      
+      if (userShop) {
+        // Propriétaire - toutes les permissions
+        access = {
+          is_owner: true,
+          is_collaborator: false,
+          role: 'owner',
+          permissions: []
+        }
+      } else {
+        // Chercher dans les collaborations
+        const collaboration = myCollaborations.value.find(c => c.shop.slug === requestedSlug)
+        if (collaboration) {
+          userShop = {
+            id: collaboration.shop.id,
+            name: collaboration.shop.name,
+            slug: collaboration.shop.slug,
+            logo: collaboration.shop.logo,
+            is_collaboration: true
+          } as any
+          
+          access = {
+            is_owner: false,
+            is_collaborator: true,
+            role: collaboration.role?.code || 'collaborator',
+            permissions: collaboration.permissions || []
+          }
+        }
+      }
 
-    // Stocker la boutique courante
-    setCurrentShop(userShop)
+      if (!userShop) {
+        throw createError({
+          statusCode: 403,
+          statusMessage: 'Acces non autorise a cette boutique'
+        })
+      }
+
+      setCurrentShop(userShop, access)
+    }
 
   } catch (error) {
     console.error('Erreur lors de la validation du slug:', error)
