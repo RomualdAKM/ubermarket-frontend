@@ -16,7 +16,7 @@
 
     <!-- Filtres -->
     <div class="bg-white p-4 mb-6 rounded-md">
-      <div class="grid grid-cols-1 md:grid-cols-4 gap-3">
+      <div class="grid grid-cols-1 md:grid-cols-5 gap-3">
         <div>
           <label for="status" class="block text-sm font-medium text-gray-700">Statut commande</label>
           <select 
@@ -43,9 +43,23 @@
           >
             <option value="">Tous</option>
             <option value="pending">En attente</option>
+            <option value="partially_paid">Partiellement payé</option>
             <option value="paid">Payé</option>
             <option value="failed">Échoué</option>
             <option value="refunded">Remboursé</option>
+          </select>
+        </div>
+
+        <div>
+          <label for="order_type" class="block text-sm font-medium text-gray-700">Type</label>
+          <select 
+            v-model="filters.order_type" 
+            @change="loadOrders"
+            class="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-secondary focus:border-secondary"
+          >
+            <option value="">Tous</option>
+            <option value="standard">Standard</option>
+            <option value="preorder">Précommande</option>
           </select>
         </div>
 
@@ -104,7 +118,12 @@
           <tbody class="bg-white divide-y divide-gray-200">
             <tr v-for="order in orders" :key="order.id">
               <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                {{ order.order_number }}
+                <div class="flex items-center gap-2">
+                  {{ order.order_number }}
+                  <span v-if="order.is_preorder" class="px-2 py-0.5 text-xs font-medium rounded-full bg-purple-100 text-purple-800">
+                    Précommande
+                  </span>
+                </div>
               </td>
               <td class="px-6 py-4 whitespace-nowrap">
                 <div class="text-sm font-medium text-gray-900">{{ order.customer_name }}</div>
@@ -114,7 +133,10 @@
                 {{ formatDate(order.created_at) }}
               </td>
               <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                {{ formatPrice(order.total_amount, order.currency) }}
+                <div>{{ formatPrice(order.total_amount, order.currency) }}</div>
+                <div v-if="order.amount_remaining > 0" class="text-xs text-orange-600">
+                  Reste: {{ formatPrice(order.amount_remaining, order.currency) }}
+                </div>
               </td>
               <td class="px-6 py-4 whitespace-nowrap">
                 <span :class="getPaymentStatusClass(order.payment_status)">
@@ -379,6 +401,20 @@
                   <span class="text-gray-900">Total</span>
                   <span class="text-gray-900">{{ formatPrice(selectedOrder.total_amount, selectedOrder.currency) }}</span>
                 </div>
+                <!-- Infos précommande -->
+                <div v-if="selectedOrder.is_preorder" class="mt-3 pt-3 border-t border-gray-200">
+                  <div class="flex items-center gap-2 mb-2">
+                    <span class="px-2 py-0.5 text-xs font-medium rounded-full bg-purple-100 text-purple-800">Précommande</span>
+                  </div>
+                  <div class="flex justify-between text-sm">
+                    <span class="text-gray-600">Montant payé</span>
+                    <span class="text-green-600 font-medium">{{ formatPrice(selectedOrder.amount_paid || 0, selectedOrder.currency) }}</span>
+                  </div>
+                  <div v-if="selectedOrder.amount_remaining > 0" class="flex justify-between text-sm mt-1">
+                    <span class="text-gray-600">Reste à payer</span>
+                    <span class="text-orange-600 font-medium">{{ formatPrice(selectedOrder.amount_remaining, selectedOrder.currency) }}</span>
+                  </div>
+                </div>
               </div>
             </div>
 
@@ -425,6 +461,7 @@ const currentShopId = computed(() => currentShop.value?.id)
 const filters = ref({
   status: '',
   payment_status: '',
+  order_type: '',
   search: '',
   sort_by: 'created_at',
   sort_order: 'desc' as 'asc' | 'desc',
@@ -652,6 +689,7 @@ const getOrderStatusClass = (status: string) => {
 const getPaymentStatusLabel = (status: string) => {
   const labels: Record<string, string> = {
     pending: 'En attente',
+    partially_paid: 'Partiellement payé',
     paid: 'Payé',
     failed: 'Échoué',
     refunded: 'Remboursé'
@@ -662,6 +700,7 @@ const getPaymentStatusLabel = (status: string) => {
 const getPaymentStatusClass = (status: string) => {
   const classes: Record<string, string> = {
     pending: 'px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800',
+    partially_paid: 'px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-orange-100 text-orange-800',
     paid: 'px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800',
     failed: 'px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800',
     refunded: 'px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-100 text-gray-800'

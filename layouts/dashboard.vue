@@ -604,17 +604,7 @@ const isWebsiteShop = computed(() => currentShop.value?.shop_type === 'website')
 // Fonction pour obtenir l'URL publique du site de la boutique
 const getShopPublicUrl = (): string => {
   if (!currentShop.value?.subdomain) return '#'
-  
-  if (typeof window !== 'undefined') {
-    const currentHost = window.location.host
-    // Extraire le domaine principal (ex: fga-numerik.fr depuis dashboard.fga-numerik.fr)
-    const mainDomain = currentHost.replace(/^[^.]+\./, '')
-    const protocol = window.location.protocol
-    return `${protocol}//${currentShop.value.subdomain}.${mainDomain}`
-  }
-  
-  // Fallback pour SSR
-  return `https://${currentShop.value.subdomain}.fga-numerik.fr`
+  return `/boutique/${currentShop.value.subdomain}`
 }
 
 // Fonction pour obtenir l'URL du logo

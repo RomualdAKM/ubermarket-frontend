@@ -39,7 +39,12 @@ export interface ProductData {
   preview_image?: string // Champ qui existe en DB
   status: 'active' | 'inactive' | 'draft'
   show_sales_count: boolean
-  // Champs supprimés car inexistants en DB: sku, weight, dimensions, download_limit, download_expiry_days, show_reviews
+  // Champs précommande
+  availability_type?: 'in_stock' | 'preorder'
+  preorder_payment_type?: 'none' | 'deposit' | 'full' | null
+  deposit_amount?: number | null
+  deposit_percentage?: number | null
+  // Champs supprimes car inexistants en DB: sku, weight, dimensions, download_limit, download_expiry_days, show_reviews
   variants: ProductVariant[]
   images: ProductImage[] // Pour le formulaire, on garde images pour la compatibilité
 }
@@ -61,6 +66,12 @@ export interface Product {
   sales_count: number // Champ qui existe en DB
   status: 'active' | 'inactive' | 'draft'
   is_marketplace_approved: boolean // Champ qui existe en DB
+  // Champs précommande
+  availability_type: 'in_stock' | 'preorder'
+  preorder_payment_type?: 'none' | 'deposit' | 'full' | null
+  deposit_amount?: number | null
+  deposit_percentage?: number | null
+  minimum_deposit?: number | null // Calculé par le backend (accessor)
   created_at: string
   updated_at: string
   // Relations

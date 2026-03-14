@@ -16,13 +16,17 @@ export interface VendorOrder {
   discount_amount: number
   total_amount: number
   currency: string
-  payment_status: 'pending' | 'paid' | 'failed' | 'refunded'
+  payment_status: 'pending' | 'partially_paid' | 'paid' | 'failed' | 'refunded'
   payment_method: string | null
   order_status: 'pending' | 'confirmed' | 'processing' | 'shipped' | 'delivered' | 'cancelled'
   delivery_method: 'pickup' | 'delivery' | 'partner'
   tracking_code: string | null
   notes: string | null
   promo_code_id: number | null
+  // Précommande
+  is_preorder: boolean
+  amount_paid: number
+  amount_remaining: number
   created_at: string
   updated_at: string
   order_items?: any[]
@@ -33,6 +37,7 @@ export interface VendorOrder {
 export interface OrdersFilters {
   status?: string
   payment_status?: string
+  order_type?: string
   search?: string
   sort_by?: string
   sort_order?: 'asc' | 'desc'

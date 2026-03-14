@@ -170,6 +170,23 @@
               <div v-else>
                 <!-- Totaux (affichés en haut quand connecté) -->
                 <div class="space-y-3 mb-6 pb-6 border-b border-gray-200">
+                  <!-- Message précommande -->
+                  <div v-if="hasPreorderProducts" class="p-3 bg-amber-50 border border-amber-200 rounded-md mb-3">
+                    <div class="flex">
+                      <svg class="h-5 w-5 text-amber-400 mr-2 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                      </svg>
+                      <div>
+                        <p class="text-sm font-medium text-amber-800">Précommande</p>
+                        <p class="text-xs text-amber-700">
+                          <span v-if="preorderPaymentInfo?.paymentType === 'none'">Certains produits sont en précommande. Vous serez contacté quand ils seront disponibles.</span>
+                          <span v-else-if="preorderPaymentInfo?.paymentType === 'deposit'">Un acompte de {{ preorderPaymentInfo.totalDeposit.toLocaleString('fr-FR') }} {{ shop?.currency || 'XOF' }} est requis.</span>
+                          <span v-else>Le paiement intégral est requis pour les produits en précommande.</span>
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                  
                   <div class="flex justify-between text-gray-600">
                     <span>Sous-total</span>
                     <span class="text-gray-900">{{ formatPrice(subtotal) }}</span>
@@ -481,6 +498,38 @@ const footerSocialLinks = computed(() => {
 
 // Déterminer si la boutique vend des produits digitaux
 const isDigitalShop = computed(() => props.shop?.product_type === 'digital')
+
+// Détecter les produits en précommande dans le panier
+const hasPreorderProducts = computed(() => {
+  return cartItems.value.some((item: any) => item.product?.availability_type === 'preorder')
+})
+
+// Type de paiement requis pour les précommandes
+const preorderPaymentInfo = computed(() => {
+  const preorderItems = cartItems.value.filter((item: any) => item.product?.availability_type === 'preorder')
+  if (preorderItems.length === 0) return null
+  
+  let paymentType: 'none' | 'deposit' | 'full' = 'none'
+  let totalDeposit = 0
+  
+  for (const item of preorderItems) {
+    const product = item.product
+    if (product.preorder_payment_type === 'full') {
+      paymentType = 'full'
+    } else if (product.preorder_payment_type === 'deposit' && paymentType !== 'full') {
+      paymentType = 'deposit'
+      // Calculer l'acompte
+      const basePrice = product.promotional_price || product.price
+      if (product.deposit_percentage) {
+        totalDeposit += Math.round((basePrice * product.deposit_percentage) / 100) * item.quantity
+      } else if (product.deposit_amount) {
+        totalDeposit += product.deposit_amount * item.quantity
+      }
+    }
+  }
+  
+  return { paymentType, totalDeposit }
+})
 
 // État
 const isUpdating = ref<number | null>(null)
@@ -798,8 +847,11 @@ const handleCreateOrder = async () => {
     const order = await createOrder(shopSubdomain.value, orderData)
     
     if (order) {
-      // Si paiement en ligne, initialiser le paiement
-      if (selectedPaymentMethod.value !== 'cash_on_delivery') {
+      // Vérifier si c'est une précommande sans paiement
+      const isPreorderNone = hasPreorderProducts.value && preorderPaymentInfo.value?.paymentType === 'none'
+      
+      // Si paiement en ligne ET pas une précommande sans paiement, initialiser le paiement
+      if (selectedPaymentMethod.value !== 'cash_on_delivery' && !isPreorderNone) {
         try {
           // Construire l'URL de retour de base
           // Le backend ajoutera automatiquement le payment_id
@@ -824,8 +876,9 @@ const handleCreateOrder = async () => {
           errorMessage.value = paymentErr.message || 'Erreur lors de l\'initialisation du paiement'
         }
       } else {
-        // Paiement à la livraison - flux normal
-        successMessage.value = 'Commande créée avec succès !'
+        // Paiement à la livraison OU précommande sans paiement - flux normal
+        const messageType = isPreorderNone ? 'Précommande' : 'Commande'
+        successMessage.value = `${messageType} créée avec succès !`
         
         setTimeout(() => {
           fetchCart(shopSubdomain.value)

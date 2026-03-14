@@ -196,6 +196,105 @@
             </div>
           </div>
 
+          <!-- Disponibilité / Précommande (uniquement pour les produits physiques) -->
+          <div v-if="isPhysicalShop" class="border-b border-gray-200 pb-6 mb-6">
+            <h2 class="text-lg font-semibold text-gray-900 mb-4">Disponibilité</h2>
+            
+            <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">
+                  Type de disponibilité
+                </label>
+                <select
+                  v-model="productForm.availability_type"
+                  class="mt-1 block w-full px-3 py-2 border-0 border-b-2 border-gray-300 text-gray-900 focus:outline-none focus:ring-0 focus:border-primary transition-colors duration-200"
+                >
+                  <option value="in_stock">En stock</option>
+                  <option value="preorder">Précommande</option>
+                </select>
+                <p class="mt-1 text-xs text-gray-500">
+                  Précommande : les clients peuvent commander même si le produit n'est pas encore disponible
+                </p>
+              </div>
+              
+              <!-- Options de précommande -->
+              <template v-if="productForm.availability_type === 'preorder'">
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-1">
+                    Paiement requis
+                  </label>
+                  <select
+                    v-model="productForm.preorder_payment_type"
+                    class="mt-1 block w-full px-3 py-2 border-0 border-b-2 border-gray-300 text-gray-900 focus:outline-none focus:ring-0 focus:border-primary transition-colors duration-200"
+                  >
+                    <option value="none">Aucun paiement à la commande</option>
+                    <option value="deposit">Acompte à la commande</option>
+                    <option value="full">Paiement intégral à la commande</option>
+                  </select>
+                </div>
+                
+                <!-- Options d'acompte -->
+                <template v-if="productForm.preorder_payment_type === 'deposit'">
+                  <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">
+                      Type d'acompte
+                    </label>
+                    <div class="flex gap-4 mt-2">
+                      <label class="flex items-center">
+                        <input
+                          type="radio"
+                          v-model="depositType"
+                          value="percentage"
+                          class="h-4 w-4 text-primary focus:ring-primary border-gray-300"
+                        />
+                        <span class="ml-2 text-sm text-gray-700">Pourcentage</span>
+                      </label>
+                      <label class="flex items-center">
+                        <input
+                          type="radio"
+                          v-model="depositType"
+                          value="fixed"
+                          class="h-4 w-4 text-primary focus:ring-primary border-gray-300"
+                        />
+                        <span class="ml-2 text-sm text-gray-700">Montant fixe</span>
+                      </label>
+                    </div>
+                  </div>
+                  
+                  <div v-if="depositType === 'percentage'">
+                    <label class="block text-sm font-medium text-gray-700 mb-1">
+                      Pourcentage d'acompte
+                    </label>
+                    <div class="flex items-center gap-2">
+                      <input
+                        type="number"
+                        v-model.number="productForm.deposit_percentage"
+                        min="1"
+                        max="100"
+                        class="mt-1 block w-full px-3 py-2 border-0 border-b-2 border-gray-300 text-gray-900 focus:outline-none focus:ring-0 focus:border-primary transition-colors duration-200"
+                        placeholder="Ex. : 30"
+                      />
+                      <span class="text-gray-500">%</span>
+                    </div>
+                  </div>
+                  
+                  <div v-else-if="depositType === 'fixed'">
+                    <label class="block text-sm font-medium text-gray-700 mb-1">
+                      Montant de l'acompte ({{ currentShop?.currency || 'XOF' }})
+                    </label>
+                    <input
+                      type="number"
+                      v-model.number="productForm.deposit_amount"
+                      min="0"
+                      class="mt-1 block w-full px-3 py-2 border-0 border-b-2 border-gray-300 text-gray-900 focus:outline-none focus:ring-0 focus:border-primary transition-colors duration-200"
+                      placeholder="Ex. : 5000"
+                    />
+                  </div>
+                </template>
+              </template>
+            </div>
+          </div>
+
           <!-- Statut du produit -->
           <div class="pb-6">
             <h2 class="text-lg font-semibold text-gray-900 mb-4">Statut du produit</h2>
@@ -311,9 +410,17 @@ const productForm = reactive<ProductData>({
   digital_file: undefined,
   status: 'active',
   show_sales_count: false,
+  // Champs précommande
+  availability_type: 'in_stock',
+  preorder_payment_type: null,
+  deposit_amount: null,
+  deposit_percentage: null,
   variants: [],
   images: []
 })
+
+// Type d'acompte (pourcentage ou montant fixe)
+const depositType = ref<'percentage' | 'fixed'>('percentage')
 
 const isPhysicalShop = computed(() => {
   return currentShop.value?.product_type === 'physical'
@@ -383,6 +490,17 @@ const loadProductData = async () => {
       productForm.stock_quantity = product.stock_quantity
       productForm.status = product.status
       productForm.show_sales_count = product.show_sales_count
+      // Champs précommande
+      productForm.availability_type = product.availability_type || 'in_stock'
+      productForm.preorder_payment_type = product.preorder_payment_type || null
+      productForm.deposit_amount = product.deposit_amount || null
+      productForm.deposit_percentage = product.deposit_percentage || null
+      // Déterminer le type d'acompte
+      if (product.deposit_percentage) {
+        depositType.value = 'percentage'
+      } else if (product.deposit_amount) {
+        depositType.value = 'fixed'
+      }
     } else {
       throw new Error('Produit introuvable')
     }

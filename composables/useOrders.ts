@@ -27,8 +27,11 @@ export interface Order {
   shipping_cost: number
   discount_amount: number
   total_amount: number
+  amount_paid: number
+  amount_remaining: number
+  is_preorder: boolean
   currency: string
-  payment_status: 'pending' | 'paid' | 'failed' | 'refunded'
+  payment_status: 'pending' | 'partially_paid' | 'paid' | 'failed' | 'refunded'
   payment_method: string
   order_status: 'pending' | 'confirmed' | 'processing' | 'shipped' | 'delivered' | 'cancelled'
   delivery_method: 'pickup' | 'delivery' | 'partner'
@@ -211,6 +214,87 @@ export const useOrders = () => {
     }
   }
 
+  /**
+   * Récupérer les informations de paiement pour compléter une commande
+   */
+  const getOrderPaymentInfo = async (orderId: number): Promise<any | null> => {
+    isLoading.value = true
+    error.value = null
+
+    try {
+      const response = await apiRequest<any>(`/client/orders/${orderId}/complete-payment`, {
+        method: 'POST'
+      })
+
+      if (response.success) {
+        return response.order
+      }
+
+      return null
+    } catch (err: any) {
+      error.value = err.message
+      console.error('Erreur getOrderPaymentInfo:', err)
+      return null
+    } finally {
+      isLoading.value = false
+    }
+  }
+
+  /**
+   * Payer le solde restant d'une commande (précommande)
+   * Retourne les infos pour initier le paiement
+   */
+  const completePayment = async (orderId: number, paymentMethod?: string): Promise<{ payment_url?: string, order?: Order, payment_info?: any } | null> => {
+    isLoading.value = true
+    error.value = null
+
+    try {
+      // Étape 1: Récupérer les infos de paiement
+      const infoResponse = await apiRequest<any>(`/client/orders/${orderId}/complete-payment`, {
+        method: 'POST'
+      })
+
+      if (!infoResponse.success || !infoResponse.payment_info) {
+        return null
+      }
+
+      // Étape 2: Initialiser le paiement avec le montant restant
+      const paymentResponse = await apiRequest<any>('/payments/initialize', {
+        method: 'POST',
+        body: JSON.stringify({
+          order_id: orderId,
+          payment_method: paymentMethod || infoResponse.order.payment_method || 'mobile_money',
+          amount: infoResponse.payment_info.amount,
+          return_url: infoResponse.payment_info.return_url
+        })
+      })
+
+      if (paymentResponse.success && paymentResponse.checkout_url) {
+        return {
+          payment_url: paymentResponse.checkout_url,
+          order: infoResponse.order
+        }
+      }
+
+      return null
+    } catch (err: any) {
+      error.value = err.message
+      console.error('Erreur completePayment:', err)
+      return null
+    } finally {
+      isLoading.value = false
+    }
+  }
+
+  /**
+   * Vérifier si une commande peut recevoir un paiement complémentaire
+   */
+  const canCompletePayment = (order: Order): boolean => {
+    return order.amount_remaining > 0 
+      && ['pending', 'partially_paid'].includes(order.payment_status)
+      && !['cancelled'].includes(order.order_status)
+  }
+
   return {
     // State
     orders,
@@ -222,6 +306,9 @@ export const useOrders = () => {
     createOrder,
     fetchMyOrders,
     fetchOrderDetails,
-    cancelOrder
+    cancelOrder,
+    getOrderPaymentInfo,
+    completePayment,
+    canCompletePayment
   }
 }

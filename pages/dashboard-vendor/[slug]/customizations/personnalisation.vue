@@ -353,12 +353,12 @@
               id="about-text"
               v-model="aboutPage.text"
               rows="5"
-              maxlength="1000"
+              maxlength="5000"
                class="mt-1 block w-full px-3 py-2 border-0 border-b-2 border-gray-300 placeholder-gray-300 placeholder:italic text-gray-900 focus:outline-none focus:ring-0 focus:border-primary transition-colors duration-200"
               placeholder="Décrivez votre entreprise, votre mission, vos valeurs..."
             ></textarea>
             <div class="text-right text-sm text-gray-500 mt-1">
-              {{ aboutPage.text.length }}/1000
+              {{ aboutPage.text.length }}/5000
             </div>
           </div>
           

@@ -74,6 +74,22 @@ export const useProducts = () => {
       // stock_quantity est maintenant obligatoire
       formData.append('stock_quantity', productData.stock_quantity.toString())
 
+      // Champs précommande
+      if (productData.availability_type) {
+        formData.append('availability_type', productData.availability_type)
+      }
+      if (productData.availability_type === 'preorder' && productData.preorder_payment_type) {
+        formData.append('preorder_payment_type', productData.preorder_payment_type)
+        if (productData.preorder_payment_type === 'deposit') {
+          if (productData.deposit_amount) {
+            formData.append('deposit_amount', productData.deposit_amount.toString())
+          }
+          if (productData.deposit_percentage) {
+            formData.append('deposit_percentage', productData.deposit_percentage.toString())
+          }
+        }
+      }
+
       // Ajouter le fichier numérique si présent
       if (productData.digital_file) {
         formData.append('digital_file', productData.digital_file)

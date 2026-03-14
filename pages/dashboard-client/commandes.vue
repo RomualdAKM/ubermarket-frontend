@@ -75,6 +75,9 @@
                 >
                   {{ getPaymentStatusLabel(order.payment_status) }}
                 </span>
+                <span v-if="order.is_preorder" class="px-2 py-1 text-xs font-medium rounded-full bg-purple-100 text-purple-800">
+                  Précommande
+                </span>
               </div>
               <div class="text-sm text-gray-600 space-y-1">
                 <p>Boutique: <strong>{{ order.shop?.name || 'N/A' }}</strong></p>
@@ -88,6 +91,9 @@
             <div class="text-right">
               <div class="text-lg font-medium text-gray-900 mb-1">{{ formatPrice(order.total_amount, order.currency) }}</div>
               <div class="text-sm text-gray-600">{{ order.order_items?.length || 0 }} article(s)</div>
+              <div v-if="order.amount_remaining > 0" class="text-sm text-orange-600 mt-1">
+                Reste à payer: {{ formatPrice(order.amount_remaining, order.currency) }}
+              </div>
             </div>
           </div>
           
@@ -161,6 +167,19 @@
                 Voir les détails
               </button>
             </div>
+            
+            <!-- Bouton payer le solde -->
+            <button 
+              v-if="order.amount_remaining > 0 && order.order_status !== 'cancelled'"
+              @click="handlePayRemaining(order)"
+              :disabled="isPayingRemaining"
+              class="px-4 py-2 bg-gradient-to-r from-orange-500 to-orange-600 text-white text-sm rounded-lg hover:from-orange-600 hover:to-orange-700 disabled:opacity-50 flex items-center gap-2"
+            >
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
+              </svg>
+              Payer le solde ({{ formatPrice(order.amount_remaining, order.currency) }})
+            </button>
           </div>
         </div>
       </div>
@@ -191,7 +210,7 @@
         </div>
 
         <!-- Statuts -->
-        <div class="flex space-x-2 mb-6">
+        <div class="flex flex-wrap gap-2 mb-6">
           <span 
             class="px-3 py-1 text-sm font-medium rounded-full"
             :class="getOrderStatusClass(selectedOrder.order_status)"
@@ -203,6 +222,9 @@
             :class="getPaymentStatusClass(selectedOrder.payment_status)"
           >
             {{ getPaymentStatusLabel(selectedOrder.payment_status) }}
+          </span>
+          <span v-if="selectedOrder.is_preorder" class="px-3 py-1 text-sm font-medium rounded-full bg-purple-100 text-purple-800">
+            Précommande
           </span>
         </div>
 
@@ -335,10 +357,32 @@
             <span class="text-gray-900">Total</span>
             <span class="text-gray-900">{{ formatPrice(selectedOrder.total_amount, selectedOrder.currency) }}</span>
           </div>
+          <!-- Infos précommande -->
+          <div v-if="selectedOrder.is_preorder" class="mt-3 pt-3 border-t">
+            <div class="flex justify-between text-sm mb-1">
+              <span class="text-gray-600">Montant payé</span>
+              <span class="text-green-600 font-medium">{{ formatPrice(selectedOrder.amount_paid || 0, selectedOrder.currency) }}</span>
+            </div>
+            <div v-if="selectedOrder.amount_remaining > 0" class="flex justify-between text-sm">
+              <span class="text-gray-600">Reste à payer</span>
+              <span class="text-orange-600 font-medium">{{ formatPrice(selectedOrder.amount_remaining, selectedOrder.currency) }}</span>
+            </div>
+          </div>
         </div>
 
         <!-- Actions modal -->
         <div class="mt-6 flex justify-end space-x-4">
+          <button 
+            v-if="selectedOrder.amount_remaining > 0 && selectedOrder.order_status !== 'cancelled'"
+            @click="handlePayRemaining(selectedOrder)"
+            :disabled="isPayingRemaining"
+            class="px-4 py-2 bg-gradient-to-r from-orange-500 to-orange-600 text-white rounded-lg hover:from-orange-600 hover:to-orange-700 disabled:opacity-50 flex items-center gap-2"
+          >
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
+            </svg>
+            {{ isPayingRemaining ? 'Traitement...' : `Payer le solde (${formatPrice(selectedOrder.amount_remaining, selectedOrder.currency)})` }}
+          </button>
           <button 
             v-if="selectedOrder.order_status === 'pending'"
             @click="handleCancelOrder(selectedOrder.id)"
@@ -366,7 +410,7 @@ definePageMeta({
 })
 
 const config = useRuntimeConfig()
-const { orders, isLoading, error, fetchMyOrders, fetchOrderDetails, cancelOrder: cancelOrderAPI } = useOrders()
+const { orders, isLoading, error, fetchMyOrders, fetchOrderDetails, cancelOrder: cancelOrderAPI, completePayment } = useOrders()
 const { createReview, updateReview, deleteReview } = useReviews()
 
 // État réactif
@@ -382,6 +426,7 @@ const reviewingItemId = ref<number | null>(null)
 const reviewRating = ref(0)
 const reviewComment = ref('')
 const isSubmittingReview = ref(false)
+const isPayingRemaining = ref(false)
 
 // Charger les commandes au montage
 onMounted(async () => {
@@ -468,6 +513,7 @@ const getOrderStatusClass = (status: string) => {
 const getPaymentStatusLabel = (status: string) => {
   const labels: Record<string, string> = {
     pending: 'Paiement en attente',
+    partially_paid: 'Partiellement payé',
     paid: 'Payé',
     failed: 'Échec paiement',
     refunded: 'Remboursé'
@@ -478,6 +524,7 @@ const getPaymentStatusLabel = (status: string) => {
 const getPaymentStatusClass = (status: string) => {
   const classes: Record<string, string> = {
     pending: 'bg-orange-100 text-orange-800',
+    partially_paid: 'bg-amber-100 text-amber-800',
     paid: 'bg-green-100 text-green-800',
     failed: 'bg-red-100 text-red-800',
     refunded: 'bg-gray-100 text-gray-800'
@@ -517,6 +564,32 @@ const handleCancelOrder = async (orderId: number) => {
     } else {
       alert('Erreur lors de l\'annulation de la commande')
     }
+  }
+}
+
+// Payer le solde restant
+const handlePayRemaining = async (order: Order) => {
+  if (!order.amount_remaining || order.amount_remaining <= 0) return
+  
+  isPayingRemaining.value = true
+  
+  try {
+    const result = await completePayment(order.id)
+    if (result && result.payment_url) {
+      // Rediriger vers la page de paiement
+      window.location.href = result.payment_url
+    } else if (result) {
+      alert('Paiement initié avec succès')
+      await fetchMyOrders()
+      closeOrderDetails()
+    } else {
+      alert('Erreur lors de l\'initialisation du paiement')
+    }
+  } catch (err) {
+    console.error('Erreur paiement:', err)
+    alert('Erreur lors du paiement')
+  } finally {
+    isPayingRemaining.value = false
   }
 }
 

@@ -13,19 +13,20 @@
             <div 
               v-for="(image, index) in bannerImages" 
               :key="index"
-              class="w-full flex-shrink-0 relative h-[350px] sm:h-[450px] md:h-[550px] lg:h-[600px]"
+              class="w-full flex-shrink-0 relative h-[500px] sm:h-[600px] md:h-[700px] lg:h-[800px]"
             >
               <img :src="image" :alt="`Slide ${index + 1}`" class="w-full h-full object-cover">
               <div class="absolute inset-0 bg-gradient-to-r from-gray-900/80 to-transparent flex items-center">
                 <div class="text-white max-w-xl pl-4 pr-4 sm:pl-8 md:pl-12 lg:pl-24">
                   <h2 class="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold mb-3 sm:mb-4 md:mb-6">{{ bannerTitle }}</h2>
                   <p class="text-base sm:text-lg md:text-xl lg:text-2xl mb-4 sm:mb-6 md:mb-10">{{ bannerSubtitle }}</p>
-                  <button 
-                    class="px-4 py-2 sm:px-6 sm:py-3 md:px-8 md:py-4 text-white text-sm sm:text-base md:text-lg font-medium transition-all rounded-md hover-secondary-btn"
+                  <NuxtLink 
+                    :to="`/boutique/${shop?.subdomain}/produits`"
+                    class="inline-block px-4 py-2 sm:px-6 sm:py-3 md:px-8 md:py-4 text-white text-sm sm:text-base md:text-lg font-medium transition-all rounded-md hover-secondary-btn"
                     :style="{ backgroundColor: primaryColor }"
                   >
                     Explorer la collection
-                  </button>
+                  </NuxtLink>
                 </div>
               </div>
             </div>
