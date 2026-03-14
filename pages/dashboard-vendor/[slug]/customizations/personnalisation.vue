@@ -353,12 +353,12 @@
               id="about-text"
               v-model="aboutPage.text"
               rows="5"
-              maxlength="5000"
+              maxlength="20000"
                class="mt-1 block w-full px-3 py-2 border-0 border-b-2 border-gray-300 placeholder-gray-300 placeholder:italic text-gray-900 focus:outline-none focus:ring-0 focus:border-primary transition-colors duration-200"
               placeholder="Décrivez votre entreprise, votre mission, vos valeurs..."
             ></textarea>
             <div class="text-right text-sm text-gray-500 mt-1">
-              {{ aboutPage.text.length }}/5000
+              {{ aboutPage.text.length }}/20000
             </div>
           </div>
           
@@ -445,12 +445,12 @@
             id="terms-text"
             v-model="termsPage.text"
             rows="15"
-            maxlength="5000"
+            maxlength="20000"
              class="mt-1 block w-full px-3 py-2 border-0 border-b-2 border-gray-300 placeholder-gray-300 placeholder:italic text-gray-900 focus:outline-none focus:ring-0 focus:border-primary transition-colors duration-200"
             placeholder="Saisissez ici les conditions générales d'utilisation de votre boutique..."
           ></textarea>
           <div class="text-right text-sm text-gray-500 mt-1">
-            {{ termsPage.text.length }}/5000
+            {{ termsPage.text.length }}/20000
           </div>
         </div>
       </div>
@@ -469,12 +469,12 @@
             id="sales-terms-text"
             v-model="salesTermsPage.text"
             rows="15"
-            maxlength="5000"
+            maxlength="20000"
              class="mt-1 block w-full px-3 py-2 border-0 border-b-2 border-gray-300 placeholder-gray-300 placeholder:italic text-gray-900 focus:outline-none focus:ring-0 focus:border-primary transition-colors duration-200"
             placeholder="Saisissez ici les conditions générales de vente de votre boutique..."
           ></textarea>
           <div class="text-right text-sm text-gray-500 mt-1">
-            {{ salesTermsPage.text.length }}/5000
+            {{ salesTermsPage.text.length }}/20000
           </div>
         </div>
       </div>
@@ -513,12 +513,12 @@
               id="footer-text"
               v-model="footer.text"
               rows="3"
-              maxlength="500"
+              maxlength="20000"
                class="mt-1 block w-full px-3 py-2 border-0 border-b-2 border-gray-300 placeholder-gray-300 placeholder:italic text-gray-900 focus:outline-none focus:ring-0 focus:border-primary transition-colors duration-200"
               placeholder="Texte à afficher dans le pied de page..."
             ></textarea>
             <div class="text-right text-sm text-gray-500 mt-1">
-              {{ footer.text.length }}/500
+              {{ footer.text.length }}/20000
             </div>
           </div>
           
