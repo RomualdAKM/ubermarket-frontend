@@ -390,8 +390,9 @@
 
           <div class="flex items-center gap-3">
             <!-- Bouton Voir mon site -->
-            <a 
-              :href="getShopPublicUrl()" 
+            <NuxtLink 
+              v-if="currentShop?.subdomain"
+              :to="`/boutique/${currentShop.subdomain}`"
               target="_blank"
               class="hidden sm:flex items-center gap-2 px-3 py-1.5 text-sm font-medium text-primary bg-primary/10 hover:bg-primary/20 rounded-lg transition-colors"
             >
@@ -399,7 +400,7 @@
                 <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 6H5.25A2.25 2.25 0 0 0 3 8.25v10.5A2.25 2.25 0 0 0 5.25 21h10.5A2.25 2.25 0 0 0 18 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25"/>
               </svg>
               Voir mon site
-            </a>
+            </NuxtLink>
 
             <!-- Notifications -->
             <button class="p-2 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition-colors relative">
