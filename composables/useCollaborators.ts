@@ -68,6 +68,7 @@ export interface CollaborationShop {
     id: number
     name: string
     slug: string
+    subdomain: string | null
     logo: string | null
   }
   role: RoleInfo

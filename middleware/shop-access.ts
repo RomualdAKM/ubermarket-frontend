@@ -75,6 +75,7 @@ export default defineNuxtRouteMiddleware(async (to) => {
             id: collaboration.shop.id,
             name: collaboration.shop.name,
             slug: collaboration.shop.slug,
+            subdomain: collaboration.shop.subdomain,
             logo: collaboration.shop.logo,
             is_collaboration: true
           } as any
