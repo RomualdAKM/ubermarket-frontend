@@ -391,8 +391,8 @@
           <div class="flex items-center gap-3">
             <!-- Bouton Voir mon site -->
             <NuxtLink 
-              v-if="currentShop?.subdomain"
-              :to="`/boutique/${currentShop.subdomain}`"
+              v-if="currentShop?.subdomain || currentShop?.slug"
+              :to="`/boutique/${currentShop.subdomain || currentShop.slug}`"
               target="_blank"
               class="hidden sm:flex items-center gap-2 px-3 py-1.5 text-sm font-medium text-primary bg-primary/10 hover:bg-primary/20 rounded-lg transition-colors"
             >
