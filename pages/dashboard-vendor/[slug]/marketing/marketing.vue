@@ -264,7 +264,7 @@ definePageMeta({
 })
 
 const route = useRoute()
-const { integrations, isLoading, error, fetchIntegrations, createIntegration, updateIntegration, deleteIntegration } = useMarketing()
+const { integrations, isLoading, error, fetchIntegrations, connectIntegration, updateIntegration, deleteIntegration } = useMarketing()
 
 // Vérification de l'abonnement
 const { hasModule } = useSubscription()
@@ -360,7 +360,7 @@ const handleConnect = async (platform: 'facebook_pixel' | 'google_analytics' | '
       successMessage.value = 'Intégration mise à jour avec succès'
     } else {
       // Créer
-      await createIntegration(shopSlug, {
+      await connectIntegration(shopSlug, {
         platform,
         credentials,
         is_active: true
