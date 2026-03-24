@@ -202,14 +202,14 @@
                 <div class="flex flex-col sm:flex-row sm:space-x-4 space-y-4 sm:space-y-0">
                   <button 
                     @click="handleAddToCart"
-                    :disabled="isAddingToCart || availableStock === 0"
+                    :disabled="isAddingToCart || (availableStock === 0 && !isPreorder)"
                     class="flex-1 px-6 py-3 bg-primary text-white font-medium hover:bg-secondary transition-all rounded-md disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
                   >
                     <svg v-if="isAddingToCart" class="animate-spin -ml-1 mr-2 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                       <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                       <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                     </svg>
-                    {{ isAddingToCart ? 'Ajout en cours...' : (availableStock === 0 ? 'Rupture de stock' : 'Ajouter au panier') }}
+                    {{ isAddingToCart ? 'Ajout en cours...' : (availableStock === 0 && !isPreorder ? 'Rupture de stock' : 'Ajouter au panier') }}
                   </button>
                   <NuxtLink 
                     :to="getCartUrl(props.shop)"
@@ -347,6 +347,9 @@ const shop = computed(() => props.shop)
 
 // Données dynamiques du produit
 const productName = computed(() => props.product?.name || 'Produit')
+
+// Vérifier si le produit est en précommande
+const isPreorder = computed(() => props.product?.availability_type === 'preorder')
 
 // Vérifier si le produit est en promotion (période active)
 const isOnPromotion = computed(() => {
@@ -529,8 +532,8 @@ const formattedCalculatedPrice = computed(() => {
 
 // Stock disponible basé sur les variantes sélectionnées
 const availableStock = computed(() => {
-  // Si produit digital, toujours disponible
-  if (isDigitalProduct.value) {
+  // Si produit digital ou précommande, toujours disponible
+  if (isDigitalProduct.value || isPreorder.value) {
     return 999999
   }
   
@@ -573,8 +576,8 @@ const addToCartError = ref('')
 const handleAddToCart = async () => {
   if (!props.product?.id || !shopSubdomain.value) return
   
-  // Vérifier le stock
-  if (availableStock.value === 0) {
+  // Vérifier le stock (sauf si c'est une précommande)
+  if (availableStock.value === 0 && !isPreorder.value) {
     addToCartError.value = 'Produit en rupture de stock'
     return
   }
@@ -676,7 +679,7 @@ const increaseQuantity = () => {
   }
   
   const stock = availableStock.value
-  if (quantity.value < stock) quantity.value++
+  if (isPreorder.value || quantity.value < stock) quantity.value++
 }
 
 // S'assurer que la quantité est 1 pour les produits digitaux
@@ -745,7 +748,7 @@ onUnmounted(() => {
 
 // Avis clients - Computed properties pour statistiques
 const averageRating = computed(() => {
-  if (!productReviews.value || productReviews.value.length === 0) return 0
+  if (!productReviews.value || productReviews.value.length === 0) return '0'
   const sum = productReviews.value.reduce((acc, review) => acc + review.rating, 0)
   return (sum / productReviews.value.length).toFixed(1)
 })

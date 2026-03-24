@@ -14,9 +14,14 @@ export interface CartItem {
     id: number
     name: string
     price: number
+    stock_quantity: number
     promotional_price: number | null
     preview_image: string | null
     product_images: any[]
+    availability_type: string
+    preorder_payment_type?: string
+    deposit_percentage?: number
+    deposit_amount?: number
   }
   variant: {
     id: number
@@ -24,6 +29,7 @@ export interface CartItem {
     value: string
     price_modifier: number
   } | null
+  variants?: any[]
 }
 
 export interface Cart {

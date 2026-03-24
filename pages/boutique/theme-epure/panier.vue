@@ -57,7 +57,12 @@
                 <div class="ml-6 flex-1">
                   <div class="flex justify-between">
                     <div>
-                      <h3 class="text-lg font-medium text-gray-900">{{ item.product.name }}</h3>
+                       <div class="flex items-center gap-2">
+                         <h3 class="text-lg font-medium text-gray-900">{{ item.product.name }}</h3>
+                         <span v-if="item.product && item.product.availability_type === 'preorder'" class="px-2 py-0.5 text-[10px] font-bold uppercase bg-amber-100 text-amber-700 rounded-full">
+                           Précommande
+                         </span>
+                       </div>
                       <!-- Afficher TOUTES les variantes sélectionnées -->
                       <div v-if="item.variants && item.variants.length > 0" class="mt-1 space-y-1">
                         <p v-for="variant in item.variants" :key="variant.id" class="text-sm text-gray-600">
@@ -699,6 +704,12 @@ const getProductImage = (product: any) => {
 // Augmenter la quantité
 const increaseQuantity = async (item: any) => {
   if (isUpdating.value) return
+  
+  // Vérifier le stock (sauf pour les précommandes)
+  if (item.product?.availability_type !== 'preorder' && item.quantity >= (item.product?.stock_quantity || 0)) {
+    errorMessage.value = `Stock insuffisant (${item.product?.stock_quantity} disponible${item.product?.stock_quantity > 1 ? 's' : ''})`
+    return
+  }
   
   isUpdating.value = item.id
   errorMessage.value = ''
