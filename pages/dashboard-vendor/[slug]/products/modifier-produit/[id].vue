@@ -193,6 +193,51 @@
                   />
                 </div>
               </template>
+
+              <template v-else-if="isDigitalShop">
+                <div class="sm:col-span-2">
+                  <label class="block text-sm font-medium text-gray-700 mb-1">
+                    Fichier numérique<span class="text-red-500">*</span>
+                    <span class="text-gray-500 font-normal"> (PDF, MP4, ZIP, max 100 Mo)</span>
+                  </label>
+                  <div class="mt-1 flex justify-center px-4 pt-3 pb-4 border-2 border-gray-300 border-dashed">
+                    <div class="space-y-1 text-center">
+                      <svg class="mx-auto h-10 w-10 text-gray-400" stroke="currentColor" fill="none" viewBox="0 0 48 48">
+                        <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                      </svg>
+                      <div class="flex text-sm text-gray-600">
+                        <label for="file-upload" class="relative cursor-pointer bg-white font-medium text-blue-600 hover:text-blue-500">
+                          <span>Télécharger un nouveau fichier</span>
+                          <input id="file-upload" name="file-upload" type="file" class="sr-only" @change="handleFileUpload">
+                        </label>
+                        <p class="pl-1">ou glisser-déposer</p>
+                      </div>
+                      <p class="text-xs text-gray-500">PDF, MP4, ZIP jusqu'à 100MB</p>
+                    </div>
+                  </div>
+                  <div v-if="productForm.digital_file" class="mt-2 text-sm text-blue-600">
+                    Nouveau fichier sélectionné : {{ productForm.digital_file.name }}
+                  </div>
+                  <div v-else-if="currentDigitalFile" class="mt-2 text-sm text-gray-500">
+                    Fichier actuel : {{ currentDigitalFile.split('/').pop() }}
+                  </div>
+                </div>
+              </template>
+
+              <!-- Options d'affichage -->
+              <div class="sm:col-span-2 grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4">
+                <div class="flex items-center">
+                  <input
+                    id="afficher-ventes"
+                    type="checkbox"
+                    v-model="productForm.show_sales_count"
+                    class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300"
+                  />
+                  <label for="afficher-ventes" class="ml-2 block text-sm text-gray-700">
+                    Afficher le nombre de ventes
+                  </label>
+                </div>
+              </div>
             </div>
           </div>
 
@@ -295,6 +340,187 @@
             </div>
           </div>
 
+          <!-- Variantes (uniquement pour les produits physiques) -->
+          <div v-if="isPhysicalShop" class="border-b border-gray-200 pb-6 mb-6">
+            <div class="flex justify-between items-center mb-4">
+              <h2 class="text-lg font-semibold text-gray-900">Variantes</h2>
+              <button
+                type="button"
+                @click="addVariant"
+                class="inline-flex items-center px-2 py-1 border border-transparent text-xs font-medium text-blue-700 bg-blue-100 hover:bg-blue-200 focus:outline-none focus:ring-1 focus:ring-offset-1 focus:ring-blue-500"
+              >
+                <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                </svg>
+                Ajouter une variante
+              </button>
+            </div>
+            
+            <div v-if="productForm.variants.length > 0" class="space-y-4">
+              <div
+                v-for="(variant, index) in productForm.variants"
+                :key="index"
+                class="bg-gray-50 p-3"
+              >
+                <div class="flex justify-between items-start">
+                  <h3 class="text-sm font-medium text-gray-900">Variante {{ index + 1 }}</h3>
+                  <button
+                    type="button"
+                    @click="removeVariant(index)"
+                    class="text-red-500 hover:text-red-700"
+                  >
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                    </svg>
+                  </button>
+                </div>
+                
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 mt-2">
+                  <div>
+                    <label :for="'variant-name-' + index" class="block text-xs font-medium text-gray-700 mb-1">
+                      Nom (ex. : Taille)
+                    </label>
+                    <input
+                      :id="'variant-name-' + index"
+                      v-model="variant.name"
+                      type="text"
+                      class="w-full px-2 py-1 text-sm border border-gray-300 rounded-md focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+                      placeholder="Ex. : Taille"
+                    />
+                  </div>
+                  
+                  <div>
+                    <label :for="'variant-value-' + index" class="block text-xs font-medium text-gray-700 mb-1">
+                      Valeur
+                    </label>
+                    <input
+                      :id="'variant-value-' + index"
+                      v-model="variant.value"
+                      type="text"
+                      class="w-full px-2 py-1 text-sm border border-gray-300 rounded-md focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+                      placeholder="Ex. : Rouge, M, 32GB"
+                    />
+                  </div>
+                  
+                  <div>
+                    <label :for="'variant-price-' + index" class="block text-xs font-medium text-gray-700 mb-1">
+                      Prix supplémentaire ({{ currentShop?.currency || 'XOF' }})
+                    </label>
+                    <input
+                      :id="'variant-price-' + index"
+                      v-model.number="variant.price_modifier"
+                      type="number"
+                      step="0.01"
+                      min="0"
+                      class="w-full px-2 py-1 text-sm border border-gray-300 rounded-md focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+                      placeholder="Ex. : 2.00"
+                    />
+                  </div>
+                  
+                  <div>
+                    <label :for="'variant-stock-' + index" class="block text-xs font-medium text-gray-700 mb-1">
+                      Stock
+                    </label>
+                    <input
+                      :id="'variant-stock-' + index"
+                      v-model.number="variant.stock_quantity"
+                      type="number"
+                      min="0"
+                      class="w-full px-2 py-1 text-sm border border-gray-300 rounded-md focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+                      placeholder="Ex. : 10"
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <div v-else class="text-center py-4 text-gray-500">
+              <p>Aucune variante ajoutée. Cliquez sur "Ajouter une variante" pour commencer.</p>
+            </div>
+          </div>
+
+          <!-- Images du produit -->
+          <div class="border-b border-gray-200 pb-6 mb-6">
+            <h3 class="text-xl font-semibold text-gray-900 mb-2">
+              Images du produit<span class="text-red-500">*</span>
+              <span class="text-gray-500 font-normal text-base"> (jusqu'à 5 images, PNG/JPEG, max 5 Mo chacune)</span>
+            </h3>
+            
+            <div class="mb-3 text-sm text-gray-600">
+              <span class="font-medium">💡 Astuce :</span> Cliquez sur une image pour la définir comme image principale
+            </div>
+            
+            <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3">
+              <div
+                v-for="(image, index) in productForm.images"
+                :key="index"
+                class="relative group"
+              >
+                <div 
+                  :class="[
+                    'border-2 w-full aspect-square flex items-center justify-center overflow-hidden cursor-pointer transition-all',
+                    image.is_primary 
+                      ? 'border-blue-500 bg-blue-50' 
+                      : 'border-dashed border-gray-300 bg-gray-100 hover:border-gray-400'
+                  ]"
+                  @click="setPrimaryImage(index)"
+                >
+                  <img
+                    v-if="image.preview"
+                    :src="image.preview"
+                    alt="Aperçu de l'image"
+                    class="w-full h-full object-cover"
+                  />
+                  <svg v-else class="w-6 h-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                  </svg>
+                </div>
+                
+                <!-- Badge image principale -->
+                <div 
+                  v-if="image.is_primary"
+                  class="absolute -top-2 -left-2 bg-blue-500 text-white text-xs px-2 py-1 rounded-full font-medium"
+                >
+                  Principale
+                </div>
+                
+                <!-- Bouton supprimer -->
+                <button
+                  type="button"
+                  @click="removeImage(index)"
+                  class="absolute -top-1 -right-1 bg-red-500 text-white p-0.5 opacity-0 group-hover:opacity-100 rounded-full"
+                >
+                  <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                  </svg>
+                </button>
+              </div>
+              
+              <div
+                v-if="productForm.images.length < 5"
+                class="border-2 border-dashed border-gray-300 aspect-square flex flex-col items-center justify-center cursor-pointer hover:border-gray-400"
+                @click="triggerImageUpload"
+              >
+                <svg class="w-6 h-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                </svg>
+                <span class="mt-1 text-xs text-gray-500">Ajouter</span>
+                <input
+                  ref="imageInput"
+                  type="file"
+                  multiple
+                  accept="image/png, image/jpeg"
+                  class="sr-only"
+                  @change="handleImageUpload"
+                />
+              </div>
+            </div>
+            
+            <div v-if="productForm.images.length === 0" class="mt-2 text-sm text-red-500">
+              Au moins une image est requise.
+            </div>
+          </div>
+
           <!-- Statut du produit -->
           <div class="pb-6">
             <h2 class="text-lg font-semibold text-gray-900 mb-4">Statut du produit</h2>
@@ -386,6 +612,7 @@ definePageMeta({
 
 const router = useRouter()
 const route = useRoute()
+const config = useRuntimeConfig()
 const { currentShop } = useShops()
 const { categories, fetchCategories } = useCategories()
 const { fetchSubcategoriesByCategory } = useSubcategories()
@@ -397,6 +624,8 @@ const error = ref<string | null>(null)
 const subcategories = ref<Subcategory[]>([])
 const showShopInfo = ref(false)
 const productId = computed(() => parseInt(route.params.id as string))
+const currentDigitalFile = ref<string | null>(null)
+const imageInput = ref<HTMLInputElement | null>(null)
 
 const productForm = reactive<ProductData>({
   name: '',
@@ -457,15 +686,93 @@ const isFormValid = computed(() => {
   if (productForm.description.length > 1000) {
     return false
   }
+
+  if (productForm.images.length === 0) {
+    return false
+  }
   
   if (isPhysicalShop.value) {
     if (productForm.stock_quantity < 0) {
       return false
     }
   }
+
+  if (isDigitalShop.value && !currentDigitalFile.value && !productForm.digital_file) {
+    return false
+  }
   
   return true
 })
+
+// Gestion du fichier numérique
+const handleFileUpload = (event: Event) => {
+  const input = event.target as HTMLInputElement
+  if (input.files && input.files.length > 0) {
+    productForm.digital_file = input.files[0]
+  }
+}
+
+// Gestion des variantes
+const addVariant = () => {
+  productForm.variants.push({
+    name: '',
+    value: '',
+    price_modifier: 0,
+    stock_quantity: 0
+  })
+}
+
+const removeVariant = (index: number) => {
+  productForm.variants.splice(index, 1)
+}
+
+// Gestion des images
+const triggerImageUpload = () => {
+  imageInput.value?.click()
+}
+
+const handleImageUpload = (event: Event) => {
+  const input = event.target as HTMLInputElement
+  if (!input.files) return
+
+  const files = Array.from(input.files)
+  
+  // Limiter à 5 images au total
+  const remainingSlots = 5 - productForm.images.length
+  const filesToAdd = files.slice(0, remainingSlots)
+
+  filesToAdd.forEach(file => {
+    const reader = new FileReader()
+    reader.onload = (e) => {
+      productForm.images.push({
+        file: file,
+        preview: e.target?.result as string,
+        is_primary: productForm.images.length === 0,
+        image_path: ''
+      })
+    }
+    reader.readAsDataURL(file)
+  })
+
+  // Réinitialiser l'input
+  input.value = ''
+}
+
+const removeImage = (index: number) => {
+  const wasPrimary = productForm.images[index].is_primary
+  productForm.images.splice(index, 1)
+  
+  // Si on a supprimé l'image principale, on en définit une nouvelle si possible
+  if (wasPrimary && productForm.images.length > 0) {
+    productForm.images[0].is_primary = true
+  }
+}
+
+const setPrimaryImage = (index: number) => {
+  productForm.images.forEach((img, i) => {
+    img.is_primary = i === index
+  })
+}
 
 const loadProductData = async () => {
   if (!currentShop.value) {
@@ -490,6 +797,9 @@ const loadProductData = async () => {
       productForm.stock_quantity = product.stock_quantity
       productForm.status = product.status
       productForm.show_sales_count = product.show_sales_count
+      
+      currentDigitalFile.value = product.digital_file || null
+
       // Champs précommande
       productForm.availability_type = product.availability_type || 'in_stock'
       productForm.preorder_payment_type = product.preorder_payment_type || null
@@ -500,6 +810,28 @@ const loadProductData = async () => {
         depositType.value = 'percentage'
       } else if (product.deposit_amount) {
         depositType.value = 'fixed'
+      }
+
+      // Charger les images
+      if (product.product_images) {
+        const storageBase = config.public.apiBase.replace('/api', '') + '/storage/'
+        productForm.images = product.product_images.map(img => ({
+          id: img.id,
+          image_path: img.image_path,
+          preview: img.image_path.startsWith('http') ? img.image_path : storageBase + img.image_path,
+          is_primary: img.image_path === product.preview_image
+        }))
+      }
+
+      // Charger les variantes
+      if (product.product_variants) {
+        productForm.variants = product.product_variants.map(v => ({
+          id: v.id,
+          name: v.name,
+          value: v.value,
+          price_modifier: v.price_modifier ? parseFloat(v.price_modifier as any) : 0,
+          stock_quantity: v.stock_quantity ? parseInt(v.stock_quantity as any) : 0
+        }))
       }
     } else {
       throw new Error('Produit introuvable')
@@ -535,16 +867,25 @@ const submitForm = async () => {
   error.value = null
   
   try {
-    const productData: Partial<ProductData> = {
-      name: productForm.name,
-      description: productForm.description,
-      subcategory_id: productForm.subcategory_id,
-      price: productForm.price,
-      promotional_price: productForm.promotional_price,
-      promotion_start_date: productForm.promotion_start_date,
-      promotion_end_date: productForm.promotion_end_date,
-      stock_quantity: productForm.stock_quantity,
-      status: productForm.status
+    const productData: any = {
+      ...productForm,
+      // S'assurer que les dates sont envoyées correctement
+      promotion_start_date: productForm.promotion_start_date || null,
+      promotion_end_date: productForm.promotion_end_date || null,
+    }
+
+    // Gérer l'image principale
+    const primaryImage = productForm.images.find(img => img.is_primary)
+    if (primaryImage) {
+      if (primaryImage.image_path) {
+        productData.preview_image = primaryImage.image_path
+      } else {
+        // C'est une nouvelle image, on passera son index
+        const index = productForm.images.filter(img => img.file).indexOf(primaryImage)
+        if (index !== -1) {
+          productData.primary_image_index = index
+        }
+      }
     }
     
     const updatedProduct = await updateProduct(currentShop.value.id, productId.value, productData)
