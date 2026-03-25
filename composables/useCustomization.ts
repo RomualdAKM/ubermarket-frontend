@@ -4,6 +4,7 @@ export interface BannerCustomization {
   images: string[]
   title: string
   subtitle: string
+  button_text?: string
   overlay_opacity?: number
 }
 

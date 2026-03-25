@@ -86,7 +86,7 @@
                 </div>
               </div>
               
-              <p class="mt-4 text-gray-600">{{ productDescription }}</p>
+              <div class="mt-4 text-gray-600 rich-description prose prose-sm max-w-none" v-html="productDescription"></div>
             </div>
 
             <!-- Variantes (uniquement pour produits physiques) -->
@@ -817,5 +817,37 @@ const toggleWishlist = async () => {
 
 .hover\:text-secondary:hover {
   color: v-bind(secondaryColor);
+}
+
+/* Styles pour la description riche (Tiptap) */
+.rich-description :deep(ul) {
+  list-style-type: disc !important;
+  padding-left: 1.5rem !important;
+  margin-top: 0.5rem !important;
+  margin-bottom: 0.5rem !important;
+}
+
+.rich-description :deep(ol) {
+  list-style-type: decimal !important;
+  padding-left: 1.5rem !important;
+  margin-top: 0.5rem !important;
+  margin-bottom: 0.5rem !important;
+}
+
+.rich-description :deep(li) {
+  margin-bottom: 0.25rem !important;
+  display: list-item !important;
+}
+
+.rich-description :deep(p) {
+  margin-bottom: 0.75rem !important;
+}
+
+.rich-description :deep(b), .rich-description :deep(strong) {
+  font-weight: bold !important;
+}
+
+.rich-description :deep(i), .rich-description :deep(em) {
+  font-style: italic !important;
 }
 </style>

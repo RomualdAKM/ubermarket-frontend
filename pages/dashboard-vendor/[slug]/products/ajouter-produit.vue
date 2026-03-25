@@ -73,21 +73,12 @@
               
               <div class="sm:col-span-2">
                 <label for="description" class="block text-sm font-medium text-gray-700 mb-1">
-                  Description<span class="text-red-500">*</span>
-                  <!-- <span class="text-gray-500 font-normal"> (max 1000 caractères)</span> -->
+                  Description <span class="text-red-500">*</span>
                 </label>
-                <textarea
+                <RichEditor
                   id="description"
                   v-model="productForm.description"
-                  rows="4"
-                  maxlength="1000"
-                  required
-                  class="mt-1 block w-full px-3 py-2 border-0 border-b-2 border-gray-300 placeholder-gray-300 placeholder:italic text-gray-900 focus:outline-none focus:ring-0 focus:border-primary transition-colors duration-200"
-                  placeholder="Décrivez votre produit en détail..."
-                ></textarea>
-                <div class="text-right text-sm text-gray-500 mt-1">
-                  {{ productForm.description.length }}/1000
-                </div>
+                />
               </div>
               
               <div>
@@ -739,7 +730,7 @@ const isFormValid = computed(() => {
   }
   
   // Vérification de la longueur de la description
-  if (productForm.description.length > 1000) {
+  if (productForm.description.length > 10000) {
     return false
   }
   

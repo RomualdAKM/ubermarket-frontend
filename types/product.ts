@@ -16,7 +16,7 @@ export interface ProductVariant {
 export interface ProductImage {
   id?: number
   product_id?: number
-  image_path: string
+  image_path?: string
   alt_text?: string
   sort_order?: number
   created_at?: string

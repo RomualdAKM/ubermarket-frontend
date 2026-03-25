@@ -78,7 +78,7 @@
                 <h3 class="text-lg font-medium text-gray-900 truncate flex-1">{{ product.name }}</h3>
                 <span v-if="product.category" class="text-sm text-gray-500 ml-2 flex-shrink-0">{{ product.category.name }}</span>
               </div>
-              <p class="mt-1 text-gray-600 line-clamp-2">{{ product.short_description || 'Aucune description' }}</p>
+              <p class="mt-1 text-gray-600 line-clamp-2">{{ getCleanDescription(product.description, 100) }}</p>
               
               <div class="mt-4 flex justify-between items-center">
                 <!-- Prix avec promotion si disponible -->
@@ -124,6 +124,7 @@
 </template>
 
 <script setup lang="ts">
+import { getCleanDescription } from '~/utils/string'
 import FooterEpure from '@/components/theme_epure/FooterEpure.vue'
 import HeaderEpure from '@/components/theme_epure/HeaderEpure.vue'
 import { computed, ref } from 'vue'

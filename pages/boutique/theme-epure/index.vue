@@ -15,7 +15,7 @@
               :key="index"
               class="w-full flex-shrink-0 relative h-[500px] sm:h-[600px] md:h-[700px] lg:h-[800px]"
             >
-              <img :src="image" :alt="`Slide ${index + 1}`" class="w-full h-full object-cover">
+              <img :src="image" :alt="`Slide ${Number(index) + 1}`" class="w-full h-full object-cover">
               <div class="absolute inset-0 bg-gradient-to-r from-gray-900/80 to-transparent flex items-center">
                 <div class="text-white max-w-xl pl-4 pr-4 sm:pl-8 md:pl-12 lg:pl-24">
                   <h2 class="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold mb-3 sm:mb-4 md:mb-6">{{ bannerTitle }}</h2>
@@ -25,7 +25,7 @@
                     class="inline-block px-4 py-2 sm:px-6 sm:py-3 md:px-8 md:py-4 text-white text-sm sm:text-base md:text-lg font-medium transition-all rounded-md hover-secondary-btn"
                     :style="{ backgroundColor: primaryColor }"
                   >
-                    Explorer la collection
+                    {{ customizations?.home?.banner?.button_text || 'Explorer la collection' }}
                   </NuxtLink>
                 </div>
               </div>
@@ -50,7 +50,7 @@
           <button 
             v-for="(slide, index) in slides" 
             :key="index" 
-            @click="goToSlide(index)"
+            @click="goToSlide(Number(index))"
             class="w-1.5 h-1.5 sm:w-2 sm:h-2 md:w-3 md:h-3 bg-white bg-opacity-50 hover:bg-opacity-100 transition-all rounded-full"
             :class="{ 'bg-opacity-100': currentSlide === index }"
           ></button>
@@ -143,7 +143,7 @@
                   <h3 class="text-lg font-medium text-gray-900 truncate">{{ product.name }}</h3>
                   <span v-if="product.category" class="text-sm text-gray-500 ml-2 flex-shrink-0">{{ product.category.name }}</span>
                 </div>
-                <p class="mt-1 text-gray-600 line-clamp-2">{{ product.short_description || 'Aucune description' }}</p>
+                <p class="mt-1 text-gray-600 line-clamp-2">{{ getCleanDescription(product.description, 100) }}</p>
                 
                 <div class="mt-4 flex justify-between items-center">
                   <span class="text-lg font-medium text-gray-900">{{ formatPrice(product.price) }}</span>
@@ -178,6 +178,7 @@
 </template>
 
 <script setup lang="ts">
+import { getCleanDescription } from '~/utils/string'
 import FooterEpure from '@/components/theme_epure/FooterEpure.vue'
 import HeaderEpure from '@/components/theme_epure/HeaderEpure.vue'
 definePageMeta({

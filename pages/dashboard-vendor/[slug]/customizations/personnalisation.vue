@@ -289,6 +289,23 @@
                 </div>
               </div>
               
+              <div>
+                <label for="banner-button-text" class="block text-sm font-medium text-gray-700 mb-1">
+                  Texte du bouton
+                </label>
+                <input
+                  type="text"
+                  id="banner-button-text"
+                  v-model="homepageBanner.button_text"
+                  placeholder="Explorer la collection"
+                  maxlength="50"
+                   class="mt-1 block w-full px-3 py-2 border-0 border-b-2 border-gray-300 placeholder-gray-300 placeholder:italic text-gray-900 focus:outline-none focus:ring-0 focus:border-primary transition-colors duration-200"
+                />
+                <div class="text-right text-sm text-gray-500 mt-1">
+                  {{ homepageBanner.button_text?.length || 0 }}/50
+                </div>
+              </div>
+              
 
             </div>
           </div>
@@ -789,6 +806,7 @@ const homepageBanner = reactive({
   images: [] as Array<{ file: File | null; preview: string }>,
   title: '',
   subtitle: '',
+  button_text: '',
   color: '#FFFFFF'
 })
 
@@ -981,6 +999,7 @@ onMounted(async () => {
       if (home.banner) {
         homepageBanner.title = home.banner.title || ''
         homepageBanner.subtitle = home.banner.subtitle || ''
+        homepageBanner.button_text = home.banner.button_text || ''
         
         // Charger les images existantes (en tant que previews)
         if (home.banner.images && home.banner.images.length > 0) {
@@ -1081,6 +1100,7 @@ const saveCustomization = async () => {
         images: existingImages, // Conserver les images existantes
         title: homepageBanner.title,
         subtitle: homepageBanner.subtitle,
+        button_text: homepageBanner.button_text,
         overlay_opacity: 0.5
       },
       colors: {

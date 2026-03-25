@@ -20,6 +20,7 @@
 </template>
 
 <script setup lang="ts">
+import { stripHtml } from '~/utils/string'
 import { defineAsyncComponent } from 'vue'
 
 const route = useRoute()
@@ -102,7 +103,7 @@ useHead(() => ({
   meta: [
     {
       name: 'description',
-      content: product.value?.description || 'Découvrez ce produit'
+      content: product.value ? stripHtml(product.value.description) : 'Découvrez ce produit'
     }
   ]
 }))
