@@ -435,7 +435,7 @@
           <div class="border-b border-gray-200 pb-6 mb-6">
             <h3 class="text-xl font-semibold text-gray-900 mb-2">
               Images du produit<span class="text-red-500">*</span>
-              <span class="text-gray-500 font-normal text-base"> (jusqu'à 5 images, PNG/JPEG, max 5 Mo chacune)</span>
+              <span class="text-gray-500 font-normal text-base"> (jusqu'à 10 images, PNG/JPEG, max 5 Mo chacune)</span>
             </h3>
             
             <div class="mb-3 text-sm text-gray-600">
@@ -489,7 +489,7 @@
               </div>
               
               <div
-                v-if="productForm.images.length < 5"
+                v-if="productForm.images.length < 10"
                 class="border-2 border-dashed border-gray-300 aspect-square flex flex-col items-center justify-center cursor-pointer hover:border-gray-400"
                 @click="triggerImageUpload"
               >
@@ -729,8 +729,8 @@ const handleImageUpload = (event: Event) => {
 
   const files = Array.from(input.files)
   
-  // Limiter à 5 images au total
-  const remainingSlots = 5 - productForm.images.length
+  // Limiter à 10 images au total
+  const remainingSlots = 10 - productForm.images.length
   const filesToAdd = files.slice(0, remainingSlots)
 
   filesToAdd.forEach(file => {

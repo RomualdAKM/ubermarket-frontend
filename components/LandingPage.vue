@@ -15,9 +15,14 @@
         <button @click="toggleMobileMenu" class="md:hidden">
           <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="size-6.5"><path d="M4 5h16"></path><path d="M4 12h16"></path><path d="M4 19h16"></path></svg>
         </button>
-        <NuxtLink to="/inscription-vendeur" class="hidden md:inline-block py-2.5 px-6 shadow-[inset_0_2px_4px_rgba(255,255,255,0.6)] bg-primary text-white rounded-full hover:opacity-90 transition-opacity">
-          Commencer gratuitement
-        </NuxtLink>
+        <div class="hidden md:flex items-center gap-4">
+          <NuxtLink to="/connexion-vendeur" class="py-2.5 px-6 font-medium text-gray-700 hover:text-primary transition-colors">
+            Connexion
+          </NuxtLink>
+          <NuxtLink to="/inscription-vendeur" class="inline-block py-2.5 px-6 shadow-[inset_0_2px_4px_rgba(255,255,255,0.6)] bg-primary text-white rounded-full hover:opacity-90 transition-opacity">
+            Commencer gratuitement
+          </NuxtLink>
+        </div>
       </div>
     </nav>
 
@@ -34,7 +39,10 @@
         <a href="#fonctionnalites" @click="closeMobileMenu" class="py-1 px-3">Fonctionnalités</a>
         <a href="#temoignages" @click="closeMobileMenu" class="py-1 px-3">Témoignages</a>
         <a href="#tarifs" @click="closeMobileMenu" class="py-1 px-3">Tarifs</a>
-        <NuxtLink to="/inscription-vendeur" @click="closeMobileMenu" class="py-2.5 px-6 w-max text-sm shadow-[inset_0_2px_4px_rgba(255,255,255,0.6)] bg-gradient-to-tl from-primary-dark to-primary text-white rounded-full">
+        <NuxtLink to="/connexion-vendeur" @click="closeMobileMenu" class="py-2.5 px-6 w-full text-center font-medium text-gray-700 border border-gray-200 rounded-full">
+          Connexion
+        </NuxtLink>
+        <NuxtLink to="/inscription-vendeur" @click="closeMobileMenu" class="py-2.5 px-6 w-full text-center text-sm shadow-[inset_0_2px_4px_rgba(255,255,255,0.6)] bg-gradient-to-tl from-primary-dark to-primary text-white rounded-full">
           Commencer gratuitement
         </NuxtLink>
       </div>
@@ -68,7 +76,10 @@
           </div>
         </div>
         <p class="hero-desc text-center text-base/7 text-zinc-500 max-w-lg mt-4">Vendez vos produits physiques ou numériques en 1m30s. Paiements intégrés, livraison, analytics - tout inclus. Sans compétences techniques.</p>
-        <div class="hero-buttons flex flex-col md:flex-row items-center gap-4 mt-6 w-full md:w-auto">
+        <div class="hero-buttons flex flex-col sm:flex-row items-center gap-4 mt-6 w-full md:w-auto">
+          <NuxtLink to="/connexion-vendeur" class="py-3 md:py-2.5 w-full md:w-auto px-8 font-semibold text-gray-700 bg-white border border-gray-200 rounded-full hover:bg-gray-50 transition-colors text-center">
+            Connexion
+          </NuxtLink>
           <NuxtLink to="/inscription-vendeur" class="py-3 md:py-2.5 w-full md:w-auto px-8 border border-primary/20 bg-gradient-to-tl from-primary-dark to-primary text-white text-center rounded-full hover:opacity-90 transition-opacity">
             Commencer gratuitement
           </NuxtLink>

@@ -130,7 +130,7 @@
                   </div>
                   <div class="ml-4">
                     <div class="text-sm font-medium text-gray-900">{{ product.name }}</div>
-                    <div class="text-sm text-gray-500 truncate max-w-xs">{{ product.description }}</div>
+                    <div class="text-sm text-gray-500 truncate max-w-xs">{{ getCleanDescription(product.description) }}</div>
                   </div>
                 </div>
               </td>
@@ -324,7 +324,7 @@
             
             <div>
               <label class="block text-sm font-medium text-gray-700">Description</label>
-              <p class="mt-1 text-sm text-gray-900">{{ selectedProduct.description }}</p>
+              <div class="mt-1 text-sm text-gray-900 prose prose-sm max-w-none" v-html="selectedProduct.description"></div>
             </div>
             
             <!-- Variantes si disponibles -->
@@ -398,6 +398,7 @@
 </template>
 
 <script setup lang="ts">
+import { getCleanDescription } from '~/utils/string'
 import type { Product } from '~/types/product'
 
 const route = useRoute()
