@@ -279,7 +279,9 @@
               </svg>
             </button>
 
+            <!-- PAYPAL TEMPORAIREMENT DÉSACTIVÉ - DO NOT REMOVE -->
             <button 
+              v-if="false"
               @click="initiatePayment('paypal')"
               :disabled="processing"
               class="w-full flex items-center justify-between p-4 border border-gray-200 hover:border-primary transition-colors"

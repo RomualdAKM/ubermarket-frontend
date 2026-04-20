@@ -584,11 +584,12 @@ const paymentMethods = computed(() => {
       label: 'Carte bancaire', 
       description: 'Visa, Mastercard' 
     },
-    paypal: { 
-      id: 'paypal', 
-      label: 'PayPal', 
-      description: 'Compte PayPal' 
-    },
+    // PAYPAL TEMPORAIREMENT DÉSACTIVÉ - DO NOT REMOVE
+    // paypal: { 
+    //   id: 'paypal', 
+    //   label: 'PayPal', 
+    //   description: 'Compte PayPal' 
+    // },
     cash_on_delivery: { 
       id: 'cash_on_delivery', 
       label: 'Paiement à la livraison', 
@@ -610,7 +611,8 @@ const paymentMethods = computed(() => {
   const defaultMethods = [
     methodsMap.mobile_money,
     methodsMap.card,
-    methodsMap.paypal
+    // PAYPAL TEMPORAIREMENT DÉSACTIVÉ - DO NOT REMOVE
+    // methodsMap.paypal
   ]
   
   if (!isDigitalShop.value) {
@@ -867,7 +869,7 @@ const handleCreateOrder = async () => {
           // Construire l'URL de retour de base
           // Le backend ajoutera automatiquement le payment_id
           // Moneroo ajoutera: ?status=X&paymentId=Y&paymentStatus=Z
-          // PayPal ajoutera: ?token=ORDER_ID&PayerID=PAYER_ID
+          // PAYPAL TEMPORAIREMENT DÉSACTIVÉ - PayPal ajoutera: ?token=ORDER_ID&PayerID=PAYER_ID
           const returnUrl = `${window.location.origin}/boutique/${shopSubdomain.value}/payment-callback`
           
           const paymentResult = await initializePayment(

@@ -140,6 +140,8 @@
         </div>
       </div>
     </template>
+
+
   </div>
 </template>
 
@@ -150,6 +152,7 @@ definePageMeta({
 
 const config = useRuntimeConfig()
 const route = useRoute()
+const { user } = useAuth()
 
 const isLoading = ref(true)
 const codeCopied = ref(false)
@@ -166,6 +169,8 @@ const referralData = ref<{
 } | null>(null)
 
 const commissions = ref<any[]>([])
+
+
 
 // Charger les données
 const loadReferralData = async () => {

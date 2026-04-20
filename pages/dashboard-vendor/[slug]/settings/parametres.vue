@@ -381,8 +381,8 @@
     </div>
   </div>
   
-  <!-- PayPal -->
-  <div class="border border-gray-200 rounded overflow-hidden" :class="{ 'opacity-50': !hasCustomPaymentKeysAccess }">
+  <!-- PAYPAL TEMPORAIREMENT DÉSACTIVÉ - DO NOT REMOVE -->
+  <div v-if="false" class="border border-gray-200 rounded overflow-hidden" :class="{ 'opacity-50': !hasCustomPaymentKeysAccess }">
     <div class="flex items-center justify-between p-4 bg-gray-50">
       <div class="flex items-center gap-3">
         <div class="w-10 h-10 rounded bg-white border border-gray-200 flex items-center justify-center">
@@ -474,8 +474,8 @@
           </label>
         </div>
         
-        <!-- PayPal -->
-        <div class="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
+        <!-- PAYPAL TEMPORAIREMENT DÉSACTIVÉ - DO NOT REMOVE -->
+        <div v-if="false" class="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
           <div>
             <h3 class="font-medium text-gray-900">PayPal</h3>
             <p class="text-sm text-gray-500">Compte PayPal</p>

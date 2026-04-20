@@ -306,8 +306,11 @@ const handleLogin = async () => {
     const response = await login(loginData)
     
     if (response.success) {
-      // Redirection vers l'URL de redirection ou la page des boutiques
-      const destination = redirectTo.value || '/mes-boutiques'
+      // Redirection selon le rôle de l'utilisateur
+      let destination = redirectTo.value || '/mes-boutiques'
+      if (response.user?.role === 'super_admin') {
+        destination = '/dashboard-admin'
+      }
       await router.push(destination)
     }
   } catch (error: any) {

@@ -62,6 +62,7 @@ onMounted(async () => {
   
   // Extract gateway-specific IDs
   // Moneroo returns: ?status=X&paymentId=Y&paymentStatus=Z
+  // PAYPAL TEMPORAIREMENT DÉSACTIVÉ - Conserver pour réactivation future
   // PayPal returns: ?token=ORDER_ID&PayerID=PAYER_ID
   const monerooPaymentId = route.query.paymentId as string
   const paypalToken = route.query.token as string

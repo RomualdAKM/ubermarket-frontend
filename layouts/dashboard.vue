@@ -478,13 +478,14 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted, computed } from 'vue'
+import { ref, onMounted, onUnmounted, computed, watch } from 'vue'
 import { useSubscription } from '~/composables/useSubscription'
 
 // Recuperation de la boutique courante et de l'utilisateur
 const { currentShop, currentAccess, hasPermission, hasAnyPermission } = useShops()
 const { user, logout } = useAuth()
 const router = useRouter()
+const route = useRoute()
 const config = useRuntimeConfig()
 
 // ===== Vérifications de permissions pour les menus =====
@@ -580,9 +581,12 @@ const canAddCollaborators = computed(() => {
 const handleCollaboratorsClick = (event: Event) => {
   if (!hasCollaboratorsAccess.value) {
     event.preventDefault()
+    closeSidebar()
     upgradeMessage.value = 'La gestion d\'équipe nécessite un abonnement Standard ou supérieur.'
     upgradeFeature.value = 'collaborators'
     showUpgradeModal.value = true
+  } else {
+    closeSidebar()
   }
 }
 
@@ -590,9 +594,12 @@ const handleCollaboratorsClick = (event: Event) => {
 const handleRestrictedClick = (module: string, label: string, event: Event) => {
   if (!hasModule(module)) {
     event.preventDefault()
+    closeSidebar()
     upgradeMessage.value = `Le module "${label}" nécessite un abonnement supérieur`
     upgradeFeature.value = module
     showUpgradeModal.value = true
+  } else {
+    closeSidebar()
   }
 }
 
@@ -678,6 +685,13 @@ onMounted(() => {
 onUnmounted(() => {
   window.removeEventListener('resize', checkScreenSize)
   window.removeEventListener('click', closeUserMenu)
+})
+
+// Fermer la sidebar mobile automatiquement lors d'un changement de route
+watch(() => route.path, () => {
+  if (!isLargeScreen.value) {
+    isSidebarOpen.value = false
+  }
 })
 </script>
 

@@ -166,6 +166,17 @@
               >
                 Voir les détails
               </button>
+              
+              <button 
+                v-if="hasPhysicalDelivery(order) && order.order_status !== 'cancelled' && order.order_status !== 'pending'"
+                @click="openTrackingModal(order)"
+                class="text-sm text-cyan-600 hover:text-cyan-800 flex items-center space-x-1"
+              >
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path>
+                </svg>
+                <span>Suivre ma livraison</span>
+              </button>
             </div>
             
             <!-- Bouton payer le solde -->
@@ -399,11 +410,211 @@
         </div>
       </div>
     </div>
+    
+    <!-- Modal suivi livraison -->
+    <div v-if="showTrackingModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+      <div class="bg-white rounded-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+        <!-- En-tête -->
+        <div class="sticky top-0 bg-white border-b px-6 py-4 flex justify-between items-center rounded-t-xl z-10">
+          <div>
+            <h3 class="text-lg font-semibold text-gray-900">Suivi de livraison</h3>
+            <p class="text-sm text-gray-500">{{ trackingOrderNumber }}</p>
+          </div>
+          <button @click="closeTrackingModal" class="text-gray-400 hover:text-gray-600 p-1">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+            </svg>
+          </button>
+        </div>
+
+        <div class="p-6">
+          <!-- Loading -->
+          <div v-if="trackingLoading && !deliveryStatus" class="space-y-4">
+            <div class="animate-pulse space-y-6">
+              <div class="h-4 bg-gray-200 rounded w-1/3"></div>
+              <div v-for="i in 6" :key="i" class="flex items-start space-x-4">
+                <div class="w-8 h-8 bg-gray-200 rounded-full flex-shrink-0"></div>
+                <div class="flex-1 space-y-2">
+                  <div class="h-4 bg-gray-200 rounded w-2/3"></div>
+                  <div class="h-3 bg-gray-100 rounded w-1/2"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Erreur -->
+          <div v-else-if="trackingError" class="text-center py-8">
+            <svg class="w-12 h-12 mx-auto text-red-400 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+            </svg>
+            <p class="text-red-600 mb-4">{{ trackingError }}</p>
+            <button 
+              @click="trackingOrderId && fetchDeliveryStatus(trackingOrderId)"
+              class="px-4 py-2 bg-blue-600 text-white text-sm rounded-lg hover:bg-blue-700"
+            >
+              Réessayer
+            </button>
+          </div>
+
+          <!-- Contenu -->
+          <div v-else-if="deliveryStatus">
+            <!-- Indicateur dernière MAJ -->
+            <div class="flex items-center justify-between mb-6">
+              <span 
+                class="px-3 py-1 text-sm font-medium rounded-full"
+                :class="getDeliveryStatusBadgeClass(deliveryStatus.delivery.current_status)"
+              >
+                {{ getDeliveryStatusLabel(deliveryStatus.delivery.current_status) }}
+              </span>
+              <div class="flex items-center space-x-2 text-xs text-gray-400">
+                <svg class="w-3.5 h-3.5 animate-spin" v-if="trackingLoading" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+                </svg>
+                <span>Dernière mise à jour : {{ lastUpdateText }}</span>
+              </div>
+            </div>
+
+            <!-- Info livraison -->
+            <div class="bg-gray-50 rounded-lg p-4 mb-6">
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <p class="text-xs text-gray-500 uppercase tracking-wide mb-1">Livreur</p>
+                  <p class="text-sm font-medium text-gray-900">
+                    {{ deliveryStatus.delivery.courier_name || 'En attente d\'attribution' }}
+                  </p>
+                </div>
+                <div>
+                  <p class="text-xs text-gray-500 uppercase tracking-wide mb-1">Estimation</p>
+                  <p class="text-sm font-medium text-gray-900">
+                    <template v-if="deliveryStatus.delivery.estimated_days">
+                      Livraison estimée sous {{ deliveryStatus.delivery.estimated_days }} jour{{ deliveryStatus.delivery.estimated_days > 1 ? 's' : '' }}
+                    </template>
+                    <template v-else>
+                      Non disponible
+                    </template>
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <!-- Timeline -->
+            <div class="mb-6">
+              <h4 class="text-sm font-semibold text-gray-700 uppercase tracking-wide mb-4">Progression</h4>
+              <div class="relative">
+                <div v-for="(step, index) in deliverySteps" :key="step.key" class="flex items-start mb-0 last:mb-0">
+                  <!-- Ligne verticale + indicateur -->
+                  <div class="flex flex-col items-center mr-4 flex-shrink-0">
+                    <!-- Indicateur -->
+                    <div 
+                      class="w-8 h-8 rounded-full flex items-center justify-center border-2 transition-all"
+                      :class="{
+                        'bg-green-500 border-green-500 text-white': getStepState(step.key) === 'completed',
+                        'bg-blue-500 border-blue-500 text-white ring-4 ring-blue-100': getStepState(step.key) === 'current',
+                        'bg-white border-gray-300 text-gray-400': getStepState(step.key) === 'future'
+                      }"
+                    >
+                      <!-- Check pour complété -->
+                      <svg v-if="getStepState(step.key) === 'completed'" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path>
+                      </svg>
+                      <!-- Cercle pour courant -->
+                      <div v-else-if="getStepState(step.key) === 'current'" class="w-2.5 h-2.5 bg-white rounded-full"></div>
+                      <!-- Cercle vide pour futur -->
+                      <div v-else class="w-2 h-2 bg-gray-300 rounded-full"></div>
+                    </div>
+                    <!-- Ligne verticale -->
+                    <div 
+                      v-if="index < deliverySteps.length - 1" 
+                      class="w-0.5 h-12"
+                      :class="getStepState(deliverySteps[index + 1].key) !== 'future' ? 'bg-green-400' : 'bg-gray-200'"
+                    ></div>
+                  </div>
+                  <!-- Contenu -->
+                  <div class="pt-1 pb-8 last:pb-0 min-w-0">
+                    <p 
+                      class="text-sm font-medium"
+                      :class="{
+                        'text-green-700': getStepState(step.key) === 'completed',
+                        'text-blue-700': getStepState(step.key) === 'current',
+                        'text-gray-400': getStepState(step.key) === 'future'
+                      }"
+                    >
+                      {{ step.label }}
+                    </p>
+                    <p v-if="getStepTimestamp(step.key)" class="text-xs text-gray-500 mt-0.5">
+                      {{ formatDate(getStepTimestamp(step.key) || '') }}
+                    </p>
+                    <p v-if="getStepNote(step.key)" class="text-xs text-gray-400 mt-0.5 italic">
+                      {{ getStepNote(step.key) }}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Message de succès après confirmation -->
+            <div v-if="receptionConfirmed" class="bg-green-50 border border-green-200 rounded-lg p-4 mb-4">
+              <div class="flex items-center space-x-3">
+                <svg class="w-6 h-6 text-green-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+                <p class="text-sm text-green-700 font-medium">Réception confirmée avec succès !</p>
+              </div>
+            </div>
+
+            <!-- Bouton confirmer réception -->
+            <div 
+              v-if="!receptionConfirmed && (deliveryStatus.delivery.current_status === 'delivered' || deliveryStatus.delivery.current_status === 'in_transit')"
+              class="border-t pt-4"
+            >
+              <div v-if="!showConfirmDialog">
+                <button 
+                  @click="showConfirmDialog = true"
+                  class="w-full px-4 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-medium flex items-center justify-center space-x-2"
+                >
+                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                  </svg>
+                  <span>Confirmer la réception</span>
+                </button>
+              </div>
+              <!-- Dialog de confirmation -->
+              <div v-else class="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+                <p class="text-sm text-yellow-800 mb-4">
+                  Êtes-vous sûr d'avoir bien reçu votre commande ? Cette action est irréversible.
+                </p>
+                <!-- Message d'erreur -->
+                <div v-if="confirmError" class="bg-red-50 border border-red-200 rounded-lg p-3 mb-3">
+                  <p class="text-sm text-red-700">{{ confirmError }}</p>
+                </div>
+                <div class="flex space-x-3">
+                  <button 
+                    @click="handleConfirmReception"
+                    :disabled="isConfirmingReception"
+                    class="flex-1 px-4 py-2 bg-green-600 text-white text-sm rounded-lg hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    {{ isConfirmingReception ? 'Confirmation...' : 'Oui, j\'ai reçu ma commande' }}
+                  </button>
+                  <button 
+                    @click="showConfirmDialog = false"
+                    :disabled="isConfirmingReception"
+                    class="px-4 py-2 bg-gray-200 text-gray-700 text-sm rounded-lg hover:bg-gray-300"
+                  >
+                    Annuler
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
 <script setup lang="ts">
 import type { Order } from '~/composables/useOrders'
+import { useDeliveryTracking } from '~/composables/useDeliveryTracking'
 
 definePageMeta({
   layout: 'dashboard-client'
@@ -412,6 +623,17 @@ definePageMeta({
 const config = useRuntimeConfig()
 const { orders, isLoading, error, fetchMyOrders, fetchOrderDetails, cancelOrder: cancelOrderAPI, completePayment } = useOrders()
 const { createReview, updateReview, deleteReview } = useReviews()
+const {
+  deliveryStatus,
+  loading: trackingLoading,
+  error: trackingError,
+  secondsSinceUpdate,
+  fetchDeliveryStatus,
+  confirmReception,
+  startPolling,
+  stopPolling,
+  reset: resetTracking
+} = useDeliveryTracking()
 
 // État réactif
 const searchQuery = ref('')
@@ -427,6 +649,15 @@ const reviewRating = ref(0)
 const reviewComment = ref('')
 const isSubmittingReview = ref(false)
 const isPayingRemaining = ref(false)
+
+// Modal suivi livraison
+const showTrackingModal = ref(false)
+const trackingOrderId = ref<number | null>(null)
+const trackingOrderNumber = ref('')
+const isConfirmingReception = ref(false)
+const showConfirmDialog = ref(false)
+const receptionConfirmed = ref(false)
+const confirmError = ref<string | null>(null)
 
 // Charger les commandes au montage
 onMounted(async () => {
@@ -456,6 +687,131 @@ const filteredOrders = computed(() => {
   
   return filtered.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
 })
+
+// Étapes de la timeline livraison
+const deliverySteps = [
+  { key: 'pending', label: 'Commande passée' },
+  { key: 'confirmed', label: 'Commande confirmée' },
+  { key: 'processing', label: 'En préparation' },
+  { key: 'picked_up', label: 'Récupérée par le livreur' },
+  { key: 'in_transit', label: 'En cours de livraison' },
+  { key: 'delivered', label: 'Livrée' }
+]
+
+// Ouvrir le modal de suivi
+const openTrackingModal = async (order: Order) => {
+  trackingOrderId.value = order.id
+  trackingOrderNumber.value = order.order_number
+  showTrackingModal.value = true
+  receptionConfirmed.value = false
+  
+  await fetchDeliveryStatus(order.id)
+  
+  // Démarrer le polling si pas encore livrée
+  if (deliveryStatus.value?.delivery?.current_status !== 'delivered') {
+    startPolling(order.id)
+  }
+}
+
+const closeTrackingModal = () => {
+  showTrackingModal.value = false
+  trackingOrderId.value = null
+  trackingOrderNumber.value = ''
+  showConfirmDialog.value = false
+  resetTracking()
+}
+
+// Vérifier si une étape est atteinte
+const getStepState = (stepKey: string): 'completed' | 'current' | 'future' => {
+  if (!deliveryStatus.value?.delivery) return 'future'
+  
+  const currentStatus = deliveryStatus.value.delivery.current_status
+  const stepOrder = deliverySteps.map(s => s.key)
+  const currentIndex = stepOrder.indexOf(currentStatus)
+  const stepIndex = stepOrder.indexOf(stepKey)
+  
+  if (stepIndex < 0 || currentIndex < 0) return 'future'
+  if (stepIndex < currentIndex) return 'completed'
+  if (stepIndex === currentIndex) return 'current'
+  return 'future'
+}
+
+// Obtenir le timestamp d'une étape depuis l'historique
+const getStepTimestamp = (stepKey: string): string | null => {
+  if (!deliveryStatus.value?.status_history) return null
+  const entry = deliveryStatus.value.status_history.find(h => h.status === stepKey)
+  return entry?.changed_at || null
+}
+
+// Obtenir la note d'une étape
+const getStepNote = (stepKey: string): string | null => {
+  if (!deliveryStatus.value?.status_history) return null
+  const entry = deliveryStatus.value.status_history.find(h => h.status === stepKey)
+  return entry?.note || null
+}
+
+// Label du statut livraison
+const getDeliveryStatusLabel = (status: string): string => {
+  const labels: Record<string, string> = {
+    pending: 'En attente',
+    confirmed: 'Confirmée',
+    processing: 'En préparation',
+    picked_up: 'Récupérée',
+    in_transit: 'En cours de livraison',
+    delivered: 'Livrée'
+  }
+  return labels[status] || status
+}
+
+const getDeliveryStatusBadgeClass = (status: string): string => {
+  const classes: Record<string, string> = {
+    pending: 'bg-yellow-100 text-yellow-800',
+    confirmed: 'bg-blue-100 text-blue-800',
+    processing: 'bg-purple-100 text-purple-800',
+    picked_up: 'bg-indigo-100 text-indigo-800',
+    in_transit: 'bg-cyan-100 text-cyan-800',
+    delivered: 'bg-green-100 text-green-800'
+  }
+  return classes[status] || 'bg-gray-100 text-gray-800'
+}
+
+// Confirmer la réception
+const handleConfirmReception = async () => {
+  if (!trackingOrderId.value) return
+  
+  isConfirmingReception.value = true
+  confirmError.value = null
+  try {
+    const success = await confirmReception(trackingOrderId.value)
+    if (success) {
+      receptionConfirmed.value = true
+      showConfirmDialog.value = false
+      stopPolling()
+      // Rafraîchir la liste des commandes
+      await fetchMyOrders()
+    } else {
+      confirmError.value = 'Erreur lors de la confirmation de réception. Veuillez réessayer.'
+    }
+  } catch (err) {
+    confirmError.value = 'Erreur lors de la confirmation de réception. Veuillez réessayer.'
+  } finally {
+    isConfirmingReception.value = false
+  }
+}
+
+// Texte "il y a Xs"
+const lastUpdateText = computed(() => {
+  const s = secondsSinceUpdate.value
+  if (s < 5) return 'à l\'instant'
+  if (s < 60) return `il y a ${s}s`
+  const m = Math.floor(s / 60)
+  return `il y a ${m}min`
+})
+
+// Vérifier si la commande a une livraison physique
+const hasPhysicalDelivery = (order: Order): boolean => {
+  return order.delivery_method === 'delivery' || order.delivery_method === 'partner'
+}
 
 // Fonctions utilitaires
 const formatDate = (dateString: string) => {
