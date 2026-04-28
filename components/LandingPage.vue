@@ -150,8 +150,8 @@
             <div class="bg-green-500 p-2 text-white rounded-md">
               <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="20" height="14" x="2" y="5" rx="2"></rect><path d="M2 10h20"></path></svg>
             </div>
-            <p class="text-base font-medium mt-4">Paiements Mobile Money, Carte & PayPal</p>
-            <p class="text-sm text-gray-600 mt-2">Acceptez Orange Money, MTN, Wave, Visa, Mastercard et PayPal. Retirez vos gains à tout moment.</p>
+            <p class="text-base font-medium mt-4">Paiements Mobile Money & Carte</p>
+            <p class="text-sm text-gray-600 mt-2">Acceptez Orange Money, MTN, Wave, Visa et Mastercard. Retirez vos gains à tout moment.</p>
           </div>
           <!-- Gestion produits -->
           <div class="feature-card bg-amber-100 flex flex-col items-start p-6 rounded-xl w-full md:sticky md:top-26">
@@ -287,7 +287,7 @@
                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="group-open:rotate-180 transition-transform"><path d="m6 9 6 6 6-6"></path></svg>
               </summary>
               <p class="text-sm/6 text-zinc-500 max-w-md p-6 pt-0">
-                Via notre partenaire de paiement, vous acceptez les cartes (Visa, Mastercard), Mobile Money (Orange, MTN, Wave), PayPal et autres méthodes locales.
+                Via notre partenaire de paiement, vous acceptez les cartes (Visa, Mastercard), Mobile Money (Orange, MTN, Wave) et autres méthodes locales.
               </p>
             </details>
             <details class="group bg-gray-50 border border-gray-200 rounded-xl">
