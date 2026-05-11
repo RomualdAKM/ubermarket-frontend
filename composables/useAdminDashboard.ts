@@ -128,6 +128,60 @@ export const useAdminDashboard = () => {
     })
   }
 
+  // ==================== CATEGORIES ====================
+
+  const fetchCategories = async () => {
+    return await apiRequest('/admin/categories')
+  }
+  const createCategory = async (data: { name: string }) => {
+    return await apiRequest('/admin/categories', { method: 'POST', body: JSON.stringify(data) })
+  }
+  const updateCategory = async (id: number, data: { name: string }) => {
+    return await apiRequest(`/admin/categories/${id}`, { method: 'PUT', body: JSON.stringify(data) })
+  }
+  const deleteCategory = async (id: number) => {
+    return await apiRequest(`/admin/categories/${id}`, { method: 'DELETE' })
+  }
+
+  // ==================== SUBCATEGORIES ====================
+
+  const createSubcategory = async (data: { name: string; category_id: number }) => {
+    return await apiRequest('/admin/subcategories', { method: 'POST', body: JSON.stringify(data) })
+  }
+  const updateSubcategory = async (id: number, data: { name: string }) => {
+    return await apiRequest(`/admin/subcategories/${id}`, { method: 'PUT', body: JSON.stringify(data) })
+  }
+  const deleteSubcategory = async (id: number) => {
+    return await apiRequest(`/admin/subcategories/${id}`, { method: 'DELETE' })
+  }
+
+  // ==================== COURIERS ====================
+
+  const fetchCouriers = async (params?: { page?: number; search?: string; courier_type?: string; status?: string }) => {
+    const query = new URLSearchParams()
+    if (params?.search) query.append('search', params.search)
+    if (params?.courier_type) query.append('courier_type', params.courier_type)
+    if (params?.status) query.append('status', params.status)
+    if (params?.page) query.append('page', String(params.page))
+    const qs = query.toString()
+    return await apiRequest(`/admin/couriers${qs ? `?${qs}` : ''}`)
+  }
+
+  const createCourier = async (data: { first_name: string; last_name: string; email: string; phone: string; city: string }) => {
+    return await apiRequest('/admin/couriers', {
+      method: 'POST',
+      body: JSON.stringify(data)
+    })
+  }
+
+  const fetchCourierDetails = async (id: number) => {
+    return await apiRequest(`/admin/couriers/${id}`)
+  }
+
+  const toggleCourier = async (id: number) => {
+    return await apiRequest(`/admin/couriers/${id}/toggle`, { method: 'PUT' })
+  }
+
   return {
     // Stats
     fetchAdminStats,
@@ -147,6 +201,20 @@ export const useAdminDashboard = () => {
     fetchWithdrawalStats,
     approveWithdrawal,
     completeWithdrawal,
-    rejectWithdrawal
+    rejectWithdrawal,
+    // Couriers
+    fetchCouriers,
+    createCourier,
+    fetchCourierDetails,
+    toggleCourier,
+    // Categories
+    fetchCategories,
+    createCategory,
+    updateCategory,
+    deleteCategory,
+    // Subcategories
+    createSubcategory,
+    updateSubcategory,
+    deleteSubcategory
   }
 }

@@ -90,6 +90,16 @@
         </div>
       </div>
 
+      <!-- Lien inscription -->
+      <div class="text-center">
+        <p class="text-sm text-gray-600">
+          Pas encore inscrit ?
+          <NuxtLink to="/inscription-livreur" class="font-medium text-primary hover:text-secondary">
+            Créer un compte
+          </NuxtLink>
+        </p>
+      </div>
+
       <!-- Lien retour -->
       <div class="text-center">
         <NuxtLink to="/" class="text-sm text-gray-500 hover:text-primary transition-colors">

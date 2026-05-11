@@ -239,74 +239,120 @@ export const useProducts = () => {
     error.value = null
 
     try {
-      // Créer FormData pour gérer les fichiers si présents
-      const hasFiles = productData.images?.some(img => img.file) || productData.digital_file
+      // Toujours utiliser FormData pour gérer correctement les images existantes vs nouvelles
+      const formData = new FormData()
+      formData.append('_method', 'PUT')
       
-      if (hasFiles) {
-        const formData = new FormData()
-        formData.append('_method', 'PUT')
-        
-        // Ajouter les données de base
-        if (productData.name) formData.append('name', productData.name)
-        if (productData.description) formData.append('description', productData.description)
-        if (productData.subcategory_id) formData.append('subcategory_id', productData.subcategory_id.toString())
-        if (productData.price !== undefined) formData.append('price', productData.price.toString())
-        if (productData.status) formData.append('status', productData.status)
-        if (productData.stock_quantity !== undefined) formData.append('stock_quantity', productData.stock_quantity.toString())
-        
-        // Ajouter les données optionnelles
-        if (productData.promotional_price) {
-          formData.append('promotional_price', productData.promotional_price.toString())
-        }
-        if (productData.promotion_start_date) {
-          formData.append('promotion_start_date', productData.promotion_start_date)
-        }
-        if (productData.promotion_end_date) {
-          formData.append('promotion_end_date', productData.promotion_end_date)
-        }
+      // Ajouter les données de base
+      if (productData.name) formData.append('name', productData.name)
+      if (productData.description) formData.append('description', productData.description)
+      if (productData.subcategory_id) formData.append('subcategory_id', productData.subcategory_id.toString())
+      if (productData.price !== undefined) formData.append('price', productData.price.toString())
+      if (productData.status) formData.append('status', productData.status)
+      if (productData.stock_quantity !== undefined) formData.append('stock_quantity', productData.stock_quantity.toString())
+      formData.append('show_sales_count', productData.show_sales_count ? '1' : '0')
+      
+      // Ajouter les données optionnelles
+      if (productData.promotional_price) {
+        formData.append('promotional_price', productData.promotional_price.toString())
+      }
+      if (productData.promotion_start_date) {
+        formData.append('promotion_start_date', productData.promotion_start_date)
+      }
+      if (productData.promotion_end_date) {
+        formData.append('promotion_end_date', productData.promotion_end_date)
+      }
 
-        const response = await fetch(`${config.public.apiBase}/shops/${shopId}/products/${productId}`, {
-          method: 'POST',
-          headers: {
-            'Accept': 'application/json',
-            'Authorization': `Bearer ${token.value}`
-          },
-          body: formData
-        })
-
-        const data = await response.json()
-
-        if (!response.ok) {
-          throw new Error(data.message || 'Erreur lors de la mise à jour du produit')
-        }
-
-        if (data.success && data.data) {
-          // Mettre à jour le produit dans la liste
-          const index = products.value.findIndex(p => p.id === productId)
-          if (index !== -1) {
-            products.value[index] = data.data
+      // Champs précommande
+      if (productData.availability_type) {
+        formData.append('availability_type', productData.availability_type)
+      }
+      if (productData.availability_type === 'preorder' && productData.preorder_payment_type) {
+        formData.append('preorder_payment_type', productData.preorder_payment_type)
+        if (productData.preorder_payment_type === 'deposit') {
+          if (productData.deposit_amount) {
+            formData.append('deposit_amount', productData.deposit_amount.toString())
           }
-          return data.data
-        } else {
-          throw new Error(data.message || 'Erreur lors de la mise à jour du produit')
+          if (productData.deposit_percentage) {
+            formData.append('deposit_percentage', productData.deposit_percentage.toString())
+          }
         }
+      }
+
+      // Ajouter le fichier numérique si présent
+      if (productData.digital_file) {
+        formData.append('digital_file', productData.digital_file)
+      }
+
+      // Séparer les images existantes des nouvelles images
+      let newImageIndex = 0
+      let primaryImagePath: string | null = null
+      let primaryNewImageIndex: number | null = null
+
+      if (productData.images && productData.images.length > 0) {
+        productData.images.forEach((image) => {
+          if (image.file) {
+            // Nouvelle image (fichier uploadé)
+            formData.append(`images[${newImageIndex}]`, image.file)
+            if (image.is_primary) {
+              primaryNewImageIndex = newImageIndex
+            }
+            newImageIndex++
+          } else if (image.id) {
+            // Image existante - envoyer uniquement l'ID
+            formData.append('existing_image_ids[]', image.id.toString())
+            if (image.is_primary && image.image_path) {
+              primaryImagePath = image.image_path
+            }
+          }
+        })
+      }
+
+      // Envoyer l'info sur l'image principale
+      if (primaryImagePath) {
+        formData.append('preview_image', primaryImagePath)
+      } else if (primaryNewImageIndex !== null) {
+        formData.append('primary_image_index', primaryNewImageIndex.toString())
+      }
+
+      // Ajouter les variantes
+      if (productData.variants && productData.variants.length > 0) {
+        productData.variants.forEach((variant, index) => {
+          formData.append(`variants[${index}][name]`, variant.name)
+          formData.append(`variants[${index}][value]`, variant.value)
+          if (variant.price_modifier !== undefined) {
+            formData.append(`variants[${index}][price_modifier]`, variant.price_modifier.toString())
+          }
+          if (variant.stock_quantity !== undefined) {
+            formData.append(`variants[${index}][stock_quantity]`, variant.stock_quantity.toString())
+          }
+        })
+      }
+
+      const response = await fetch(`${config.public.apiBase}/shops/${shopId}/products/${productId}`, {
+        method: 'POST',
+        headers: {
+          'Accept': 'application/json',
+          'Authorization': `Bearer ${token.value}`
+        },
+        body: formData
+      })
+
+      const data = await response.json()
+
+      if (!response.ok) {
+        throw new Error(data.message || 'Erreur lors de la mise à jour du produit')
+      }
+
+      if (data.success && data.data) {
+        // Mettre à jour le produit dans la liste
+        const index = products.value.findIndex(p => p.id === productId)
+        if (index !== -1) {
+          products.value[index] = data.data
+        }
+        return data.data
       } else {
-        // Requête JSON standard sans fichiers
-        const response = await apiRequest<Product>(`/shops/${shopId}/products/${productId}`, {
-          method: 'PUT',
-          body: JSON.stringify(productData)
-        })
-        
-        if (response.success && response.data) {
-          // Mettre à jour le produit dans la liste
-          const index = products.value.findIndex(p => p.id === productId)
-          if (index !== -1) {
-            products.value[index] = response.data
-          }
-          return response.data
-        } else {
-          throw new Error(response.message || 'Erreur lors de la mise à jour du produit')
-        }
+        throw new Error(data.message || 'Erreur lors de la mise à jour du produit')
       }
     } catch (err: any) {
       error.value = err.message
