@@ -27,7 +27,7 @@
             <NuxtLink
               v-for="navPage in pages"
               :key="navPage.id"
-              :to="navPage.is_homepage ? '/' : `/${navPage.slug}`"
+              :to="getPageUrl(navPage)"
               :class="[
                 'px-4 py-2 text-sm font-medium rounded-lg transition-colors',
                 isCurrentPage(navPage) 
@@ -60,7 +60,7 @@
             <NuxtLink
               v-for="navPage in pages"
               :key="navPage.id"
-              :to="navPage.is_homepage ? '/' : `/${navPage.slug}`"
+              :to="getPageUrl(navPage)"
               :class="[
                 'px-4 py-3 text-sm font-medium rounded-lg transition-colors',
                 isCurrentPage(navPage) 
@@ -119,6 +119,7 @@ interface Props {
   pages: WebsitePage[]
   currentPage: WebsitePage | null
   currentSlug?: string
+  subdomain?: string  
   showNavigation?: boolean
   showFooter?: boolean
   isLoading?: boolean
@@ -127,7 +128,8 @@ interface Props {
 const props = withDefaults(defineProps<Props>(), {
   showNavigation: true,
   showFooter: true,
-  isLoading: false
+  isLoading: false,
+  subdomain: '' 
 })
 
 const config = useRuntimeConfig()
@@ -154,6 +156,12 @@ const isCurrentPage = (page: WebsitePage) => {
   if (page.is_homepage && !props.currentSlug) return true
   if (page.slug === props.currentSlug) return true
   return false
+}
+
+const getPageUrl = (page: any) => {
+  const base = `/site/${props.subdomain || props.shop?.subdomain || props.shop?.slug}`
+  if (page.is_homepage) return base
+  return `${base}/${page.slug}`
 }
 </script>
 

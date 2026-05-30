@@ -164,7 +164,8 @@ const updateProfile = async () => {
 // Charger au montage
 onMounted(async () => {
   if (!token.value) {
-    router.push('/connexion')
+    //router.push('/connexion')
+    router.push(`/connexion?redirect=${encodeURIComponent(route.fullPath)}`)
     return
   }
   

@@ -50,6 +50,11 @@ const loadShop = async () => {
     }
 
     shop.value = data.data
+
+    // Sauvegarder l'URL de la boutique pour "Continuer mes achats"
+    if (process.client) {
+      localStorage.setItem('last_shop_url', `/boutique/${subdomain}`)
+    }
     
     // Charger les customizations de la boutique
     await fetchCustomizations(subdomain)

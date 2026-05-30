@@ -113,12 +113,12 @@
               <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
                 <div>
                   <label for="country" class="block text-sm font-medium text-gray-700">Pays *</label>
-                  <input v-model="formData.country" type="text" id="country" required class="mt-1 block w-full border border-gray-300 px-3 py-2 focus:outline-none focus:ring-secondary focus:border-secondary" placeholder="France, Belgique, etc.">
+                  <input v-model="formData.country" type="text" id="country" required class="mt-1 block w-full border border-gray-300 px-3 py-2 focus:outline-none focus:ring-secondary focus:border-secondary" placeholder="Benin, France, Belgique, Atlanta, etc.">
                 </div>
                 
                 <div>
                   <label for="city" class="block text-sm font-medium text-gray-700">Ville/Région *</label>
-                  <input v-model="formData.city" type="text" id="city" required class="mt-1 block w-full border border-gray-300 px-3 py-2 focus:outline-none focus:ring-secondary focus:border-secondary" placeholder="Paris, Province, etc.">
+                  <input v-model="formData.city" type="text" id="city" required class="mt-1 block w-full border border-gray-300 px-3 py-2 focus:outline-none focus:ring-secondary focus:border-secondary" placeholder="Cotonou, Paris, Province, etc.">
                 </div>
                 
                 <div>

@@ -310,7 +310,8 @@ const loadStats = async () => {
   error.value = ''
   try {
     const data = await fetchAdminStats()
-    stats.value = data.stats
+    // data = { success: true, stats: {...} }
+    stats.value = data.stats  // ✅ correspond maintenant
   } catch (e: any) {
     error.value = e.message || 'Impossible de charger les statistiques'
   } finally {

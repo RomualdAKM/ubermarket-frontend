@@ -75,18 +75,33 @@ export const useAuth = () => {
   // Connexion
   const login = async (credentials: LoginData): Promise<ApiResponse<{ user: User, token: string }>> => {
     try {
-      const response = await apiRequest<{ user: User, token: string }>('/vendor/login', {
-        method: 'POST',
-        body: JSON.stringify(credentials)
-      })
+      // Essayer d'abord /vendor/login, puis /client/login si ça échoue
+      let response: any = null
+      let lastError: Error | null = null
 
-      if (response.success && response.token && response.user) {
+      for (const endpoint of ['/vendor/login', '/client/login']) {
+        try {
+          response = await apiRequest<{ user: User, token: string }>(endpoint, {
+            method: 'POST',
+            body: JSON.stringify(credentials)
+          })
+          if (response.success) break
+        } catch (err: any) {
+          lastError = err
+          continue
+        }
+      }
+
+      if (!response?.success) {
+        throw lastError || new Error('Identifiants invalides')
+      }
+
+      if (response.token && response.user) {
         token.value = response.token
         user.value = response.user
-        
-        // Stocker le token dans le localStorage pour la persistance
         if (process.client) {
           localStorage.setItem('auth_token', response.token)
+          localStorage.setItem('user_role', response.user.role || 'client')
         }
       }
 

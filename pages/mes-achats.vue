@@ -95,7 +95,8 @@ const error = ref<string | null>(null)
 // Rediriger si non connecté
 onMounted(async () => {
   if (!user.value) {
-    router.push('/connexion')
+    //router.push('/connexion')
+    router.push(`/connexion?redirect=${encodeURIComponent(route.fullPath)}`)
     return
   }
   

@@ -2,8 +2,8 @@
   <div>
     <!-- Header -->
     <div class="mb-6">
-      <h1 class="text-2xl font-bold text-gray-900">Gestion des boutiques</h1>
-      <p class="mt-1 text-sm text-gray-500">Gérez toutes les boutiques de la plateforme</p>
+      <h1 class="text-2xl font-bold text-gray-900">Gestion des sites/boutiques</h1>
+      <p class="mt-1 text-sm text-gray-500">Toutes les sites et boutiques de la plateforme sont géré içi.</p>
     </div>
 
     <!-- Filtres -->
@@ -18,7 +18,7 @@
             <input
               v-model="searchQuery"
               type="text"
-              placeholder="Rechercher une boutique..."
+              placeholder="Rechercher un site / une boutique..."
               class="w-full pl-10 pr-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
               @input="debouncedSearch"
             />
@@ -32,7 +32,7 @@
           @change="loadShops(1)"
         >
           <option value="">Tous les types</option>
-          <option value="ecommerce">E-commerce</option>
+          <option value="e-commerce">E-commerce</option>
           <option value="website">Website</option>
         </select>
 
@@ -53,7 +53,7 @@
     <div v-if="loading" class="bg-white rounded-xl border border-gray-200 p-12">
       <div class="flex flex-col items-center justify-center gap-3">
         <div class="w-8 h-8 border-3 border-indigo-200 border-t-indigo-600 rounded-full animate-spin"></div>
-        <p class="text-sm text-gray-500">Chargement des boutiques...</p>
+        <p class="text-sm text-gray-500">Chargement des sites & boutiques...</p>
       </div>
     </div>
 
@@ -64,7 +64,7 @@
         <table class="w-full">
           <thead>
             <tr class="border-b border-gray-100 bg-gray-50/50">
-              <th class="text-left px-5 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Nom boutique</th>
+              <th class="text-left px-5 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Nom du projet</th>
               <th class="text-left px-5 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Propriétaire</th>
               <th class="text-left px-5 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Type</th>
               <th class="text-left px-5 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Abonnement</th>
@@ -89,7 +89,7 @@
               </td>
               <td class="px-5 py-4">
                 <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-indigo-50 text-indigo-700">
-                  {{ shop.shop_type === 'ecommerce' ? 'E-commerce' : shop.shop_type === 'website' ? 'Website' : shop.shop_type }}
+                  {{ shop.shop_type === 'e-commerce' ? 'E-commerce' : shop.shop_type === 'website' ? 'Website' : shop.shop_type }}
                 </span>
               </td>
               <td class="px-5 py-4">
@@ -153,7 +153,7 @@
             </span>
           </div>
           <div class="flex items-center gap-3 text-xs text-gray-500">
-            <span>{{ shop.shop_type === 'ecommerce' ? 'E-commerce' : shop.shop_type === 'website' ? 'Website' : shop.shop_type }}</span>
+            <span>{{ shop.shop_type === 'e-commerce' ? 'E-commerce' : shop.shop_type === 'website' ? 'Website' : shop.shop_type }}</span>
             <span>·</span>
             <span>{{ shop.subscription?.plan || 'Aucun' }}</span>
             <span>·</span>
@@ -165,7 +165,7 @@
       <!-- Pagination -->
       <div class="border-t border-gray-100 px-5 py-3 flex items-center justify-between">
         <p class="text-sm text-gray-500">
-          Page {{ currentPage }} sur {{ lastPage }} — {{ total }} boutique{{ total > 1 ? 's' : '' }}
+          Page {{ currentPage }} sur {{ lastPage }} — {{ total }} site{{ total > 1 ? 's' : '' }}
         </p>
         <div class="flex items-center gap-2">
           <button
@@ -194,7 +194,7 @@
             <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 21v-7.5a.75.75 0 0 1 .75-.75h3a.75.75 0 0 1 .75.75V21m-4.5 0H2.36m11.14 0H18m0 0h3.64m-1.39 0V9.349M3.75 21V9.349m0 0a3.001 3.001 0 0 0 3.75-.615A2.993 2.993 0 0 0 9.75 9.75c.896 0 1.7-.393 2.25-1.016a2.993 2.993 0 0 0 2.25 1.016c.896 0 1.7-.393 2.25-1.015a3.001 3.001 0 0 0 3.75.614m-16.5 0a3.004 3.004 0 0 1-.621-4.72l1.189-1.19A1.5 1.5 0 0 1 5.378 3h13.243a1.5 1.5 0 0 1 1.06.44l1.19 1.189a3 3 0 0 1-.621 4.72M6.75 18h3.75a.75.75 0 0 0 .75-.75V13.5a.75.75 0 0 0-.75-.75H6.75a.75.75 0 0 0-.75.75v3.75c0 .414.336.75.75.75Z"/>
           </svg>
         </div>
-        <p class="text-sm font-medium text-gray-900">Aucune boutique trouvée</p>
+        <p class="text-sm font-medium text-gray-900">Aucun projet trouvée</p>
         <p class="text-sm text-gray-500">Modifiez vos filtres pour voir plus de résultats</p>
       </div>
     </div>
@@ -208,7 +208,7 @@
           <p class="text-sm text-gray-600 mb-6">
             Êtes-vous sûr de vouloir
             <strong>{{ shopToToggle?.status === 'active' ? 'désactiver' : 'activer' }}</strong>
-            la boutique <strong>{{ shopToToggle?.name }}</strong> ?
+            le site <strong>{{ shopToToggle?.name }}</strong> ?
           </p>
           <div class="flex items-center justify-end gap-3">
             <button
@@ -258,11 +258,11 @@
             <div class="p-6 space-y-6">
               <!-- Infos boutique -->
               <div>
-                <h3 class="text-sm font-semibold text-gray-900 mb-3">Informations boutique</h3>
+                <h3 class="text-sm font-semibold text-gray-900 mb-3">Informations projet</h3>
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div class="bg-gray-50 rounded-lg p-3">
                     <p class="text-xs text-gray-500 mb-1">Type</p>
-                    <p class="text-sm font-medium text-gray-900">{{ shopDetail.shop_type === 'ecommerce' ? 'E-commerce' : shopDetail.shop_type === 'website' ? 'Website' : shopDetail.shop_type }}</p>
+                    <p class="text-sm font-medium text-gray-900">{{ shopDetail.shop_type === 'e-commerce' ? 'E-commerce' : shopDetail.shop_type === 'website' ? 'Website' : shopDetail.shop_type }}</p>
                   </div>
                   <div class="bg-gray-50 rounded-lg p-3">
                     <p class="text-xs text-gray-500 mb-1">Sous-domaine</p>
@@ -352,14 +352,14 @@
                   <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 6H5.25A2.25 2.25 0 0 0 3 8.25v10.5A2.25 2.25 0 0 0 5.25 21h10.5A2.25 2.25 0 0 0 18 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25"/>
                   </svg>
-                  Visiter la boutique
+                  Visiter le site.
                 </a>
                 <button
                   @click="confirmToggleFromDetail"
                   class="px-4 py-2 text-sm font-medium text-white rounded-lg transition-colors"
                   :class="shopDetail.status === 'active' ? 'bg-red-600 hover:bg-red-700' : 'bg-green-600 hover:bg-green-700'"
                 >
-                  {{ shopDetail.status === 'active' ? 'Désactiver la boutique' : 'Activer la boutique' }}
+                  {{ shopDetail.status === 'active' ? 'Désactiver le site' : 'Activer le site' }}
                 </button>
               </div>
             </div>
@@ -426,7 +426,7 @@ const loadShops = async (page: number = 1) => {
     lastPage.value = response.shops?.last_page || 1
     total.value = response.shops?.total || 0
   } catch (error: any) {
-    console.error('Erreur chargement boutiques:', error)
+    console.error('Erreur chargement sites:', error)
   } finally {
     loading.value = false
   }

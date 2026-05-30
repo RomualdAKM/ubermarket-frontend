@@ -304,13 +304,17 @@ const handleLogin = async () => {
     }
     
     const response = await login(loginData)
-    
+    // Redirection selon le rôle de l'utilisateur
     if (response.success) {
-      // Redirection selon le rôle de l'utilisateur
-      let destination = redirectTo.value || '/mes-boutiques'
-      if (response.user?.role === 'super_admin') {
-        destination = '/dashboard-admin'
+      const role = response.user?.role
+      let destination = redirectTo.value
+
+      if (!destination) {
+        if (role === 'super_admin') destination = '/dashboard-admin'
+        else if (role === 'client') destination = '/dashboard-client/profil'
+        else destination = '/mes-boutiques'
       }
+
       await router.push(destination)
     }
   } catch (error: any) {

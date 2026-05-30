@@ -85,32 +85,26 @@ const user = ref({
 })
 
 // Détecter l'URL de la boutique depuis le paramètre redirect ou localStorage
-const shopUrl = computed(() => {
-  // Vérifier dans le query param redirect
-  const redirect = route.query.redirect as string
-  if (redirect && redirect.includes('/boutique/')) {
-    const match = redirect.match(/(\/boutique\/[^\/]+)/)
-    if (match) {
-      return match[1]
+  const shopUrl = computed(() => {
+    // Vérifier le query param 'from' ou 'redirect'
+    const from = (route.query.from || route.query.redirect) as string
+    if (from && (from.includes('/boutique/') || from.includes('/site/'))) {
+      return from
     }
-  }
-  
-  // Vérifier dans le localStorage
-  if (process.client) {
-    const lastShop = localStorage.getItem('last_shop_url')
-    if (lastShop) {
-      return lastShop
+
+    // Vérifier dans le localStorage
+    if (process.client) {
+      const lastShop = localStorage.getItem('last_shop_url')
+      if (lastShop) return lastShop
     }
-  }
-  
   // Par défaut, retourner vers la marketplace
-  return '/'
-})
+    return null  // null = bouton masqué si pas de boutique connue
+  })
 
 // Charger les informations de l'utilisateur
 onMounted(async () => {
   if (!token.value) {
-    router.push('/connexion')
+    router.push(`/connexion?from=${encodeURIComponent(route.fullPath)}`)
     return
   }
   
@@ -123,6 +117,6 @@ onMounted(async () => {
 // Déconnexion
 const handleLogout = async () => {
   await logout()
-  router.push('/connexion')
+  router.push(`/connexion?from=${encodeURIComponent(route.fullPath)}`)
 }
 </script>

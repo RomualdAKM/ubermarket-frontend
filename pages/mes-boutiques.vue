@@ -1,19 +1,42 @@
 <template>
   <div class="max-w-7xl mx-auto p-6">
+    <NuxtLink to="/">
+        <img alt="UberMarket Logo" class="h-34 md:h-36" src="/uber-market.png">
+        <!-- Le bouton de déconnexion sorti du lien et placé en haut à droite -->
+        <button 
+          @click="handleLogout"
+          class="absolute top-2 right-2 flex items-center gap-2 px-3 py-1.5 text-sm text-red-600 hover:bg-red-50 rounded-md transition-colors"
+        >
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0 0 13.5 3h-6a2.25 2.25 0 0 0-2.25 2.25v13.5A2.25 2.25 0 0 0 7.5 21h6a2.25 2.25 0 0 0 2.25-2.25V15m3 0 3-3m0 0-3-3m3 3H9"/>
+          </svg>
+          <span>Se déconnecter</span>
+        </button>
+    </NuxtLink>
     <div class="mb-8 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
       <div>
-        <h1 class="text-2xl font-bold text-gray-900">Mes boutiques</h1>
+        <h1 class="text-2xl font-bold text-gray-900">
+          Content de te revoir, {{ user?.name }}
+            <div class="px-4 py-3 border-b border-slate-100">
+              <!--<p class="text-sm font-medium text-slate-900">{{ user?.name }}</p>-->
+              <p class="text-xs text-slate-500 truncate">{{ user?.email }}</p>
+            </div>
+        </h1>
+        <!-- <p class="text-gray-600 mt-1">Gérez vos boutiques en ligne</p> -->
+      </div>
+      <div>
+        <h1 class="text-2xl font-bold text-gray-900">Mes sites /  Boutiques </h1>
         <!-- <p class="text-gray-600 mt-1">Gérez vos boutiques en ligne</p> -->
       </div>
       <NuxtLink to="/creer-boutique" class="px-4 py-2 bg-primary text-white text-sm font-medium hover:bg-secondary focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary rounded-md transition-colors duration-200">
-        + Créer une boutique
+        + Nouveau projet
       </NuxtLink>
     </div>
 
     <!-- Message de chargement -->
     <div v-if="loading" class="flex justify-center items-center py-12">
       <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-      <span class="ml-3 text-gray-600">Chargement de vos boutiques...</span>
+      <span class="ml-3 text-gray-600">Chargement de vos sites/boutiques...</span>
     </div>
 
     <!-- Message si aucune boutique -->
@@ -23,20 +46,50 @@
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
         </svg>
       </div>
-      <h3 class="text-lg font-medium text-gray-900 mb-2">Aucune boutique trouvée</h3>
-      <p class="text-gray-500 mb-6">Commencez par créer votre première boutique en ligne</p>
+      <h3 class="text-lg font-medium text-gray-900 mb-2">Aucune site/boutique trouvée</h3>
+      <p class="text-gray-500 mb-6">Commencez par créer votre première site/boutique en ligne</p>
       <NuxtLink to="/creer-boutique" class="px-6 py-3 bg-primary text-white font-medium rounded-md hover:bg-secondary focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition-colors duration-200">
-        Créer ma première boutique
+        Créer mon premier projet
       </NuxtLink>
     </div>
 
     <!-- Liste des boutiques propriétaires -->
     <div v-else>
+      <!-- Filtres -->
+      <div v-if="shops.length > 0" class="mb-6 flex gap-2">
+        <button
+          @click="activeFilter = 'all'"
+          :class="activeFilter === 'all' 
+            ? 'bg-primary text-white' 
+            : 'bg-white border border-gray-300 text-gray-700 hover:bg-gray-50'"
+          class="px-4 py-1.5 rounded-full text-sm font-medium transition-colors"
+        >
+          Tous ({{ shops.length }})
+        </button>
+        <button
+          @click="activeFilter = 'e-commerce'"
+          :class="activeFilter === 'e-commerce' 
+            ? 'bg-primary text-white' 
+            : 'bg-white border border-gray-300 text-gray-700 hover:bg-gray-50'"
+          class="px-4 py-1.5 rounded-full text-sm font-medium transition-colors"
+        >
+          Boutiques ({{ shops.filter(s => s.shop_type === 'e-commerce').length }})
+        </button>
+        <button
+          @click="activeFilter = 'website'"
+          :class="activeFilter === 'website' 
+            ? 'bg-primary text-white' 
+            : 'bg-white border border-gray-300 text-gray-700 hover:bg-gray-50'"
+          class="px-4 py-1.5 rounded-full text-sm font-medium transition-colors"
+        >
+          Sites vitrines ({{ shops.filter(s => s.shop_type === 'website').length }})
+        </button>
+      </div>
       <!-- Section Mes boutiques -->
       <div v-if="shops.length > 0" class="mb-10">
-        <h2 class="text-sm font-medium text-gray-500 uppercase tracking-wide mb-4">Mes boutiques</h2>
+        <h2 class="text-sm font-medium text-gray-500 uppercase tracking-wide mb-4">Mes sites/boutiques</h2>
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          <div v-for="shop in shops" :key="shop.id" class="bg-white border border-gray-200 rounded-lg">
+          <div v-for="shop in filteredShops" :key="shop.id" class="bg-white border border-gray-200 rounded-lg">
             <div class="p-6">
               <div class="flex items-start">
                 <!-- Logo de la boutique -->
@@ -71,14 +124,13 @@
                 >
                   Gérer
                 </NuxtLink>
-                <a 
-                  :href="getShopUrl(shop)" 
+                <NuxtLink 
+                  :to="getShopUrl(shop)"
                   target="_blank"
-                  rel="noopener noreferrer"
                   class="flex-1 px-3 py-2 bg-primary text-white text-sm font-medium rounded-md hover:bg-secondary focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition-colors duration-200 text-center"
                 >
                   Voir
-                </a>
+                </NuxtLink>
               </div>
             </div>
             
@@ -151,10 +203,10 @@
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
           </svg>
         </div>
-        <h3 class="text-lg font-medium text-gray-900 mb-2">Aucune boutique trouvée</h3>
-        <p class="text-gray-500 mb-6">Commencez par créer votre première boutique en ligne</p>
+        <h3 class="text-lg font-medium text-gray-900 mb-2">Aucun(e) site/boutique trouvée</h3>
+        <p class="text-gray-500 mb-6">Commencez par créer votre premier/première, site/boutique en ligne</p>
         <NuxtLink to="/creer-boutique" class="px-6 py-3 bg-primary text-white font-medium rounded-md hover:bg-secondary focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition-colors duration-200">
-          Créer ma première boutique
+          Créer mon premier projet
         </NuxtLink>
       </div>
       
@@ -166,8 +218,8 @@
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
             </svg>
           </div>
-          <h3 class="text-lg font-medium text-gray-900">Nouvelle boutique</h3>
-          <p class="text-gray-500 text-sm mt-1">Créer une autre boutique</p>
+          <h3 class="text-lg font-medium text-gray-900">Nouveau projet</h3>
+          <p class="text-gray-500 text-sm mt-1">Créer une autre site/boutique</p>
           <div class="mt-4">
             <NuxtLink to="/creer-boutique" class="px-4 py-2 bg-primary text-white text-sm font-medium rounded-md hover:bg-secondary focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition-colors duration-200">
               Créer
@@ -187,16 +239,21 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+//import { ref, onMounted } from 'vue'
 import { useShops } from '~/composables/useShops'
 import { useAuth } from '~/composables/useAuth'
 import { useCollaborators } from '~/composables/useCollaborators'
+import { ref, onMounted, computed } from 'vue'
 
 // Redirection si non authentifié
 const { isAuthenticated } = useAuth()
 if (!isAuthenticated.value) {
   await navigateTo('/connexion-vendeur')
 }
+
+// Recuperation de la boutique courante et de l'utilisateur
+//const { currentShop, currentAccess, hasPermission, hasAnyPermission } = useShops()
+const { user, logout } = useAuth()
 
 // Composables
 const { shops, fetchShops } = useShops()
@@ -205,6 +262,13 @@ const config = useRuntimeConfig()
 
 // États locaux
 const loading = ref(true)
+// Filtre actif : 'all' | 'e-commerce' | 'website'
+const activeFilter = ref<'all' | 'e-commerce' | 'website'>('all')
+
+const filteredShops = computed(() => {
+  if (activeFilter.value === 'all') return shops.value
+  return shops.value.filter(s => s.shop_type === activeFilter.value)
+})
 const showSuccessMessage = ref(false)
 
 // Fonctions utilitaires
@@ -240,29 +304,11 @@ const getStatusClass = (status: string) => {
 }
 
 const getShopUrl = (shop: any) => {
-  // Si custom_domain est défini, l'utiliser
-  if (shop.custom_domain) {
-    // Vérifier si le domaine commence déjà par http:// ou https://
-    if (shop.custom_domain.startsWith('http://') || shop.custom_domain.startsWith('https://')) {
-      return shop.custom_domain
-    }
-    return `https://${shop.custom_domain}`
-  }
-  
-  // Sinon utiliser le sous-domaine
-  if (shop.subdomain) {
-    return `https://${shop.subdomain}.uber-market.com`
-  }
-  
-  // Fallback sur full_domain si disponible
-  if (shop.full_domain) {
-    if (shop.full_domain.startsWith('http://') || shop.full_domain.startsWith('https://')) {
-      return shop.full_domain
-    }
-    return `https://${shop.full_domain}`
-  }
-  
-  return '#'
+  const identifier = shop.subdomain || shop.slug
+  if (!identifier) return '#'
+  return shop.shop_type === 'website'
+    ? `/site/${identifier}`
+    : `/boutique/${identifier}`
 }
 
 // Chargement des données au montage

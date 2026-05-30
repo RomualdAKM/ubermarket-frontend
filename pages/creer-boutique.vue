@@ -5,7 +5,7 @@
         <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
         </svg>
-        Retour à mes boutiques
+        Retour à mes projets
       </NuxtLink>
       <h1 class="text-xl font-bold text-gray-900">{{ boutiqueForm.type === 'website' ? 'Créer un nouveau site' : 'Créer une nouvelle boutique' }}</h1>
       <!-- <p class="text-gray-600 mt-1">Remplissez les informations ci-dessous pour créer votre boutique</p> -->
@@ -142,6 +142,38 @@
               </option>
             </select>
           </div>
+
+          <!-- Sous-catégories (elles sont affichées uniquement si une catégorie est sélectionnée) -->
+          <div v-if="boutiqueForm.category_id">
+            <label for="subcategory" class="block text-sm font-medium text-gray-700 mb-1">
+              Sous-catégorie <span class="text-gray-400 font-normal">(optionnel)</span>
+            </label>
+            <select
+              id="subcategory"
+              name="subcategory"
+              v-model="boutiqueForm.subcategory_id"
+              class="block w-full px-3 py-2 border-0 border-b-2 border-gray-300 text-gray-900 focus:outline-none focus:ring-0 focus:border-primary bg-white"
+              :disabled="subcategoriesLoading"
+            >
+              <option :value="null">
+                {{ subcategoriesLoading ? 'Chargement...' : '— Aucune sous-catégorie —' }}
+              </option>
+              <option
+                v-for="sub in subcategories"
+                :key="sub.id"
+                :value="sub.id">
+                {{ sub.name }}
+              </option>
+            </select>
+
+            <!-- Message si aucune sous-catégorie disponible -->
+            <p 
+              v-if="!subcategoriesLoading && subcategories.length === 0" 
+              class="mt-1 text-xs text-gray-400 italic"
+            >
+              Aucune sous-catégorie pour cette catégorie.
+            </p>
+          </div>
           
           <div>
             <label for="currency" class="block text-sm font-medium text-gray-700 mb-1">Devise <span class="text-red-500">*</span></label>
@@ -251,7 +283,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, onMounted } from 'vue'
+import { ref, reactive, onMounted, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import type { ShopData } from '~/types/auth'
 import { useShops } from '~/composables/useShops'
@@ -260,23 +292,23 @@ import { useCategories } from '~/composables/useCategories'
 
 const router = useRouter()
 const { createShop } = useShops()
-const { categories, fetchCategories, isLoading: categoriesLoading } = useCategories()
+const { 
+  categories, fetchCategories, isLoading: categoriesLoading,
+  subcategories, subcategoriesLoading, fetchSubcategories
+} = useCategories()
+
 const showSuccessMessage = ref(false)
 const isSubmitting = ref(false)
 const submitError = ref('')
 const showTypeInfo = ref(false)
 const showProductTypeInfo = ref(false)
 
-// Charger les catégories au montage du composant
-onMounted(async () => {
-  await fetchCategories()
-})
-
 const boutiqueForm = reactive({
   name: '',
   type: 'e-commerce' as 'e-commerce' | 'website',
   productType: 'physical' as 'physical' | 'digital',
   category_id: null as number | null,
+  subcategory_id: null as number | null,
   logo: null as File | null,
   logoPreview: '',
   color: '#FF0000',
@@ -286,23 +318,27 @@ const boutiqueForm = reactive({
   currency: 'XOF' as 'EUR' | 'USD' | 'XOF'
 })
 
+onMounted(async () => {
+  await fetchCategories()
+})
+
+watch(() => boutiqueForm.category_id, async (newId) => {
+  boutiqueForm.subcategory_id = null
+  if (newId) await fetchSubcategories(newId)
+})
+
 const handleLogoUpload = (event: Event) => {
   const target = event.target as HTMLInputElement
   const file = target.files?.[0]
-  
   if (file) {
-    // Vérifier la taille du fichier (max 2 Mo)
     if (file.size > 2 * 1024 * 1024) {
       alert('Le fichier est trop volumineux. Taille maximale : 2 Mo.')
       return
     }
-    
-    // Vérifier le type de fichier
     if (!file.type.match('image/png') && !file.type.match('image/jpeg')) {
       alert('Format de fichier non supporté. Formats acceptés : PNG, JPEG.')
       return
     }
-    
     boutiqueForm.logo = file
     const reader = new FileReader()
     reader.onload = (e) => {
@@ -313,39 +349,32 @@ const handleLogoUpload = (event: Event) => {
 }
 
 const sanitizeSubdomain = () => {
-  // Nettoyer la saisie : minuscules uniquement, remplacer espaces par tirets, supprimer caractères spéciaux
   boutiqueForm.domain = boutiqueForm.domain
     .toLowerCase()
-    .replace(/\s+/g, '-')  // Remplacer espaces par tirets
-    .replace(/[^a-z0-9-]/g, '')  // Supprimer tout sauf lettres, chiffres et tirets
-    .replace(/-+/g, '-')  // Remplacer plusieurs tirets consécutifs par un seul
-    .replace(/^-+|-+$/g, '')  // Supprimer tirets au début et à la fin
+    .replace(/\s+/g, '-')
+    .replace(/[^a-z0-9-]/g, '')
+    .replace(/-+/g, '-')
+    .replace(/^-+|-+$/g, '')
 }
 
 const createBoutique = async () => {
-  // Réinitialiser les erreurs
   submitError.value = ''
-  
-  // Validation des champs obligatoires
   if (!boutiqueForm.name) {
     submitError.value = 'Le nom de la boutique est obligatoire.'
     return
   }
-  
   isSubmitting.value = true
-  
   try {
-    // Validation des champs obligatoires
     if (!boutiqueForm.category_id) {
       submitError.value = 'Veuillez sélectionner une catégorie.'
       return
     }
-
     const shopData: ShopData = {
       name: boutiqueForm.name,
       shop_type: boutiqueForm.type,
       product_type: boutiqueForm.productType,
       category_id: boutiqueForm.category_id,
+      subcategory_id: boutiqueForm.subcategory_id || undefined,
       description: boutiqueForm.description,
       primary_color: boutiqueForm.color,
       logo: boutiqueForm.logo || undefined,
@@ -353,28 +382,22 @@ const createBoutique = async () => {
       currency: boutiqueForm.currency,
       subdomain: boutiqueForm.domain || undefined
     }
-    
     console.log('Données à envoyer:', shopData)
     const response = await createShop(shopData)
-    
     if (response.success) {
-      // Afficher le message de succès
       showSuccessMessage.value = true
-      
-      // Réinitialiser le formulaire
       Object.assign(boutiqueForm, {
         name: '',
         type: 'e-commerce',
         productType: 'physical',
         category_id: null,
+        subcategory_id: null,
         logo: null,
         logoPreview: '',
         color: '#FF0000',
         description: '',
         domain: ''
       })
-      
-      // Rediriger vers la page des boutiques après 2 secondes
       setTimeout(() => {
         router.push('/mes-boutiques')
       }, 2000)

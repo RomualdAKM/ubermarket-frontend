@@ -95,13 +95,151 @@ export const useGlobalStats = () => {
     error.value = null
 
     try {
-      const response = await apiRequest<any>(`/vendor/shops/global-stats?period=${period}`)
+      // 1. Récupérer la liste des boutiques
+      const shopsResponse = await apiRequest<any>('/shops')
+      if (!shopsResponse.success || !shopsResponse.data) {
+        throw new Error('Impossible de récupérer les boutiques')
+      }
 
-      if (response.success && response.data) {
-        globalStats.value = response.data
+      // 💡Filtre pour ne garder que les e-commerce
+      const shops = shopsResponse.data.filter((shop: any) => shop.shop_type === 'e-commerce')
+
+      if (shops.length === 0) {
+        globalStats.value = {
+          statistics: {
+            total_orders: 0, total_revenue: 0, total_products: 0,
+            total_customers: 0, total_shops: 0, conversion_rate: 0,
+            average_cart: 0, total_visits: 0, currency: 'XOF'
+          },
+          shops_stats: [],
+          revenue_by_day: [],
+          visits_by_day: [],
+          popular_products: [],
+          period
+        }
         return true
       }
-      return false
+
+      // 2. Récupérer les stats de chaque boutique en parallèle
+      const shopsStatsResults = await Promise.allSettled(
+        shops.map((shop: any) =>
+          apiRequest<any>(`/shops/${shop.id}/dashboard/stats?period=${period}`)
+        )
+      )
+
+      // 3. Agréger les résultats
+      let totalOrders = 0
+      let totalRevenue = 0
+      let totalProducts = 0
+      let totalCustomers = 0
+      let totalVisits = 0
+      const shopsStats: ShopStat[] = []
+      const revenueByDay: Record<string, number> = {}
+      const visitsByDay: Record<string, number> = {}
+      const popularProductsMap: Record<number, PopularProduct> = {}
+      const currency = shops[0]?.currency || 'XOF'
+
+      shopsStatsResults.forEach((result, index) => {
+        const shop = shops[index]
+        if (result.status === 'rejected' || !result.value?.success) return
+
+        const stats = result.value.data
+
+        const shopOrders = stats.orders_count || stats.total_orders || 0
+        const shopRevenue = stats.total_revenue || stats.revenue || 0
+        const shopProducts = stats.products_count || stats.total_products || 0
+        const shopCustomers = stats.customers_count || stats.total_customers || 0
+
+        totalOrders += shopOrders
+        totalRevenue += shopRevenue
+        totalProducts += shopProducts
+        totalCustomers += shopCustomers
+
+        shopsStats.push({
+          id: shop.id,
+          name: shop.name,
+          slug: shop.slug,
+          logo: shop.logo || null,
+          orders: shopOrders,
+          revenue: shopRevenue,
+          currency: shop.currency || 'XOF'
+        })
+
+        // Agréger les revenus par jour
+        if (stats.revenue_by_day || stats.revenue_chart) {
+          const revData = stats.revenue_by_day || stats.revenue_chart || []
+          revData.forEach((item: any) => {
+            const label = item.label || item.date || item.day
+            const value = item.value || item.revenue || item.amount || 0
+            revenueByDay[label] = (revenueByDay[label] || 0) + value
+          })
+        }
+
+        // Agréger les visites
+        if (stats.visits_by_day || stats.visits_chart) {
+          const visitsData = stats.visits_by_day || stats.visits_chart || []
+          visitsData.forEach((item: any) => {
+            const label = item.label || item.date || item.day
+            const value = item.value || item.visits || item.count || 0
+            visitsByDay[label] = (visitsByDay[label] || 0) + value
+            totalVisits += value
+          })
+        }
+
+        // Produits populaires
+        if (stats.popular_products) {
+          stats.popular_products.forEach((product: any) => {
+            if (popularProductsMap[product.id]) {
+              popularProductsMap[product.id].sales += product.sales_count || product.sales || 0
+              popularProductsMap[product.id].revenue += product.revenue || 0
+            } else {
+              popularProductsMap[product.id] = {
+                id: product.id,
+                name: product.name,
+                shop_name: shop.name,
+                sales: product.sales_count || product.sales || 0,
+                revenue: product.revenue || 0,
+                preview_image: product.preview_image || product.image || null
+              }
+            }
+          })
+        }
+      })
+
+      const conversionRate = totalVisits > 0
+        ? Math.round((totalOrders / totalVisits) * 100 * 100) / 100
+        : 0
+
+      const averageCart = totalOrders > 0
+        ? Math.round(totalRevenue / totalOrders)
+        : 0
+
+      globalStats.value = {
+        statistics: {
+          total_orders: totalOrders,
+          total_revenue: totalRevenue,
+          total_products: totalProducts,
+          total_customers: totalCustomers,
+          total_shops: shops.length,
+          conversion_rate: conversionRate,
+          average_cart: averageCart,
+          total_visits: totalVisits,
+          currency
+        },
+        shops_stats: shopsStats,
+        revenue_by_day: Object.entries(revenueByDay)
+          .map(([label, value]) => ({ label, value }))
+          .slice(-30),
+        visits_by_day: Object.entries(visitsByDay)
+          .map(([label, value]) => ({ label, value }))
+          .slice(-30),
+        popular_products: Object.values(popularProductsMap)
+          .sort((a, b) => b.sales - a.sales)
+          .slice(0, 10),
+        period
+      }
+
+      return true
     } catch (err: any) {
       error.value = err.message
       console.error('Erreur fetchGlobalStats:', err)
