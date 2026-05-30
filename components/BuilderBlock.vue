@@ -4,7 +4,6 @@
     :class="section.advanced?.cssClasses || undefined"
     :style="sectionStyle"
   >
-    <!-- Background overlay pour images -->
     <div 
       v-if="(section.style?.backgroundType === 'image' || section.style?.backgroundType === 'video') && section.style?.backgroundOverlay" 
       class="absolute inset-0 pointer-events-none z-[1]"
