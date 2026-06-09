@@ -41,7 +41,7 @@
         
         <!-- Lien vers UberMarket -->
         <div class="mt-12 pt-6 border-t border-slate-200">
-          <a href="https://uber-market.com" class="text-slate-400 text-xs hover:text-slate-600 transition-colors">
+          <a href="https://www.uber-market.com" class="text-slate-400 text-xs hover:text-slate-600 transition-colors">
             Propulsé par UberMarket
           </a>
         </div>
@@ -84,7 +84,7 @@
         
         <!-- Lien vers UberMarket -->
         <div class="mt-12 pt-6 border-t border-slate-200">
-          <a href="https://uber-market.com" class="text-slate-400 text-xs hover:text-slate-600 transition-colors">
+          <a href="https://www.uber-market.com" class="text-slate-400 text-xs hover:text-slate-600 transition-colors">
             Propulsé par UberMarket
           </a>
         </div>

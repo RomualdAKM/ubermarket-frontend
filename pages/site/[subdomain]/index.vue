@@ -103,8 +103,42 @@ onMounted(() => {
   loadSite()
 })
 
-useHead(() => ({
+useHead(() => {
+  if (!shop.value) return { title: 'Site — UberMarket' }
+
+  const shopName = shop.value.name
+  const shopDesc = shop.value.description || `Site officiel de ${shopName}`
+  const shopUrl  = `https://uber-market.com/site/${subdomain}`
+
+  return {
+    title: `${shopName} — Site officiel`,
+    meta: [
+      { name: 'description', content: shopDesc.slice(0, 155) },
+      { name: 'robots', content: 'index, follow' },
+      { property: 'og:type',        content: 'website' },
+      { property: 'og:url',         content: shopUrl },
+      { property: 'og:title',       content: `${shopName} — Site officiel` },
+      { property: 'og:description', content: shopDesc.slice(0, 155) },
+      { property: 'og:image',       content: shop.value.logo_url || 'https://uber-market.com/og-image.png' },
+    ],
+    link: [{ rel: 'canonical', href: shopUrl }],
+    script: [
+      {
+        type: 'application/ld+json',
+        innerHTML: JSON.stringify({
+          '@context': 'https://schema.org',
+          '@type': 'WebSite',
+          name: shopName,
+          url: shopUrl,
+          description: shopDesc,
+        })
+      }
+    ]
+  }
+})
+
+/*useHead(() => ({
   title: shop.value?.name || 'Chargement...',
   meta: [{ name: 'description', content: shop.value?.description || 'Site vitrine' }]
-}))
+}))*/
 </script>

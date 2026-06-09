@@ -87,7 +87,30 @@ onMounted(() => {
   loadSite()
 })
 
-useHead(() => ({
+useHead(() => {
+  if (!page.value) return { title: 'Page — UberMarket' }
+
+  const pageTitle = page.value.title
+  const pageDesc  = page.value.meta_description
+    || page.value.sections?.[0]?.content?.text?.slice(0, 155)
+    || `${pageTitle} — ${shop.value?.name}`
+  const pageUrl   = `https://www.uber-market.com/site/${subdomain}/${pageSlug}`
+
+  return {
+    title: `${pageTitle} — ${shop.value?.name}`,
+    meta: [
+      { name: 'description', content: pageDesc },
+      { name: 'robots', content: page.value.is_published ? 'index, follow' : 'noindex, nofollow' },
+      { property: 'og:type',        content: 'article' },
+      { property: 'og:url',         content: pageUrl },
+      { property: 'og:title',       content: `${pageTitle} — ${shop.value?.name}` },
+      { property: 'og:description', content: pageDesc },
+    ],
+    link: [{ rel: 'canonical', href: pageUrl }]
+  }
+})
+
+/*seHead(() => ({
   title: shop.value?.name || 'Chargement...',
-}))
+}))*/
 </script>

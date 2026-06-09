@@ -51,34 +51,29 @@ const loadShop = async () => {
 
     shop.value = data.data
 
-    // Sauvegarder l'URL de la boutique pour "Continuer mes achats"
-    if (process.client) {
-      localStorage.setItem('last_shop_url', `/boutique/${subdomain}`)
+    // ✅ Vérifier si un thème de prévisualisation est demandé
+    const previewThemeSlug = route.query.preview_theme as string
+
+    const themeSlug = previewThemeSlug || shop.value.theme?.slug
+
+    if (themeSlug) {
+      try {
+        themeComponent.value = defineAsyncComponent(() =>
+          import(`~/pages/boutique/${themeSlug}/index.vue`)
+        )
+      } catch (err) {
+        error.value = `Thème "${themeSlug}" non disponible`
+      }
+    } else {
+      error.value = 'Aucun thème configuré'
     }
-    
-    // Charger les customizations de la boutique
+
+    // Charger les customizations
     await fetchCustomizations(subdomain)
     const customizationData = useState('shop.customizations')
     customizations.value = customizationData.value || {}
 
-    // Charger le composant de thème dynamiquement
-    if (shop.value.theme && shop.value.theme.slug) {
-      const themeSlug = shop.value.theme.slug
-      
-      try {
-        // Charger le composant index.vue du thème correspondant
-        themeComponent.value = defineAsyncComponent(() => 
-          import(`~/pages/boutique/${themeSlug}/index.vue`)
-        )
-      } catch (err) {
-        console.error(`Erreur lors du chargement du thème ${themeSlug}:`, err)
-        error.value = `Le thème "${shop.value.theme.name}" n'est pas disponible`
-      }
-    } else {
-      error.value = 'Cette boutique n\'a pas de thème configuré'
-    }
   } catch (err: any) {
-    console.error('Erreur lors du chargement de la boutique:', err)
     error.value = err.message || 'Une erreur est survenue'
   } finally {
     isLoading.value = false
@@ -91,7 +86,65 @@ onMounted(() => {
 })
 
 // Metadata pour SEO
-useHead(() => ({
+// Données de la boutique (après loadShop)
+useHead(() => {
+  if (!shop.value) return { title: 'Boutique — UberMarket' }
+
+  const shopName        = shop.value.name || 'Boutique'
+  const shopDesc        = shop.value.description || `Découvrez les produits de ${shopName} sur UberMarket`
+  const shopImage       = shop.value.logo_url || shop.value.banner_url || 'https://uber-market.com/og-image.png'
+  const shopUrl         = `https://uber-market.com/boutique/${subdomain}`
+  const shopCategory    = shop.value.subcategory?.category?.name || shop.value.category?.name || ''
+
+  return {
+    title: `${shopName} — Boutique en ligne | UberMarket`,
+    meta: [
+      // SEO de base
+      { name: 'description', content: `${shopDesc.slice(0, 155)}` },
+      { name: 'robots', content: 'index, follow' },
+      { name: 'keywords', content: `${shopName}, boutique en ligne, ${shopCategory}, acheter en ligne, UberMarket` },
+
+      // Open Graph
+      { property: 'og:type',        content: 'website' },
+      { property: 'og:url',         content: shopUrl },
+      { property: 'og:title',       content: `${shopName} — Boutique en ligne` },
+      { property: 'og:description', content: shopDesc.slice(0, 155) },
+      { property: 'og:image',       content: shopImage },
+      { property: 'og:site_name',   content: 'UberMarket' },
+
+      // Twitter
+      { name: 'twitter:card',        content: 'summary_large_image' },
+      { name: 'twitter:title',       content: `${shopName} — Boutique en ligne` },
+      { name: 'twitter:description', content: shopDesc.slice(0, 155) },
+      { name: 'twitter:image',       content: shopImage },
+    ],
+    link: [
+      { rel: 'canonical', href: shopUrl }
+    ],
+    script: [
+      {
+        type: 'application/ld+json',
+        innerHTML: JSON.stringify({
+          '@context': 'https://schema.org',
+          '@type': 'Store',
+          name: shopName,
+          description: shopDesc,
+          url: shopUrl,
+          image: shopImage,
+          '@id': shopUrl,
+          ...(shop.value.phone && { telephone: shop.value.phone }),
+          ...(shopCategory && {
+            hasOfferCatalog: {
+              '@type': 'OfferCatalog',
+              name: shopCategory
+            }
+          })
+        })
+      }
+    ]
+  }
+})
+/*useHead(() => ({
   title: shop.value ? `${shop.value.name} - Boutique` : 'Chargement...',
   meta: [
     {
@@ -99,5 +152,5 @@ useHead(() => ({
       content: shop.value?.description || 'Découvrez notre boutique en ligne'
     }
   ]
-}))
+}))*/
 </script>

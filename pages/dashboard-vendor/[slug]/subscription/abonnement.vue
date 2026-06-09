@@ -322,206 +322,255 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue'
-import { useRoute } from 'vue-router'
-import { useSubscription } from '~/composables/useSubscription'
+  import { ref, computed, onMounted } from 'vue'
+  //import { ref, computed, onMounted, nextTick } from 'vue'
+  import { useRoute } from 'vue-router'
+  import { useSubscription } from '~/composables/useSubscription'
 
-definePageMeta({
-  layout: 'dashboard'
-})
-
-const route = useRoute()
-const { 
-  plans, 
-  currentSubscription, 
-  paymentHistory: payments,
-  loading, 
-  error,
-  fetchPlans, 
-  fetchCurrentSubscription,
-  fetchPaymentHistory,
-  initiatePayment: initPayment,
-  verifyPayment,
-  changePlan
-} = useSubscription()
-
-const showPaymentModal = ref(false)
-const selectedPlan = ref<any>(null)
-const processing = ref(false)
-const message = ref('')
-const messageType = ref<'success' | 'error'>('success')
-
-// Labels des modules
-const moduleLabels: Record<string, string> = {
-  delivery: 'Livraisons',
-  promo: 'Codes Promo',
-  marketing: 'Marketing',
-  analytics: 'Analyses avancées',
-  customization: 'Personnalisation avancée',
-  custom_payment_keys: 'Clés paiement perso'
-}
-
-const getModuleLabel = (module: string) => moduleLabels[module] || module
-
-// Status de l'abonnement
-const statusLabel = computed(() => {
-  if (!currentSubscription.value) return ''
-  const status = currentSubscription.value.status
-  const labels: Record<string, string> = {
-    active: 'Actif',
-    trial: 'Essai gratuit',
-    expired: 'Expiré',
-    cancelled: 'Annulé'
-  }
-  return labels[status] || status
-})
-
-const statusColor = computed(() => {
-  if (!currentSubscription.value) return ''
-  const status = currentSubscription.value.status
-  const colors: Record<string, string> = {
-    active: 'text-green-600',
-    trial: 'text-blue-600',
-    expired: 'text-red-600',
-    cancelled: 'text-gray-600'
-  }
-  return colors[status] || 'text-gray-600'
-})
-
-// Vérifications
-const isCurrentPlan = (plan: any) => {
-  return currentSubscription.value?.plan?.code === plan.code
-}
-
-const canUpgrade = (plan: any) => {
-  if (!currentSubscription.value) return false
-  const currentPlanCode = currentSubscription.value.plan?.code
-  const currentPlanData = plans.value.find((p: any) => p.code === currentPlanCode)
-  if (!currentPlanData) return false
-  return plan.price > currentPlanData.price
-}
-
-// Format date
-const formatDate = (dateStr: string) => {
-  return new Date(dateStr).toLocaleDateString('fr-FR', {
-    day: 'numeric',
-    month: 'long',
-    year: 'numeric'
+  definePageMeta({
+    layout: 'dashboard'
   })
-}
 
-// Status des paiements
-const getPaymentStatusClass = (status: string) => {
-  const classes: Record<string, string> = {
-    completed: 'bg-green-100 text-green-800',
-    pending: 'bg-yellow-100 text-yellow-800',
-    failed: 'bg-red-100 text-red-800'
+  const route = useRoute()
+  const { 
+    plans, 
+    currentSubscription, 
+    paymentHistory: payments,
+    loading, 
+    error,
+    fetchPlans, 
+    fetchCurrentSubscription,
+    fetchPaymentHistory,
+    initiatePayment: initPayment,
+    verifyPayment,
+    changePlan
+  } = useSubscription()
+
+  const showPaymentModal = ref(false)
+  const selectedPlan = ref<any>(null)
+  const processing = ref(false)
+  const message = ref('')
+  const messageType = ref<'success' | 'error'>('success')
+
+  // Labels des modules
+  const moduleLabels: Record<string, string> = {
+    delivery: 'Livraisons',
+    promo: 'Codes Promo',
+    marketing: 'Marketing',
+    analytics: 'Analyses avancées',
+    customization: 'Personnalisation avancée',
+    custom_payment_keys: 'Clés paiement perso'
   }
-  return classes[status] || 'bg-gray-100 text-gray-800'
-}
 
-const getPaymentStatusLabel = (status: string) => {
-  const labels: Record<string, string> = {
-    completed: 'Payé',
-    pending: 'En attente',
-    failed: 'Échoué'
-  }
-  return labels[status] || status
-}
+  const getModuleLabel = (module: string) => moduleLabels[module] || module
 
-// Actions
-const openPaymentModal = (plan: any) => {
-  if (plan.price === 0) {
-    selectFreePlan(plan)
-    return
-  }
-  selectedPlan.value = plan
-  showPaymentModal.value = true
-}
-
-const closePaymentModal = () => {
-  showPaymentModal.value = false
-  selectedPlan.value = null
-}
-
-const selectFreePlan = async (plan: any) => {
-  processing.value = true
-  try {
-    // Pour les plans gratuits (Welcome, début Gratuit), utiliser changePlan
-    await changePlan(plan.code)
-    showMessage('Plan activé avec succès !', 'success')
-    await fetchCurrentSubscription()
-  } catch (err: any) {
-    showMessage(err.message || 'Erreur lors de l\'activation', 'error')
-  } finally {
-    processing.value = false
-  }
-}
-
-const initiatePayment = async (method: 'moneroo' | 'paypal') => {
-  if (!selectedPlan.value) return
-  processing.value = true
-  
-  try {
-    const returnUrl = `${window.location.origin}${route.path}?payment=callback`
-    const cancelUrl = `${window.location.origin}${route.path}?payment=cancelled`
-    
-    // Mapper moneroo vers mobile_money pour le backend
-    const backendMethod = method === 'moneroo' ? 'mobile_money' : method
-    const result = await initPayment(selectedPlan.value.code, backendMethod, returnUrl, cancelUrl)
-    
-    if (result.checkout_url) {
-      window.location.href = result.checkout_url
+  // Status de l'abonnement
+  const statusLabel = computed(() => {
+    if (!currentSubscription.value) return ''
+    const status = currentSubscription.value.status
+    const labels: Record<string, string> = {
+      active: 'Actif',
+      trial: 'Essai gratuit',
+      expired: 'Expiré',
+      cancelled: 'Annulé'
     }
-  } catch (err: any) {
-    showMessage(err.message || 'Erreur lors du paiement', 'error')
-    processing.value = false
+    return labels[status] || status
+  })
+
+  const statusColor = computed(() => {
+    if (!currentSubscription.value) return ''
+    const status = currentSubscription.value.status
+    const colors: Record<string, string> = {
+      active: 'text-green-600',
+      trial: 'text-blue-600',
+      expired: 'text-red-600',
+      cancelled: 'text-gray-600'
+    }
+    return colors[status] || 'text-gray-600'
+  })
+
+  // Vérifications
+  const isCurrentPlan = (plan: any) => {
+    return currentSubscription.value?.plan?.code === plan.code
   }
-}
 
-const showMessage = (msg: string, type: 'success' | 'error') => {
-  message.value = msg
-  messageType.value = type
-  setTimeout(() => { message.value = '' }, 5000)
-}
+  const canUpgrade = (plan: any) => {
+    if (!currentSubscription.value) return false
+    const currentPlanCode = currentSubscription.value.plan?.code
+    const currentPlanData = plans.value.find((p: any) => p.code === currentPlanCode)
+    if (!currentPlanData) return false
+    return plan.price > currentPlanData.price
+  }
 
-// Vérification callback paiement
-const checkPaymentCallback = async () => {
-  const query = route.query
-  
-  if (query.payment === 'callback') {
-    // Le backend retourne subscription_payment_id dans l'URL
-    const paymentId = query.subscription_payment_id as string
-    const gatewayId = query.token as string // PayPal utilise 'token'
+  // Format date
+  const formatDate = (dateStr: string) => {
+    return new Date(dateStr).toLocaleDateString('fr-FR', {
+      day: 'numeric',
+      month: 'long',
+      year: 'numeric'
+    })
+  }
+
+  // Status des paiements
+  const getPaymentStatusClass = (status: string) => {
+    const classes: Record<string, string> = {
+      completed: 'bg-green-100 text-green-800',
+      pending: 'bg-yellow-100 text-yellow-800',
+      failed: 'bg-red-100 text-red-800'
+    }
+    return classes[status] || 'bg-gray-100 text-gray-800'
+  }
+
+  const getPaymentStatusLabel = (status: string) => {
+    const labels: Record<string, string> = {
+      completed: 'Payé',
+      pending: 'En attente',
+      failed: 'Échoué'
+    }
+    return labels[status] || status
+  }
+
+  // Actions
+  const openPaymentModal = (plan: any) => {
+    if (plan.price === 0) {
+      selectFreePlan(plan)
+      return
+    }
+    selectedPlan.value = plan
+    showPaymentModal.value = true
+  }
+
+  const closePaymentModal = () => {
+    showPaymentModal.value = false
+    selectedPlan.value = null
+  }
+
+  const selectFreePlan = async (plan: any) => {
+    processing.value = true
+    try {
+      // Pour les plans gratuits (Welcome, début Gratuit), utiliser changePlan
+      await changePlan(plan.code)
+      showMessage('Plan activé avec succès !', 'success')
+      await fetchCurrentSubscription()
+    } catch (err: any) {
+      showMessage(err.message || 'Erreur lors de l\'activation', 'error')
+    } finally {
+      processing.value = false
+    }
+  }
+
+  const initiatePayment = async (method: 'moneroo' | 'paypal') => {
+    if (!selectedPlan.value) return
+    processing.value = true
     
-    if (paymentId) {
-      try {
-        await verifyPayment(parseInt(paymentId), gatewayId)
-        showMessage('Paiement effectué avec succès !', 'success')
-        await fetchCurrentSubscription()
-        await fetchPaymentHistory()
-      } catch (err: any) {
-        showMessage(err.message || 'Erreur de vérification du paiement', 'error')
+    try {
+      const returnUrl = `${window.location.origin}${route.path}?payment=callback`
+      const cancelUrl = `${window.location.origin}${route.path}?payment=cancelled`
+      
+      // Mapper moneroo vers mobile_money pour le backend
+      const backendMethod = method === 'moneroo' ? 'mobile_money' : method
+      const result = await initPayment(selectedPlan.value.code, backendMethod, returnUrl, cancelUrl)
+      
+      if (result.checkout_url) {
+        window.location.href = result.checkout_url
       }
+    } catch (err: any) {
+      showMessage(err.message || 'Erreur lors du paiement', 'error')
+      processing.value = false
     }
-    
-    // Nettoyer l'URL
-    window.history.replaceState({}, '', route.path)
-  } else if (query.payment === 'cancelled') {
-    showMessage('Paiement annulé', 'error')
-    window.history.replaceState({}, '', route.path)
-  } else if (query.payment === 'success') {
-    showMessage('Plan activé avec succès !', 'success')
-    window.history.replaceState({}, '', route.path)
   }
-}
 
-onMounted(async () => {
-  await Promise.all([
-    fetchPlans(),
-    fetchCurrentSubscription(),
-    fetchPaymentHistory()
-  ])
-  await checkPaymentCallback()
-})
+  const showMessage = (msg: string, type: 'success' | 'error') => {
+    message.value = msg
+    messageType.value = type
+    setTimeout(() => { message.value = '' }, 5000)
+  }
+
+  // Vérification callback paiement
+  const checkPaymentCallback = async () => {
+    const query = route.query
+    
+    if (query.payment === 'callback') {
+      // Le backend retourne subscription_payment_id dans l'URL
+      const paymentId = query.subscription_payment_id as string
+      const gatewayId = query.token as string // PayPal utilise 'token'
+      
+      if (paymentId) {
+        try {
+          await verifyPayment(parseInt(paymentId), gatewayId)
+          showMessage('Paiement effectué avec succès !', 'success')
+          await fetchCurrentSubscription()
+          await fetchPaymentHistory()
+        } catch (err: any) {
+          showMessage(err.message || 'Erreur de vérification du paiement', 'error')
+        }
+      }
+      
+      // Nettoyer l'URL
+      window.history.replaceState({}, '', route.path)
+    } else if (query.payment === 'cancelled') {
+      showMessage('Paiement annulé', 'error')
+      window.history.replaceState({}, '', route.path)
+    } else if (query.payment === 'success') {
+      showMessage('Plan activé avec succès !', 'success')
+      window.history.replaceState({}, '', route.path)
+    }
+  }
+
+  /*onMounted(async () => {
+    await Promise.all([
+      fetchPlans(),
+      fetchCurrentSubscription(),
+      fetchPaymentHistory()
+    ])
+    await checkPaymentCallback()
+  })
+
+  // Dans le script de la page abonnement
+  onMounted(() => {
+    const themeSlug  = route.query.theme as string
+    const themeName  = route.query.theme_name as string
+    const themePrice = route.query.theme_price as string
+
+    if (themeSlug && themeName && themePrice) {
+      // Ouvrir directement la modale de paiement pour ce thème
+      openPaymentModal({
+        code:  `theme_${themeSlug}`,
+        name:  themeName,
+        price: parseFloat(themePrice),
+        description: `Thème ${themeName}`,
+        // Marquer comme achat de thème pour le backend
+        type: 'theme',
+        theme_slug: themeSlug,
+      })
+    }
+  })*/
+
+  onMounted(async () => {
+    // Charger les données en parallèle
+    await Promise.all([
+      fetchPlans(),
+      fetchCurrentSubscription(),
+      fetchPaymentHistory()
+    ])
+
+    // Vérifier callback paiement
+    await checkPaymentCallback()
+
+    // ✅ Détecter achat thème APRÈS chargement des données depuis personaliser
+    const themeSlug  = route.query.theme as string
+    const themeName  = decodeURIComponent(route.query.theme_name as string || '')
+    const themePrice = route.query.theme_price as string
+
+    if (themeSlug && themeName && themePrice) {
+      // Petit délai pour s'assurer que le DOM est prêt
+      await nextTick()
+      openPaymentModal({
+        code:        `theme_${themeSlug}`,
+        name:        `Thème ${themeName}`,
+        price:       parseFloat(themePrice),
+        description: `Achat du thème ${themeName}`,
+      })
+    }
+  })
 </script>

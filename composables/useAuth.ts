@@ -7,7 +7,7 @@ export const useAuth = () => {
   const isAuthenticated = computed(() => !!token.value)
 
   // Fonction utilitaire pour les requêtes API
-  const apiRequest = async <T>(endpoint: string, options: RequestInit = {}): Promise<ApiResponse<T>> => {
+  /*const apiRequest = async <T>(endpoint: string, options: RequestInit = {}): Promise<ApiResponse<T>> => {
     const headers: Record<string, string> = {
       'Accept': 'application/json',
       ...(options.headers as Record<string, string> || {})
@@ -46,10 +46,53 @@ export const useAuth = () => {
     } catch (error: any) {
       throw new Error(error.message || 'Erreur de connexion au serveur')
     }
-  }
+  }*/
+
+    const apiRequest = async <T>(endpoint: string, options: RequestInit = {}): Promise<ApiResponse<T>> => {
+      // Définition des headers de base
+      const headers: Record<string, string> = {
+        'Accept': 'application/json',
+        ...(options.headers as Record<string, string> || {})
+      }
+
+      // Ne pas ajouter Content-Type pour FormData (multipart)
+      if (!(options.body instanceof FormData)) {
+        headers['Content-Type'] = 'application/json'
+      }
+
+      // Ajouter le token d'authentification si présent
+      if (token.value) {
+        headers['Authorization'] = `Bearer ${token.value}`
+      }
+
+      try {
+        const response = await fetch(`${config.public.apiBase}${endpoint}`, {
+          ...options,
+          headers
+        })
+
+        const data = await response.json()
+
+        if (!response.ok) {
+          // ✅ Erreur de validation 422 : extraire le premier message lisible
+          if (response.status === 422) {
+            const firstError = data.errors
+              ? Object.values(data.errors as Record<string, string[]>)[0]?.[0]
+              : data.message
+            throw new Error(firstError || 'Erreur de validation')
+          }
+          throw new Error(data.message || 'Une erreur est survenue')
+        }
+
+        return data
+
+      } catch (error: any) {
+        throw new Error(error.message || 'Erreur de connexion au serveur')
+      }
+    }
 
   // Inscription
-  const register = async (userData: RegisterData): Promise<ApiResponse<{ user: User, token: string }>> => {
+  /*const register = async (userData: RegisterData): Promise<ApiResponse<{ user: User, token: string }>> => {
     try {
       const response = await apiRequest<{ user: User, token: string }>('/vendor/register', {
         method: 'POST',
@@ -63,6 +106,28 @@ export const useAuth = () => {
         // Stocker le token dans le localStorage pour la persistance
         if (process.client) {
           localStorage.setItem('auth_token', response.token)
+        }
+      }
+
+      return response
+    } catch (error: any) {
+      throw error
+    }
+  }*/
+
+    const register = async (userData: RegisterData) => {
+    try {
+      const response = await apiRequest<{ user: User, token: string }>('/vendor/register', {
+        method: 'POST',
+        body: JSON.stringify(userData)
+      })
+
+      if (response.success && response.token && response.user) {
+        token.value = response.token
+        user.value  = response.user
+        if (process.client) {
+          localStorage.setItem('auth_token', response.token)
+          localStorage.setItem('user_role', response.user.role || 'vendor')
         }
       }
 

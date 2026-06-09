@@ -1,294 +1,267 @@
 <template>
-  <div>
-    <div class="mb-6 flex justify-between items-center">
-      <div>
-        <h1 class="text-2xl font-semibold text-gray-800">Gestion des livreurs</h1>
-        <p class="text-gray-600">Gérez vos livreurs</p>
+  <div class="space-y-6">
+    <div class="flex items-center justify-between">
+      <h1 class="text-xl font-bold text-gray-900">Gestion des livreurs</h1>
+      <button @click="showAddModal = true"
+        class="px-4 py-2 bg-primary text-white text-sm font-medium rounded-lg hover:bg-secondary transition-colors">
+        + Ajouter un livreur
+      </button>
+    </div>
+
+    <!-- Onglets type -->
+    <div class="flex gap-2 border-b border-gray-200">
+      <button v-for="tab in tabs" :key="tab.value"
+        @click="activeTab = tab.value"
+        class="px-4 py-2 text-sm font-medium border-b-2 transition-colors"
+        :class="activeTab === tab.value
+          ? 'border-primary text-primary'
+          : 'border-transparent text-gray-500 hover:text-gray-700'">
+        {{ tab.label }}
+      </button>
+    </div>
+
+    <!-- Livreurs indépendants -->
+    <div v-if="activeTab === 'independent'">
+
+      <!-- Zones disponibles -->
+      <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4">
+        <p class="text-sm font-medium text-blue-800 mb-2">
+          💡 Pour ajouter un livreur indépendant, créez d'abord des zones de livraison dans
+          <NuxtLink :to="`/dashboard-vendor/${slug}/deliveries/livraisons`" class="underline">
+            Livraisons → Zones
+          </NuxtLink>
+        </p>
       </div>
-      <div class="flex gap-2">
-        <button @click="openSearchModal" class="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-secondary">
-          Rechercher un livreur
-        </button>
-        <button @click="openAddForm" class="px-4 py-2 bg-primary rounded-md text-white text-sm font-medium hover:bg-secondary focus:outline-none focus:ring-2 focus:ring-secondary focus:ring-offset-2">
-          Ajouter un livreur
-        </button>
+
+      <!-- Liste -->
+      <div v-if="loading" class="flex justify-center py-8">
+        <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+      </div>
+
+      <div v-else-if="independentCouriers.length === 0" class="text-center py-12 text-gray-400">
+        Aucun livreur indépendant configuré.
+      </div>
+
+      <div v-else class="bg-white border border-gray-200 rounded-xl overflow-hidden">
+        <table class="w-full text-sm">
+          <thead class="bg-gray-50 text-xs font-medium text-gray-500 uppercase">
+            <tr>
+              <th class="px-5 py-3 text-left">Nom</th>
+              <th class="px-5 py-3 text-right">Contact</th>
+              <th class="px-5 py-3 text-left"></th>
+              <th class="px-5 py-3 text-left">Zones</th>
+              <th class="px-5 py-3 text-left">Disponibilité</th>
+              <th class="px-5 py-3 text-left">Statut</th>
+              <th class="px-5 py-3 text-right">Actions</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-gray-100">
+            <tr v-for="courier in independentCouriers" :key="courier.id" class="hover:bg-gray-50">
+              <td class="px-5 py-3 font-medium text-gray-900">{{ courier.name }}</td>
+              <td class="px-5 py-3 text-gray-500">
+                <div>{{ courier.email }}</div>
+              </td>
+              <td class="px-5 py-3 text-gray-500">
+                <div>{{ courier.phone }}</div>
+              </td>
+              <!--<td class="px-5 py-3 text-gray-500">
+                <div>{{ courier.email }}</div>
+                <div>{{ courier.phone }}</div>
+              </td>-->
+              <td class="px-5 py-3">
+                <div class="flex flex-wrap gap-1">
+                  <span v-for="zone in (courier.coverage_zones || [])" :key="zone"
+                    class="px-2 py-0.5 bg-blue-100 text-blue-700 text-xs rounded-full">
+                    {{ zone }}
+                  </span>
+                </div>
+              </td>
+              <td class="px-5 py-3">
+                <span :class="availabilityClass(courier.availability)"
+                  class="px-2 py-0.5 text-xs rounded-full font-medium">
+                  {{ availabilityLabel(courier.availability) }}
+                </span>
+              </td>
+              <td class="px-5 py-3">
+                <span :class="courier.status === 'active' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'"
+                  class="px-2 py-0.5 text-xs rounded-full font-medium">
+                  {{ courier.status === 'active' ? 'Actif' : 'Inactif' }}
+                </span>
+              </td>
+              <td class="px-5 py-3 text-right">
+                <button @click="editCourier(courier)"
+                  class="text-xs text-indigo-600 hover:text-indigo-800 mr-3">Modifier</button>
+                <button @click="confirmDelete(courier)"
+                  class="text-xs text-red-500 hover:text-red-700">Supprimer</button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
       </div>
     </div>
 
-    <!-- Liste des livreurs -->
-    <div class="bg-white mb-6">
-      <!-- Loading -->
-      <div v-if="isLoading" class="p-8 text-center">
-        <p class="text-gray-500">Chargement...</p>
+    <!-- Livreurs pro -->
+    <div v-if="activeTab === 'pro'">
+      <div v-if="proCouriers.length === 0" class="text-center py-12 text-gray-400">
+        Aucun livreur sous contrat configuré.
       </div>
-      
-      <!-- Erreur -->
-      <div v-else-if="error" class="p-8 text-center">
-        <p class="text-red-600">{{ error }}</p>
-      </div>
-      
-      <!-- Liste vide -->
-      <div v-else-if="couriers.length === 0" class="p-8 text-center">
-        <p class="text-gray-500">Aucun livreur pour le moment</p>
-        <button @click="openAddForm" class="mt-4 px-4 py-2 bg-primary rounded-md text-white text-sm font-medium hover:bg-secondary">
-          Ajouter votre premier livreur
-        </button>
-      </div>
-      
-      <!-- Tableau des livreurs -->
-      <div v-else class="overflow-x-auto">
-        <!-- Mes livreurs -->
-        <div v-if="ownCouriers.length > 0" class="mb-6">
-          <h3 class="px-6 py-3 bg-gray-50 text-sm font-semibold text-gray-700">Mes livreurs ({{ ownCouriers.length }})</h3>
-          <table class="min-w-full divide-y divide-gray-200">
-            <thead class="bg-gray-50">
-              <tr>
-                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Livreur</th>
-                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
-                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Téléphone</th>
-                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Zones</th>
-                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Livraisons</th>
-                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Statut</th>
-                <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
-              </tr>
-            </thead>
-            <tbody class="bg-white divide-y divide-gray-200">
-              <tr v-for="courier in ownCouriers" :key="courier.id">
-                <td class="px-6 py-4 whitespace-nowrap">
-                  <div class="flex items-center">
-                    <div class="bg-gray-200 border-2 border-dashed rounded-xl w-8 h-8" />
-                    <div class="ml-4">
-                      <div class="text-sm font-medium text-gray-900">{{ courier.name }}</div>
-                    </div>
-                  </div>
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ courier.email }}</td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ courier.phone }}</td>
-                <td class="px-6 py-4 text-sm text-gray-500">
-                  <div v-if="courier.coverage_zones.length > 0" class="flex flex-wrap gap-1">
-                    <span v-for="(zone, index) in courier.coverage_zones.slice(0, 2)" :key="index" class="px-2 py-1 bg-gray-100 rounded text-xs">
-                      {{ zone }}
-                    </span>
-                    <span v-if="courier.coverage_zones.length > 2" class="px-2 py-1 bg-gray-100 rounded text-xs">
-                      +{{ courier.coverage_zones.length - 2 }}
-                    </span>
-                  </div>
-                  <span v-else class="text-gray-400">-</span>
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ courier.deliveries_count }}</td>
-                <td class="px-6 py-4 whitespace-nowrap">
-                  <span :class="getStatusBadge(courier.status).class" class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full">
-                    {{ getStatusBadge(courier.status).label }}
-                  </span>
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                  <button @click="openEditForm(courier)" class="text-primary hover:text-secondary mr-3">Modifier</button>
-                  <button @click="handleDelete(courier.id)" class="text-red-600 hover:text-red-900">Supprimer</button>
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-        
-        <!-- Livreurs de la plateforme -->
-        <div v-if="platformCouriersAvailable.length > 0">
-          <h3 class="px-6 py-3 bg-blue-50 text-sm font-semibold text-blue-700">Livreurs de la plateforme ({{ platformCouriersAvailable.length }})</h3>
-          <table class="min-w-full divide-y divide-gray-200">
-            <thead class="bg-gray-50">
-              <tr>
-                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Livreur</th>
-                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
-                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Téléphone</th>
-                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Zones</th>
-                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Livraisons</th>
-                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Type</th>
-                <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
-              </tr>
-            </thead>
-            <tbody class="bg-white divide-y divide-gray-200">
-              <tr v-for="courier in platformCouriersAvailable" :key="courier.id">
-                <td class="px-6 py-4 whitespace-nowrap">
-                  <div class="flex items-center">
-                    <div class="bg-blue-200 border-2 border-dashed rounded-xl w-8 h-8" />
-                    <div class="ml-4">
-                      <div class="text-sm font-medium text-gray-900">{{ courier.name }}</div>
-                    </div>
-                  </div>
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ courier.email }}</td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ courier.phone }}</td>
-                <td class="px-6 py-4 text-sm text-gray-500">
-                  <div v-if="courier.coverage_zones.length > 0" class="flex flex-wrap gap-1">
-                    <span v-for="(zone, index) in courier.coverage_zones.slice(0, 2)" :key="index" class="px-2 py-1 bg-gray-100 rounded text-xs">
-                      {{ zone }}
-                    </span>
-                    <span v-if="courier.coverage_zones.length > 2" class="px-2 py-1 bg-gray-100 rounded text-xs">
-                      +{{ courier.coverage_zones.length - 2 }}
-                    </span>
-                  </div>
-                  <span v-else class="text-gray-400">-</span>
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ courier.deliveries_count }}</td>
-                <td class="px-6 py-4 whitespace-nowrap">
-                  <span :class="getTypeBadge(courier.type).class" class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full">
-                    {{ getTypeBadge(courier.type).label }}
-                  </span>
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                  <button @click="handleRemovePlatformCourier(courier.id)" class="text-red-600 hover:text-red-900">Retirer</button>
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
+      <div v-else class="bg-white border border-gray-200 rounded-xl overflow-hidden">
+        <table class="w-full text-sm">
+          <thead class="bg-gray-50 text-xs font-medium text-gray-500 uppercase">
+            <tr>
+              <th class="px-5 py-3 text-left">Nom</th>
+              <th class="px-5 py-3 text-left">Contact</th>
+              <th class="px-5 py-3 text-left">Ville</th>
+              <th class="px-5 py-3 text-left">Disponibilité</th>
+              <th class="px-5 py-3 text-left">Livraisons</th>
+              <th class="px-5 py-3 text-right">Actions</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-gray-100">
+            <tr v-for="courier in proCouriers" :key="courier.id" class="hover:bg-gray-50">
+              <td class="px-5 py-3 font-medium text-gray-900">{{ courier.name }}</td>
+              <td class="px-5 py-3 text-gray-500">
+                <div>{{ courier.email }}</div>
+                <div>{{ courier.phone }}</div>
+              </td>
+              <td class="px-5 py-3 text-gray-600">{{ courier.city || '—' }}</td>
+              <td class="px-5 py-3">
+                <span :class="availabilityClass(courier.availability)"
+                  class="px-2 py-0.5 text-xs rounded-full font-medium">
+                  {{ availabilityLabel(courier.availability) }}
+                </span>
+              </td>
+              <td class="px-5 py-3 text-gray-600">
+                {{ courier.deliveries_count ?? 0 }} livraisons
+              </td>
+              <td class="px-5 py-3 text-right">
+                <button @click="editCourier(courier)"
+                  class="text-xs text-indigo-600 hover:text-indigo-800 mr-3">Modifier</button>
+                <button @click="confirmDelete(courier)"
+                  class="text-xs text-red-500 hover:text-red-700">Supprimer</button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
       </div>
     </div>
-    
-    <!-- Modal pour ajouter/modifier un livreur -->
+
+    <!-- Modal ajout/modification -->
     <Teleport to="body">
-      <div v-if="showAddForm" class="modal-overlay" @click.self="showAddForm = false">
-        <div class="modal-container rounded-md">
-          <div class="p-6">
-            <div class="flex justify-between items-center mb-4">
-              <h2 class="text-lg font-medium text-gray-900">
-                {{ editingCourier ? 'Modifier le livreur' : 'Ajouter un nouveau livreur' }}
-              </h2>
-              <button @click="showAddForm = false" class="px-3 py-1 border border-gray-300 text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-secondary">
-                Fermer
-              </button>
-            </div>
-            
-            <form @submit.prevent="handleSubmit" class="space-y-6">
-              <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
-                <div>
-                  <label for="name" class="block text-sm font-medium text-gray-700">Nom complet *</label>
-                  <input v-model="formData.name" type="text" name="name" id="name" required class="mt-1 block w-full border border-gray-300 px-3 py-2 focus:outline-none focus:ring-secondary focus:border-secondary">
-                </div>
-                
-                <div>
-                  <label for="email" class="block text-sm font-medium text-gray-700">Email *</label>
-                  <input v-model="formData.email" type="email" name="email" id="email" required class="mt-1 block w-full border border-gray-300 px-3 py-2 focus:outline-none focus:ring-secondary focus:border-secondary">
-                </div>
-                
-                <div>
-                  <label for="phone" class="block text-sm font-medium text-gray-700">Téléphone *</label>
-                  <input v-model="formData.phone" type="text" name="phone" id="phone" required class="mt-1 block w-full border border-gray-300 px-3 py-2 focus:outline-none focus:ring-secondary focus:border-secondary">
-                </div>
-                
-                <div>
-                  <label for="status" class="block text-sm font-medium text-gray-700">Statut *</label>
-                  <select v-model="formData.status" id="status" name="status" class="mt-1 block w-full border border-gray-300 px-3 py-2 focus:outline-none focus:ring-secondary focus:border-secondary">
-                    <option value="active">Actif</option>
-                    <option value="inactive">Inactif</option>
-                  </select>
-                </div>
+      <div v-if="showAddModal" class="fixed inset-0 z-50 flex items-center justify-center p-4">
+        <div class="absolute inset-0 bg-black/50" @click="closeModal"></div>
+        <div class="relative bg-white rounded-xl shadow-xl w-full max-w-lg p-6 max-h-[90vh] overflow-y-auto">
+          <h3 class="text-lg font-semibold text-gray-900 mb-4">
+            {{ editingCourier ? 'Modifier le livreur' : 'Ajouter un livreur' }}
+          </h3>
+
+          <form @submit.prevent="handleSubmit" class="space-y-4">
+            <!-- Type -->
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">Type de livreur</label>
+              <div class="flex gap-4">
+                <label class="flex items-center gap-2 cursor-pointer">
+                  <input type="radio" v-model="form.courier_type" value="independent" class="text-primary" />
+                  <span class="text-sm">Indépendant (zones fixes)</span>
+                </label>
+                <label class="flex items-center gap-2 cursor-pointer">
+                  <input type="radio" v-model="form.courier_type" value="pro" class="text-primary" />
+                  <span class="text-sm">Pro / Sous-contrat</span>
+                </label>
               </div>
-              
+            </div>
+
+            <div class="grid grid-cols-2 gap-4">
+              <div class="col-span-2">
+                <label class="block text-sm font-medium text-gray-700 mb-1">Nom complet *</label>
+                <input v-model="form.name" required type="text"
+                  class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary" />
+              </div>
               <div>
-                <label for="zone_input" class="block text-sm font-medium text-gray-700">Zones de couverture</label>
-                <div class="flex gap-2 mt-1">
-                  <input v-model="formData.zone_input" @keydown.enter.prevent="addZone" type="text" id="zone_input" placeholder="Ex: Paris, Lyon..." class="flex-1 block w-full border border-gray-300 px-3 py-2 focus:outline-none focus:ring-secondary focus:border-secondary">
-                  <button @click.prevent="addZone" type="button" class="px-4 py-2 bg-gray-200 rounded-md text-gray-700 text-sm font-medium hover:bg-gray-300">
-                    Ajouter
-                  </button>
-                </div>
-                
-                <!-- Liste des zones -->
-                <div v-if="formData.coverage_zones.length > 0" class="mt-2 flex flex-wrap gap-2">
-                  <span v-for="(zone, index) in formData.coverage_zones" :key="index" class="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm flex items-center gap-2">
-                    {{ zone }}
-                    <button @click.prevent="removeZone(index)" type="button" class="text-blue-600 hover:text-blue-800 font-bold">
-                      ×
-                    </button>
-                  </span>
-                </div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Email *</label>
+                <input v-model="form.email" required type="email"
+                  class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary" />
               </div>
-              
-              <!-- Message d'erreur -->
-              <div v-if="error" class="p-3 bg-red-50 border border-red-200 rounded-md">
-                <p class="text-sm text-red-600">{{ error }}</p>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Téléphone *</label>
+                <input v-model="form.phone" required type="tel"
+                  class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary" />
               </div>
-              
-              <div class="flex justify-end">
-                <button type="button" @click="showAddForm = false" class="px-4 rounded-md py-2 border border-gray-300 text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-secondary">
-                  Annuler
+            </div>
+
+            <!-- Ville (pro uniquement) -->
+            <div v-if="form.courier_type === 'pro'">
+              <label class="block text-sm font-medium text-gray-700 mb-1">Ville</label>
+              <input v-model="form.city" type="text"
+                class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary" />
+            </div>
+
+            <!-- Zones de couverture (indépendant uniquement) -->
+            <div v-if="form.courier_type === 'independent'">
+              <label class="block text-sm font-medium text-gray-700 mb-2">
+                Zones de couverture
+              </label>
+              <div class="flex gap-2 mb-2">
+                <input v-model="zoneSearch" @input="searchZones" type="text"
+                  placeholder="Rechercher une zone..."
+                  class="flex-1 px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary" />
+              </div>
+              <!-- Résultats recherche -->
+              <div v-if="zoneResults.length" class="border border-gray-200 rounded-lg max-h-32 overflow-y-auto mb-2">
+                <button type="button" v-for="zone in zoneResults" :key="zone.id"
+                  @click="addZone(zone)"
+                  class="w-full text-left px-3 py-2 text-sm hover:bg-gray-50 flex justify-between">
+                  <span>{{ zone.city }}, {{ zone.country }}</span>
+                  <span class="text-gray-400">{{ zone.shipping_cost }} FCFA</span>
                 </button>
-                <button type="submit" :disabled="isLoading" class="ml-3 px-4 py-2 bg-primary rounded-md text-white text-sm font-medium hover:bg-secondary focus:outline-none focus:ring-2 focus:ring-secondary focus:ring-offset-2 disabled:opacity-50">
-                  {{ isLoading ? 'Enregistrement...' : (editingCourier ? 'Modifier' : 'Ajouter') }}
-                </button>
               </div>
-            </form>
-          </div>
-        </div>
-      </div>
-    </Teleport>
-    
-    <!-- Modal de recherche des livreurs plateforme -->
-    <Teleport to="body">
-      <div v-if="showSearchModal" class="modal-overlay" @click.self="showSearchModal = false">
-        <div class="modal-container rounded-md">
-          <div class="p-6">
-            <div class="flex justify-between items-center mb-4">
-              <h2 class="text-lg font-medium text-gray-900">Rechercher un livreur de la plateforme</h2>
-              <button @click="showSearchModal = false" class="px-3 py-1 border border-gray-300 text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-secondary">
-                Fermer
+              <!-- Zones sélectionnées -->
+              <div class="flex flex-wrap gap-2">
+                <span v-for="(zone, i) in selectedZones" :key="i"
+                  class="flex items-center gap-1 px-3 py-1 bg-primary/10 text-primary text-sm rounded-full">
+                  {{ zone.city }}, {{ zone.country }}
+                  <button type="button" @click="removeZone(i)" class="ml-1 text-primary/60 hover:text-primary">×</button>
+                </span>
+                <span v-if="selectedZones.length === 0" class="text-sm text-gray-400 italic">
+                  Aucune zone sélectionnée
+                </span>
+              </div>
+            </div>
+
+            <!-- Taux de commission -->
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">
+                Taux de commission (%)
+              </label>
+              <input v-model.number="form.commission_rate" type="number" min="0" max="100" step="0.5"
+                class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary" />
+            </div>
+
+            <!-- Disponibilité -->
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">Statut</label>
+              <select v-model="form.status"
+                class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary">
+                <option value="active">Actif</option>
+                <option value="inactive">Inactif</option>
+              </select>
+            </div>
+
+            <div v-if="formError" class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm">
+              {{ formError }}
+            </div>
+
+            <div class="flex justify-end gap-3 pt-2">
+              <button type="button" @click="closeModal"
+                class="px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded-lg transition-colors">
+                Annuler
+              </button>
+              <button type="submit" :disabled="saving"
+                class="px-4 py-2 text-sm text-white bg-primary hover:bg-secondary rounded-lg transition-colors disabled:opacity-50">
+                {{ saving ? 'Enregistrement...' : 'Enregistrer' }}
               </button>
             </div>
-            
-            <!-- Barre de recherche -->
-            <div class="mb-4">
-              <div class="grid grid-cols-1 gap-3 sm:grid-cols-2 mb-3">
-                <input v-model="searchQuery" @keydown.enter="handleSearch" type="text" placeholder="Rechercher par nom, email, téléphone..." class="block w-full border border-gray-300 px-3 py-2 rounded focus:outline-none focus:ring-secondary focus:border-secondary">
-                <input v-model="searchZone" @keydown.enter="handleSearch" type="text" placeholder="Filtrer par zone (Paris, Lyon...)" class="block w-full border border-gray-300 px-3 py-2 rounded focus:outline-none focus:ring-secondary focus:border-secondary">
-              </div>
-              <button @click="handleSearch" class="w-full px-4 py-2 bg-primary rounded-md text-white text-sm font-medium hover:bg-secondary focus:outline-none focus:ring-2 focus:ring-secondary focus:ring-offset-2">
-                Rechercher
-              </button>
-            </div>
-            
-            <!-- Résultats -->
-            <div v-if="isLoading" class="text-center py-8">
-              <p class="text-gray-500">Recherche en cours...</p>
-            </div>
-            
-            <div v-else-if="platformCouriers.length === 0" class="text-center py-8">
-              <p class="text-gray-500">Aucun livreur trouvé</p>
-            </div>
-            
-            <div v-else class="space-y-2 max-h-96 overflow-y-auto">
-              <div v-for="courier in platformCouriers" :key="courier.id" class="p-4 border border-gray-200 rounded-md hover:bg-gray-50">
-                <div class="flex justify-between items-start">
-                  <div class="flex-1">
-                    <h3 class="font-medium text-gray-900">{{ courier.name }}</h3>
-                    <p class="text-sm text-gray-600">{{ courier.email }} | {{ courier.phone }}</p>
-                    <div class="mt-2 flex flex-wrap gap-1">
-                      <span v-for="(zone, index) in courier.coverage_zones" :key="index" class="px-2 py-1 bg-gray-100 rounded text-xs text-gray-700">
-                        {{ zone }}
-                      </span>
-                    </div>
-                    <p class="mt-1 text-xs text-gray-500">{{ courier.deliveries_count }} livraisons effectuées</p>
-                  </div>
-                  <div class="flex flex-col items-end gap-2">
-                    <span class="px-2 py-1 bg-blue-100 text-blue-800 rounded text-xs font-semibold">
-                      Plateforme
-                    </span>
-                    <button 
-                      @click="handleAddPlatformCourier(courier.id)"
-                      :disabled="isLoading"
-                      class="px-3 py-1 bg-primary text-white rounded text-xs font-medium hover:bg-secondary disabled:opacity-50 focus:outline-none focus:ring-2 focus:ring-secondary">
-                      Ajouter à ma boutique
-                    </button>
-                  </div>
-                </div>
-              </div>
-            </div>
-            
-            <div class="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-md">
-              <p class="text-sm text-blue-800">
-                <strong>Info :</strong> Une fois ajouté à votre boutique, vous pourrez assigner ce livreur à vos commandes.
-              </p>
-            </div>
-          </div>
+          </form>
         </div>
       </div>
     </Teleport>
@@ -296,208 +269,135 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref, computed } from 'vue'
-import { useShops } from '~/composables/useShops'
-import { useCouriers } from '~/composables/useCouriers'
+definePageMeta({ layout: 'dashboard' })
 
 const route = useRoute()
-const slug = route.params.slug as string
+const slug  = computed(() => route.params.slug as string)
+const { fetchCouriers, createCourier, updateCourier, deleteCourier } = useDelivery(slug.value)
 
-const { shops, currentShop, fetchShops } = useShops()
-const {
-  couriers,
-  platformCouriers,
-  isLoading,
-  error,
-  fetchCouriers,
-  searchPlatformCouriers,
-  createCourier,
-  updateCourier,
-  deleteCourier,
-  addPlatformCourier,
-  removePlatformCourier,
-  getStatusBadge,
-  getTypeBadge
-} = useCouriers()
+const config = useRuntimeConfig()
+const { token } = useAuth()
 
-const showAddForm = ref(false)
-const showSearchModal = ref(false)
+const couriers     = ref<any[]>([])
+const loading      = ref(false)
+const showAddModal = ref(false)
 const editingCourier = ref<any>(null)
+const saving       = ref(false)
+const formError    = ref('')
+const activeTab    = ref<'independent' | 'pro'>('independent')
 
-const formData = ref({
-  name: '',
-  email: '',
-  phone: '',
+const tabs = [
+  { value: 'independent', label: 'Livreurs indépendants' },
+  { value: 'pro', label: 'Livreurs pro / sous-contrat' },
+]
+
+const independentCouriers = computed(() => couriers.value.filter(c => c.courier_type === 'independent'))
+const proCouriers         = computed(() => couriers.value.filter(c => c.courier_type === 'pro'))
+
+// Formulaire
+const defaultForm = () => ({
+  name: '', email: '', phone: '', city: '',
+  courier_type: 'independent' as 'independent' | 'pro',
+  status: 'active', commission_rate: 0,
   coverage_zones: [] as string[],
-  status: 'active' as 'active' | 'inactive',
-  zone_input: '' // Pour ajouter des zones
 })
 
-const searchQuery = ref('')
-const searchZone = ref('')
+const form         = ref(defaultForm())
+const selectedZones = ref<any[]>([])
+const zoneSearch   = ref('')
+const zoneResults  = ref<any[]>([])
 
-// Separer les livreurs par type
-const ownCouriers = computed(() => {
-  return couriers.value.filter(c => c.is_own === true)
-})
-
-const platformCouriersAvailable = computed(() => {
-  return couriers.value.filter(c => c.is_platform === true)
-})
-
-const loadCouriers = async () => {
-  // S'assurer que les boutiques sont chargees
-  if (shops.value.length === 0) {
-    await fetchShops()
-  }
-  
-  // currentShop est defini par le middleware
-  if (currentShop.value) {
-    await fetchCouriers(currentShop.value.id)
-  }
+// Recherche zones
+let zoneTimer: ReturnType<typeof setTimeout> | null = null
+const searchZones = () => {
+  if (zoneTimer) clearTimeout(zoneTimer)
+  zoneTimer = setTimeout(async () => {
+    if (!zoneSearch.value.trim()) { zoneResults.value = []; return }
+    try {
+      const res = await fetch(
+        `${config.public.apiBase}/delivery-zones/search?q=${zoneSearch.value}`,
+        { headers: { 'Authorization': `Bearer ${token.value}` } }
+      )
+      const data = await res.json()
+      zoneResults.value = data.data || []
+    } catch {}
+  }, 300)
 }
 
-const openAddForm = () => {
-  editingCourier.value = null
-  formData.value = {
-    name: '',
-    email: '',
-    phone: '',
-    coverage_zones: [],
-    status: 'active',
-    zone_input: ''
+const addZone = (zone: any) => {
+  if (!selectedZones.value.find(z => z.id === zone.id)) {
+    selectedZones.value.push(zone)
+    form.value.coverage_zones.push(`${zone.city}, ${zone.country}`)
   }
-  showAddForm.value = true
-}
-
-const openEditForm = (courier: any) => {
-  editingCourier.value = courier
-  formData.value = {
-    name: courier.name,
-    email: courier.email,
-    phone: courier.phone,
-    coverage_zones: [...courier.coverage_zones],
-    status: courier.status,
-    zone_input: ''
-  }
-  showAddForm.value = true
-}
-
-const addZone = () => {
-  if (formData.value.zone_input.trim()) {
-    formData.value.coverage_zones.push(formData.value.zone_input.trim())
-    formData.value.zone_input = ''
-  }
+  zoneSearch.value  = ''
+  zoneResults.value = []
 }
 
 const removeZone = (index: number) => {
-  formData.value.coverage_zones.splice(index, 1)
+  selectedZones.value.splice(index, 1)
+  form.value.coverage_zones.splice(index, 1)
+}
+
+const availabilityClass = (av: string) => ({
+  available:   'bg-green-100 text-green-700',
+  unavailable: 'bg-red-100 text-red-700',
+  busy:        'bg-yellow-100 text-yellow-700',
+}[av] || 'bg-gray-100 text-gray-700')
+
+const availabilityLabel = (av: string) => ({
+  available:   'Disponible',
+  unavailable: 'Indisponible',
+  busy:        'Occupé',
+}[av] || av)
+
+const load = async () => {
+  loading.value = true
+  try {
+    const data = await fetchCouriers()
+    couriers.value = data.data || data.couriers || []
+  } catch {} finally { loading.value = false }
+}
+
+const editCourier = (courier: any) => {
+  editingCourier.value = courier
+  form.value = { ...defaultForm(), ...courier }
+  selectedZones.value = []
+  showAddModal.value = true
+}
+
+const closeModal = () => {
+  showAddModal.value   = false
+  editingCourier.value = null
+  form.value           = defaultForm()
+  selectedZones.value  = []
+  zoneSearch.value     = ''
+  zoneResults.value    = []
+  formError.value      = ''
 }
 
 const handleSubmit = async () => {
-  // Debug: Vérifier currentShop
-  console.log('handleSubmit - currentShop:', currentShop.value)
-  
-  if (!currentShop.value) {
-    console.error('currentShop est null - impossible de créer le livreur')
-    error.value = 'Erreur: Boutique non trouvée. Veuillez rafraîchir la page.'
-    return
-  }
-
-  const data = {
-    name: formData.value.name,
-    email: formData.value.email,
-    phone: formData.value.phone,
-    coverage_zones: formData.value.coverage_zones,
-    status: formData.value.status
-  }
-
-  let success = false
-  
-  if (editingCourier.value) {
-    success = await updateCourier(currentShop.value.id, editingCourier.value.id, data)
-  } else {
-    success = await createCourier(currentShop.value.id, data)
-  }
-
-  if (success) {
-    showAddForm.value = false
-    editingCourier.value = null
-  }
-}
-
-const handleDelete = async (courierId: number) => {
-  if (!currentShop.value) return
-  
-  if (confirm('Êtes-vous sûr de vouloir supprimer ce livreur ?')) {
-    await deleteCourier(currentShop.value.id, courierId)
-  }
-}
-
-const openSearchModal = async () => {
-  await searchPlatformCouriers()
-  showSearchModal.value = true
-}
-
-const handleSearch = async () => {
-  await searchPlatformCouriers({ search: searchQuery.value, zone: searchZone.value })
-}
-
-const handleAddPlatformCourier = async (courierId: number) => {
-  if (!currentShop.value) return
-  
-  const success = await addPlatformCourier(currentShop.value.id, courierId)
-  
-  if (success) {
-    // Fermer le modal
-    showSearchModal.value = false
-    // Recharger la liste
-    await loadCouriers()
-  }
-}
-
-const handleRemovePlatformCourier = async (courierId: number) => {
-  if (!currentShop.value) return
-  
-  if (confirm('Êtes-vous sûr de vouloir retirer ce livreur de votre boutique ?')) {
-    const success = await removePlatformCourier(currentShop.value.id, courierId)
-    
-    if (success) {
-      await loadCouriers()
+  saving.value    = true
+  formError.value = ''
+  try {
+    if (editingCourier.value) {
+      await updateCourier(editingCourier.value.id, form.value)
+    } else {
+      await createCourier(form.value)
     }
-  }
+    await load()
+    closeModal()
+  } catch (err: any) {
+    formError.value = err.message
+  } finally { saving.value = false }
 }
 
-onMounted(() => {
-  loadCouriers()
-})
+const confirmDelete = async (courier: any) => {
+  if (!confirm(`Supprimer ${courier.name} ?`)) return
+  try {
+    await deleteCourier(courier.id)
+    await load()
+  } catch {}
+}
 
-definePageMeta({
-  layout: 'dashboard',
-  middleware: ['shop-access']
-})
+onMounted(load)
 </script>
-
-<style scoped>
-.modal-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0, 0, 0, 0.3);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 999;
-}
-
-.modal-container {
-  background-color: white;
-  max-width: 56rem;
-  width: 100%;
-  z-index: 1000;
-  max-height: 90vh;
-  overflow-y: auto;
-}
-</style>

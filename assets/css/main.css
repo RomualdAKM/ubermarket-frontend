@@ -5,3 +5,34 @@
   --color-primary: #5b6ac5;
   --color-secondary: #e56a19;
 }
+
+
+/* Empêche le clic droit et le glisser-déposer sur les images produit */
+.product-image,
+.product-image img {
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  user-select: none;
+  pointer-events: none; /* désactive le clic droit */
+}
+
+/* Wrapper qui garde les interactions de lien tout en bloquant l'image */
+.product-image-wrapper {
+  position: relative;
+  pointer-events: auto;
+}
+
+.product-image-wrapper img {
+  pointer-events: none;
+  -webkit-user-drag: none;
+  user-drag: none;
+}
+
+/* Overlay invisible qui bloque le téléchargement */
+.product-image-wrapper::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  cursor: default;
+}

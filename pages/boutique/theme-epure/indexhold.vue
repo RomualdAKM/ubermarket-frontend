@@ -15,15 +15,7 @@
               :key="index"
               class="w-full flex-shrink-0 relative h-[500px] sm:h-[600px] md:h-[700px] lg:h-[800px]"
             >
-              <img
-                :src="image"
-                :alt="`Slide ${Number(index) + 1}`"
-                class="w-full h-full object-cover select-none"
-                @contextmenu.prevent
-                @dragstart.prevent
-                draggable="false"
-                loading="lazy"
-              >
+              <img :src="image" :alt="`Slide ${Number(index) + 1}`" class="w-full h-full object-cover">
               <div class="absolute inset-0 bg-gradient-to-r from-gray-900/80 to-transparent flex items-center">
                 <div class="text-white max-w-xl pl-4 pr-4 sm:pl-8 md:pl-12 lg:pl-24">
                   <h2 class="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold mb-3 sm:mb-4 md:mb-6">{{ bannerTitle }}</h2>
@@ -132,30 +124,18 @@
               :to="`/boutique/${shop?.subdomain}/produit/${product.id}`" 
               class="bg-white border border-gray-200 rounded-md group hover:border-primary transition-all duration-300 product-card block"
             >
-              <!-- Image du produit — protégée contre le téléchargement -->
-                <div class="bg-gray-100 w-full h-64 flex items-center justify-center overflow-hidden relative">
-                <img
-                    v-if="product.preview_image"
-                    :src="getProductImageUrl(product.preview_image)"
-                    :alt="product.name"
-                    class="w-full h-full object-cover select-none"
-                    @contextmenu.prevent
-                    @dragstart.prevent
-                    draggable="false"
-                    loading="lazy"
-                    decoding="async"
+              <!-- Image du produit -->
+              <div class="bg-gray-100 w-full h-64 flex items-center justify-center overflow-hidden">
+                <img 
+                  v-if="product.preview_image" 
+                  :src="getProductImageUrl(product.preview_image)" 
+                  :alt="product.name" 
+                  class="w-full h-full object-cover"
                 >
                 <div v-else class="w-full h-full bg-gray-200 flex items-center justify-center">
-                    <span class="text-gray-400 text-sm">Aucune image</span>
+                  <span class="text-gray-400 text-sm">Aucune image</span>
                 </div>
-                <!-- Overlay transparent qui intercepte le clic droit sur l'image -->
-                <div
-                    v-if="product.preview_image"
-                    class="absolute inset-0 z-10"
-                    @contextmenu.prevent
-                    @dragstart.prevent
-                ></div>
-                </div>
+              </div>
               
               <!-- Détails du produit -->
               <div class="p-5">
@@ -311,110 +291,100 @@ onUnmounted(() => {
 </script>
 
 <style scoped>
-    .bg-primary {
-    background-color: v-bind(primaryColor);
-    }
+.bg-primary {
+  background-color: v-bind(primaryColor);
+}
 
-    .border-primary {
-    border-color: v-bind(primaryColor);
-    }
+.border-primary {
+  border-color: v-bind(primaryColor);
+}
 
-    .text-primary {
-    color: v-bind(primaryColor);
-    }
+.text-primary {
+  color: v-bind(primaryColor);
+}
 
-    .bg-secondary {
-    background-color: v-bind(secondaryColor);
-    }
+.bg-secondary {
+  background-color: v-bind(secondaryColor);
+}
 
-    .border-secondary {
-    border-color: v-bind(secondaryColor);
-    }
+.border-secondary {
+  border-color: v-bind(secondaryColor);
+}
 
-    .text-secondary {
-    color: v-bind(secondaryColor);
-    }
+.text-secondary {
+  color: v-bind(secondaryColor);
+}
 
-    .hover\:bg-secondary:hover {
-    background-color: v-bind(secondaryColor);
-    }
+.hover\:bg-secondary:hover {
+  background-color: v-bind(secondaryColor);
+}
 
-    .hover\:text-secondary:hover {
-    color: v-bind(secondaryColor);
-    }
+.hover\:text-secondary:hover {
+  color: v-bind(secondaryColor);
+}
 
-    /* Bouton avec hover secondaire */
-    .hover-secondary-btn:hover {
-    background-color: v-bind(secondaryColor) !important;
-    }
+/* Bouton avec hover secondaire */
+.hover-secondary-btn:hover {
+  background-color: v-bind(secondaryColor) !important;
+}
 
-    /* Améliorations de design */
-    .section-title {
-    font-size: 2.5rem;
-    letter-spacing: -0.025em;
-    font-weight: 600;
-    position: relative;
-    display: inline-block;
-    font-family: v-bind(fontFamily);
-    color: v-bind(textColor);
-    }
+/* Améliorations de design */
+.section-title {
+  font-size: 2.5rem;
+  letter-spacing: -0.025em;
+  font-weight: 600;
+  position: relative;
+  display: inline-block;
+  font-family: v-bind(fontFamily);
+  color: v-bind(textColor);
+}
 
-    .section-title::after {
-    content: '';
-    position: absolute;
-    left: 50%;
-    transform: translateX(-50%);
-    bottom: -12px;
-    width: 60px;
-    height: 3px;
-    background-color: v-bind(primaryColor);
-    }
+.section-title::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  bottom: -12px;
+  width: 60px;
+  height: 3px;
+  background-color: v-bind(primaryColor);
+}
 
-    /* Animation de survol pour les cartes */
-    .product-card {
-    transition: transform 0.3s ease, border-color 0.3s ease;
-    }
+/* Animation de survol pour les cartes */
+.product-card {
+  transition: transform 0.3s ease, border-color 0.3s ease;
+}
 
-    .product-card:hover {
-    transform: translateY(-5px);
-    border-color: v-bind(primaryColor);
-    border-width: 2px;
-    }
+.product-card:hover {
+  transform: translateY(-5px);
+  border-color: v-bind(primaryColor);
+  border-width: 2px;
+}
 
-    /* Accent visuel */
-    .accent-left {
-    position: relative;
-    }
+/* Accent visuel */
+.accent-left {
+  position: relative;
+}
 
-    .accent-left::before {
-    content: '';
-    position: absolute;
-    left: 0;
-    top: 50%;
-    transform: translateY(-50%);
-    width: 3px;
-    height: 40px;
-    background-color: v-bind(secondaryColor);
-    }
+.accent-left::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 3px;
+  height: 40px;
+  background-color: v-bind(secondaryColor);
+}
 
-    /* Animation pour les icônes de la section "Notre philosophie" */
-    .feature-icon {
-    transition: transform 0.3s ease, background-color 0.3s ease;
-    }
+/* Animation pour les icônes de la section "Notre philosophie" */
+.feature-icon {
+  transition: transform 0.3s ease, background-color 0.3s ease;
+}
 
-    .feature-icon:hover {
-    transform: scale(1.1);
-    background-color: v-bind(secondaryColor);
-    }
-    
-    /* Protection images produit — empêche le téléchargement */
-    img {
-    -webkit-user-drag: none;
-    -khtml-user-drag: none;
-    -moz-user-drag: none;
-    -o-user-drag: none;
-    user-drag: none;
-    -webkit-user-select: none;
-    user-select: none;
-    }
+.feature-icon:hover {
+  transform: scale(1.1);
+  background-color: v-bind(secondaryColor);
+}
+
 </style>
