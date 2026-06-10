@@ -3,7 +3,6 @@
     <!-- Page de maintenance -->
     <div v-if="isInMaintenance" class="min-h-screen flex items-center justify-center bg-slate-50">
       <div class="text-center max-w-sm mx-auto px-6">
-        <!-- Logo de la boutique -->
         <div class="mb-8">
           <img 
             v-if="maintenanceData.shop_logo" 
