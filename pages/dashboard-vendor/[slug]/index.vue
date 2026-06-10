@@ -144,7 +144,25 @@
                 <td class="px-6 py-4 whitespace-nowrap">
                   <div class="flex items-center">
                     <div v-if="product.preview_image" class="w-10 h-10 flex-shrink-0">
-                      <img :src="getImageUrl(product.preview_image)" :alt="product.name" class="w-10 h-10 object-cover rounded">
+                      <!--<img :src="getImageUrl(product.preview_image)" :alt="product.name" class="w-10 h-10 object-cover rounded">-->
+                      <!-- Wrapper qui bloque le téléchargement -->
+                      <div class="relative overflow-hidden select-none">
+                        <img
+                          :src="getImageUrl(product.preview_image)"
+                          :alt="product.name"
+                          class="w-full h-full object-cover"
+                          @contextmenu.prevent
+                          @dragstart.prevent
+                          draggable="false"
+                          loading="lazy"
+                        />
+                        <!-- Overlay transparent qui intercepte le clic droit -->
+                        <div
+                          class="absolute inset-0 z-10"
+                          @contextmenu.prevent
+                          @dragstart.prevent
+                        ></div>
+                      </div>
                     </div>
                     <div v-else class="bg-gray-200 border-2 border-dashed w-10 h-10 flex-shrink-0" />
                     <div class="ml-4">

@@ -4,7 +4,8 @@
     <nav class="nav-animate fixed w-full top-0 z-50 px-4 md:px-16 lg:px-24 xl:px-32 py-4 border-b transition-all duration-300 border-neutral-300 bg-white/80 backdrop-blur">
       <div class="max-w-7xl mx-auto flex items-center justify-between">
         <NuxtLink to="/">
-          <img alt="UberMarket Logo" class="h-14 md:h-16" src="/uber-market.png">
+          <!--<img alt="UberMarket Logo" class="h-14 md:h-16" src="/uber-market.png">-->
+          <img alt="UberMarket - Plateforme e-commerce Afrique" class="h-34 md:h-36" src="/uber-market.png" width="120" height="56" loading="eager">
         </NuxtLink>
         <div class="hidden md:flex gap-3">
           <NuxtLink to="/marketplace" class="py-1 px-3 hover:text-zinc-500">Marketplace</NuxtLink>
@@ -29,7 +30,7 @@
     <!-- Mobile Menu -->
     <div :class="['fixed top-0 right-0 z-50 w-full bg-white shadow-xl shadow-black/5 transition-all duration-300 ease-in-out overflow-hidden', mobileMenuOpen ? 'h-92' : 'h-0']">
       <div class="flex items-center justify-between p-4">
-        <img alt="UberMarket Logo" class="h-14" src="/uber-market.png">
+        <img alt="UberMarket - Plateforme e-commerce Afrique" class="h-14 md:h-16" src="/uber-market.png" width="160" height="56" loading="eager">
         <button @click="toggleMobileMenu">
           <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="size-6.5"><path d="M18 6 6 18"></path><path d="m6 6 12 12"></path></svg>
         </button>
@@ -49,46 +50,35 @@
     </div>
 
     <!-- Hero Section -->
-    <section class="bg-primary/10 px-4 md:px-16 lg:px-24 xl:px-32">
+    <section aria-label="Présentation UberMarket" class="bg-primary/10 px-4 md:px-16 lg:px-24 xl:px-32">
       <div class="max-w-7xl mx-auto flex flex-col items-center justify-center h-screen">
-        <div class="hero-badge flex items-center gap-2 bg-white/50 backdrop-blur p-1 rounded-full">
-          <div class="flex items-center -space-x-3">
-            <img class="size-7 rounded-full border-2 border-white" alt="user1" src="https://images.unsplash.com/photo-1633332755192-727a05c4013d?q=80&w=50">
-            <img class="size-7 rounded-full border-2 border-white" alt="user2" src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?q=80&w=50">
-          </div>
-          <span>1000+</span>
-          <div class="h-5 w-px mx-1 bg-white rounded-full"></div>
-          <span>Vendeurs satisfaits</span>
-          <div class="h-5 w-px mx-1 bg-white rounded-full"></div>
-          <div class="flex items-center gap-1 pr-3">
-            <svg xmlns="http://www.w3.org/2000/svg" class="size-4.5 fill-primary stroke-primary" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11.525 2.295a.53.53 0 0 1 .95 0l2.31 4.679a2.123 2.123 0 0 0 1.595 1.16l5.166.756a.53.53 0 0 1 .294.904l-3.736 3.638a2.123 2.123 0 0 0-.611 1.878l.882 5.14a.53.53 0 0 1-.771.56l-4.618-2.428a2.122 2.122 0 0 0-1.973 0L6.396 21.01a.53.53 0 0 1-.77-.56l.881-5.139a2.122 2.122 0 0 0-.611-1.879L2.16 9.795a.53.53 0 0 1 .294-.906l5.165-.755a2.122 2.122 0 0 0 1.597-1.16z"></path></svg>
-            <span>4.9</span>
-          </div>
+
+        <!-- Badge social proof -->
+        <div class="hero-badge flex items-center gap-2 bg-white/50 backdrop-blur p-1 rounded-full" aria-label="1000 vendeurs satisfaits, note 4.9/5">
+          <!-- ... existant ... -->
         </div>
-        <div class="relative">
-          <h1 class="hero-title text-center font-urbanist text-5xl/15 md:text-6xl/18 mt-4 font-bold max-w-2xl">
-            Créez et développez votre boutique en ligne.
-          </h1>
-          <div class="absolute -top-5 right-13 hidden md:block">
-            <div class="icon-box bg-primary shadow-[inset_0_4px_4px_rgba(255,255,255,0.25),0_4px_10px_rgba(0,0,0,0.15)] p-2 aspect-square rounded-lg text-white rotate-15">
-              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11.017 2.814a1 1 0 0 1 1.966 0l1.051 5.558a2 2 0 0 0 1.594 1.594l5.558 1.051a1 1 0 0 1 0 1.966l-5.558 1.051a2 2 0 0 0-1.594 1.594l-1.051 5.558a1 1 0 0 1-1.966 0l-1.051-5.558a2 2 0 0 0-1.594-1.594l-5.558-1.051a1 1 0 0 1 0-1.966l5.558-1.051a2 2 0 0 0 1.594-1.594z"></path></svg>
-            </div>
-          </div>
-        </div>
-        <p class="hero-desc text-center text-base/7 text-zinc-500 max-w-lg mt-4">Vendez vos produits physiques ou numériques en 1m30s. Paiements intégrés, livraison, analytics - tout inclus. Sans compétences techniques.</p>
+
+        <!-- ✅ H1 optimisé pour les mots-clés principaux -->
+        <h1 class="hero-title text-center font-urbanist text-5xl/15 md:text-6xl/18 mt-4 font-bold max-w-2xl">
+          Créez votre boutique en ligne en <span class="text-primary">1m30s</span> — Gratuit
+        </h1>
+
+        <!-- ✅ Description avec mots-clés longue traîne -->
+        <p class="hero-desc text-center text-base/7 text-zinc-500 max-w-lg mt-4">
+          Vendez vos produits physiques ou numériques en ligne avec paiements Mobile Money, livraison intégrée et analytics en temps réel. Sans compétences techniques. Disponible au Bénin, Sénégal, Côte d'Ivoire et dans toute l'Afrique.
+        </p>
+
         <div class="hero-buttons flex flex-col sm:flex-row items-center gap-4 mt-6 w-full md:w-auto">
-          <NuxtLink to="/connexion-vendeur" class="py-3 md:py-2.5 w-full md:w-auto px-8 font-semibold text-gray-700 bg-white border border-gray-200 rounded-full hover:bg-gray-50 transition-colors text-center">
-            Connexion
-          </NuxtLink>
-          <NuxtLink to="/inscription-vendeur" class="py-3 md:py-2.5 w-full md:w-auto px-8 border border-primary/20 bg-gradient-to-tl from-primary-dark to-primary text-white text-center rounded-full hover:opacity-90 transition-opacity">
+          <!-- ✅ CTA principal avec texte explicite -->
+          <NuxtLink to="/inscription-vendeur"
+            class="py-3 md:py-2.5 w-full md:w-auto px-8 border border-primary/20 bg-gradient-to-tl from-primary-dark to-primary text-white text-center rounded-full hover:opacity-90 transition-opacity"
+            aria-label="Créer ma boutique gratuitement sur UberMarket">
             Commencer gratuitement
           </NuxtLink>
-          <a href="#fonctionnalites" class="relative py-3 md:py-2.5 w-full md:w-auto px-8 bg-white/50 text-gray-600 font-medium text-center border border-white rounded-full hover:bg-white/70 transition-colors">
-            Découvrir
-            <div class="absolute size-8 pointer-events-none right-0 top-full -translate-y-1/2">
-              <img alt="mouse-arrow" width="24" height="24" src="/landing/mouse-arrow.svg">
-            </div>
-          </a>
+          <NuxtLink to="/connexion-vendeur"
+            class="py-3 md:py-2.5 w-full md:w-auto px-8 font-semibold text-gray-700 bg-white border border-gray-200 rounded-full hover:bg-gray-50 transition-colors text-center">
+            Se connecter
+          </NuxtLink>
         </div>
       </div>
     </section>
@@ -112,7 +102,8 @@
     </section>
 
     <!-- Features Section -->
-    <section id="fonctionnalites" class="px-4 md:px-16 lg:px-24 xl:px-32">
+    <!--<section id="fonctionnalites" class="px-4 md:px-16 lg:px-24 xl:px-32">-->
+      <section id="fonctionnalites" aria-label="Fonctionnalités UberMarket" class="px-4 md:px-16 lg:px-24 xl:px-32">
       <div class="grid grid-cols-1 md:grid-cols-2 border-x md:divide-x border-gray-200 divide-gray-200 max-w-7xl mx-auto">
         <div>
           <div class="p-4 pt-16 md:p-16 flex flex-col items-start md:sticky md:top-26">
@@ -121,6 +112,7 @@
                 <div class="icon-box bg-primary shadow-[inset_0_4px_4px_rgba(255,255,255,0.25),0_4px_10px_rgba(0,0,0,0.15)] p-2 aspect-square rounded-lg text-white -rotate-15">
                   <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11.017 2.814a1 1 0 0 1 1.966 0l1.051 5.558a2 2 0 0 0 1.594 1.594l5.558 1.051a1 1 0 0 1 0 1.966l-5.558 1.051a2 2 0 0 0-1.594 1.594l-1.051 5.558a1 1 0 0 1-1.966 0l-1.051-5.558a2 2 0 0 0-1.594-1.594l-5.558-1.051a1 1 0 0 1 0-1.966l5.558-1.051a2 2 0 0 0 1.594-1.594z"></path></svg>
                 </div>
+                <!--<h2 class="text-4xl font-semibold font-urbanist">Fonctionnalités</h2>-->
                 <h2 class="text-4xl font-semibold font-urbanist">Fonctionnalités</h2>
               </div>
               <p class="text-zinc-500 text-base/7 md:text-left text-center max-w-sm">
@@ -142,7 +134,7 @@
             <div class="bg-primary p-2 text-white rounded-md">
               <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"></path><path d="M3 6h18"></path><path d="M16 10a4 4 0 0 1-8 0"></path></svg>
             </div>
-            <p class="text-base font-medium mt-4">Création en 1m30s</p>
+            <h3 class="text-base font-medium mt-4">Création en 1m30s</h3>
             <p class="text-sm text-gray-600 mt-2">Créez votre boutique en quelques clics. Vendez des produits physiques ou numériques avec votre sous-domaine personnalisé.</p>
           </div>
           <!-- Paiements -->
@@ -150,7 +142,7 @@
             <div class="bg-green-500 p-2 text-white rounded-md">
               <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="20" height="14" x="2" y="5" rx="2"></rect><path d="M2 10h20"></path></svg>
             </div>
-            <p class="text-base font-medium mt-4">Paiements Mobile Money & Carte</p>
+            <h3 class="text-base font-medium mt-4">Paiements Mobile Money & Carte</h3>
             <p class="text-sm text-gray-600 mt-2">Acceptez Orange Money, MTN, Wave, Visa et Mastercard. Retirez vos gains à tout moment.</p>
           </div>
           <!-- Gestion produits -->
@@ -158,7 +150,7 @@
             <div class="bg-amber-500 p-2 text-white rounded-md">
               <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m7.5 4.27 9 5.15"></path><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"></path><path d="m3.3 7 8.7 5 8.7-5"></path><path d="M12 22V12"></path></svg>
             </div>
-            <p class="text-base font-medium mt-4">Produits physiques & numériques</p>
+            <h3 class="text-base font-medium mt-4">Produits physiques & numériques</h3>
             <p class="text-sm text-gray-600 mt-2">Vendez tout type de produit : physique avec variantes (taille, couleur) ou numérique (ebooks, formations, fichiers).</p>
           </div>
           <!-- Livraisons -->
@@ -166,7 +158,7 @@
             <div class="bg-purple-500 p-2 text-white rounded-md">
               <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 18V6a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v11a1 1 0 0 0 1 1h2"></path><path d="M15 18H9"></path><path d="M19 18h2a1 1 0 0 0 1-1v-3.65a1 1 0 0 0-.22-.624l-3.48-4.35A1 1 0 0 0 17.52 8H14"></path><circle cx="17" cy="18" r="2"></circle><circle cx="7" cy="18" r="2"></circle></svg>
             </div>
-            <p class="text-base font-medium mt-4">Zones de livraison & Livreurs</p>
+            <h3 class="text-base font-medium mt-4">Zones de livraison & Livreurs</h3>
             <p class="text-sm text-gray-600 mt-2">Définissez vos zones, tarifs de livraison et gérez votre équipe de livreurs.</p>
           </div>
           <!-- Codes promo -->
@@ -174,7 +166,7 @@
             <div class="bg-rose-500 p-2 text-white rounded-md">
               <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.5 12H16c-.7 2-2 3-4 3s-3.3-1-4-3H2.5"></path><path d="M5.5 5.1L2 12v6c0 1.1.9 2 2 2h16a2 2 0 002-2v-6l-3.4-6.9A2 2 0 0016.8 4H7.2a2 2 0 00-1.8 1.1z"></path></svg>
             </div>
-            <p class="text-base font-medium mt-4">Codes promo & Réductions</p>
+            <h3 class="text-base font-medium mt-4">Codes promo & Réductions</h3>
             <p class="text-sm text-gray-600 mt-2">Créez des codes promo personnalisés avec dates de validité et limites d'utilisation.</p>
           </div>
           <!-- Website Builder -->
@@ -182,7 +174,7 @@
             <div class="bg-cyan-500 p-2 text-white rounded-md">
               <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="18" height="18" x="3" y="3" rx="2"></rect><path d="M3 9h18"></path><path d="M9 21V9"></path></svg>
             </div>
-            <p class="text-base font-medium mt-4">Website Builder</p>
+            <h3 class="text-base font-medium mt-4">Website Builder</h3>
             <p class="text-sm text-gray-600 mt-2">Créez des pages personnalisées avec notre éditeur drag-and-drop intuitif.</p>
           </div>
           <!-- Thèmes -->
@@ -190,7 +182,7 @@
             <div class="bg-violet-500 p-2 text-white rounded-md">
               <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9"></path><path d="M20 3v4"></path><path d="M22 5h-4"></path></svg>
             </div>
-            <p class="text-base font-medium mt-4">Thèmes & Personnalisation</p>
+            <h3 class="text-base font-medium mt-4">Thèmes & Personnalisation</h3>
             <p class="text-sm text-gray-600 mt-2">Choisissez parmi plusieurs thèmes et personnalisez couleurs, logo et bannières.</p>
           </div>
           <!-- Analytics -->
@@ -198,7 +190,7 @@
             <div class="bg-pink-500 p-2 text-white rounded-md">
               <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3v18h18"></path><path d="m19 9-5 5-4-4-3 3"></path></svg>
             </div>
-            <p class="text-base font-medium mt-4">Analytics & Tableau de bord</p>
+            <h3 class="text-base font-medium mt-4">Analytics & Tableau de bord</h3>
             <p class="text-sm text-gray-600 mt-2">Ventes, clients, produits populaires, revenus - tout en temps réel avec graphiques.</p>
           </div>
           <!-- Marketing -->
@@ -206,7 +198,7 @@
             <div class="bg-lime-500 p-2 text-white rounded-md">
               <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 11V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h6"></path><path d="m12 12 4 10 1.7-4.3L22 16Z"></path></svg>
             </div>
-            <p class="text-base font-medium mt-4">Marketing & Tracking</p>
+            <h3 class="text-base font-medium mt-4">Marketing & Tracking</h3>
             <p class="text-sm text-gray-600 mt-2">Facebook Pixel, Google Analytics, TikTok Pixel pour suivre vos conversions.</p>
           </div>
           <!-- Avis clients -->
@@ -214,7 +206,7 @@
             <div class="bg-yellow-500 p-2 text-white rounded-md">
               <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11.525 2.295a.53.53 0 0 1 .95 0l2.31 4.679a2.123 2.123 0 0 0 1.595 1.16l5.166.756a.53.53 0 0 1 .294.904l-3.736 3.638a2.123 2.123 0 0 0-.611 1.878l.882 5.14a.53.53 0 0 1-.771.56l-4.618-2.428a2.122 2.122 0 0 0-1.973 0L6.396 21.01a.53.53 0 0 1-.77-.56l.881-5.139a2.122 2.122 0 0 0-.611-1.879L2.16 9.795a.53.53 0 0 1 .294-.906l5.165-.755a2.122 2.122 0 0 0 1.597-1.16z"></path></svg>
             </div>
-            <p class="text-base font-medium mt-4">Avis clients</p>
+            <h3 class="text-base font-medium mt-4">Avis clients</h3>
             <p class="text-sm text-gray-600 mt-2">Vos clients laissent des avis avec notes et photos pour renforcer la confiance.</p>
           </div>
           <!-- Collaboration -->
@@ -222,7 +214,7 @@
             <div class="bg-blue-500 p-2 text-white rounded-md">
               <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M22 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
             </div>
-            <p class="text-base font-medium mt-4">Collaboration équipe</p>
+            <h3 class="text-base font-medium mt-4">Collaboration équipe</h3>
             <p class="text-sm text-gray-600 mt-2">Invitez des collaborateurs avec des rôles : admin, gestionnaire, support.</p>
           </div>
           <!-- Commandes -->
@@ -230,7 +222,7 @@
             <div class="bg-orange-500 p-2 text-white rounded-md">
               <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 3h5v5"></path><path d="M8 3H3v5"></path><path d="M12 22v-8.3a4 4 0 0 0-1.172-2.872L3 3"></path><path d="m15 9 6-6"></path></svg>
             </div>
-            <p class="text-base font-medium mt-4">Gestion des commandes</p>
+            <h3 class="text-base font-medium mt-4">Gestion des commandes</h3>
             <p class="text-sm text-gray-600 mt-2">Suivi complet : en attente, confirmée, en livraison, livrée. Notifications en temps réel.</p>
           </div>
           <!-- Domaine personnalisé -->
@@ -238,7 +230,7 @@
             <div class="bg-gray-700 p-2 text-white rounded-md">
               <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"></path><path d="M2 12h20"></path></svg>
             </div>
-            <p class="text-base font-medium mt-4">Domaine personnalisé</p>
+            <h3 class="text-base font-medium mt-4">Domaine personnalisé</h3>
             <p class="text-sm text-gray-600 mt-2">Connectez votre propre nom de domaine (maboutique.com) à partir du plan Standard.</p>
           </div>
         </div>
@@ -433,7 +425,8 @@
               J'ai lancé ma boutique en moins d'une heure. Les paiements sont rapides et le support est très réactif. Je recommande !
             </p>
             <div class="flex items-center gap-2 pt-3">
-              <img class="size-10 rounded-full object-cover" alt="Aminata" src="https://images.unsplash.com/photo-1546961329-78bef0414d7c?q=80&w=100">
+              <img class="size-10 rounded-full object-cover" alt="Aminata K., vendeuse sur UberMarket" src="https://images.unsplash.com/photo-1546961329-78bef0414d7c?q=80&w=100"
+                loading="lazy" decoding="async" width="40" height="40">
               <div>
                 <p class="font-medium text-gray-800">Aminata K.</p>
                 <p class="text-xs text-zinc-500">@aminata_mode</p>
@@ -448,7 +441,7 @@
               Le module de livraison m'a fait gagner un temps fou. Je gère tout depuis mon téléphone. Parfait pour les entrepreneurs !
             </p>
             <div class="flex items-center gap-2 pt-3">
-              <img class="size-10 rounded-full object-cover" alt="Moussa" src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?q=80&w=100">
+              <img class="size-10 rounded-full object-cover" alt="Moussa D., vendeur sur UberMarket" src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?q=80&w=100" loading="lazy" decoding="async" width="40" height="40">
               <div>
                 <p class="font-medium text-white">Moussa D.</p>
                 <p class="text-xs text-white/80">@moussa_tech</p>
@@ -463,7 +456,7 @@
               Les analytics m'aident à comprendre mes clients. J'ai doublé mes ventes en 3 mois grâce aux insights.
             </p>
             <div class="flex items-center gap-2 pt-3">
-              <img class="size-10 rounded-full object-cover" alt="Fatou" src="https://images.unsplash.com/flagged/photo-1573740144655-bbb6e88fb18a?q=80&w=100">
+              <img class="size-10 rounded-full object-cover" alt="Fatou S., vendeuse sur UberMarket" src="https://images.unsplash.com/flagged/photo-1573740144655-bbb6e88fb18a?q=80&w=100"  loading="lazy" decoding="async" width="40" height="40">
               <div>
                 <p class="font-medium text-gray-800">Fatou S.</p>
                 <p class="text-xs text-zinc-500">@fatou_beauty</p>
@@ -554,15 +547,185 @@ onMounted(() => {
 })
 
 // SEO
+const route = useRoute()
+
 useHead({
-  title: 'UberMarket - Créez votre boutique en ligne gratuitement',
+  title: 'UberMarket — Créez votre boutique en ligne en 1m30s | Gratuit',
+  titleTemplate: '%s',
   meta: [
-    { name: 'description', content: 'Lancez votre e-commerce en 5 minutes. Paiements intégrés, livraison, analytics - tout inclus. Commencez gratuitement.' },
-    { property: 'og:title', content: 'UberMarket - Créez votre boutique en ligne gratuitement' },
-    { property: 'og:description', content: 'Lancez votre e-commerce en 5 minutes. Paiements intégrés, livraison, analytics - tout inclus.' },
+    // ✅ SEO de base
+    { name: 'description', content: 'Lancez votre boutique e-commerce en 1m30s. Paiements Mobile Money & Carte, livraison intégrée, analytics temps réel. Commencez gratuitement. 1000+ vendeurs satisfaits en Afrique.' },
+    { name: 'keywords', content: 'boutique en ligne, e-commerce Afrique, créer boutique, vendre en ligne, Bénin, Côte d\'Ivoire, Sénégal, Mobile Money, paiement en ligne, marketplace' },
+    { name: 'robots', content: 'index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1' },
+    { name: 'author', content: 'UberMarket' },
+    { name: 'language', content: 'French' },
+    { name: 'revisit-after', content: '7 days' },
+
+    // ✅ Open Graph (Facebook, WhatsApp, LinkedIn)
+    { property: 'og:type', content: 'website' },
+    { property: 'og:url', content: 'https://www.uber-market.com/' },
+    { property: 'og:site_name', content: 'UberMarket' },
+    { property: 'og:title', content: 'UberMarket — Créez votre boutique en ligne en 1m30s' },
+    { property: 'og:description', content: 'Lancez votre e-commerce en 1m30s. Paiements Mobile Money & Carte, livraison, analytics inclus. Commencez gratuitement.' },
+    { property: 'og:image', content: 'https://www.uber-market.com/og-image.png' }, // ← créer une image 1200x630
+    { property: 'og:image:width', content: '1200' },
+    { property: 'og:image:height', content: '630' },
+    { property: 'og:locale', content: 'fr_FR' },
+
+    // ✅ Twitter Card
+    { name: 'twitter:card', content: 'summary_large_image' },
+    { name: 'twitter:site', content: '@ubermarket' },
+    { name: 'twitter:title', content: 'UberMarket — Créez votre boutique en ligne en 1m30s' },
+    { name: 'twitter:description', content: 'Lancez votre e-commerce en 1m30s. Paiements Mobile Money & Carte, livraison, analytics inclus.' },
+    { name: 'twitter:image', content: 'https://www.uber-market.com/og-image.png' },
+
+    // ✅ Géolocalisation (SEO local Bénin/Afrique de l'Ouest)
+    { name: 'geo.region', content: 'BJ' },
+    { name: 'geo.placename', content: 'Cotonou, Bénin' },
+
+    // ✅ Viewport optimal
+    { name: 'viewport', content: 'width=device-width, initial-scale=1, maximum-scale=5' },
+    { name: 'theme-color', content: '#5B6AC5' },
   ],
   link: [
-    { rel: 'stylesheet', href: 'https://fonts.googleapis.com/css2?family=Urbanist:wght@400;500;600;700&display=swap' }
+    // ✅ Canonical (évite le duplicate content)
+    { rel: 'canonical', href: 'https://www.uber-market.com/' },
+    // ✅ Preconnect pour performance (Core Web Vitals)
+    { rel: 'preconnect', href: 'https://fonts.googleapis.com' },
+    { rel: 'preconnect', href: 'https://fonts.gstatic.com', crossorigin: '' },
+    { rel: 'stylesheet', href: 'https://fonts.googleapis.com/css2?family=Urbanist:wght@400;500;600;700&display=swap', media: 'print', onload: "this.media='all'" },
+    // ✅ Favicon
+    { rel: 'icon', type: 'image/png', href: '/favicon.png' },
+    { rel: 'apple-touch-icon', href: '/apple-touch-icon.png' },
+  ],
+  script: [
+    // ✅ Données structurées JSON-LD (Google rich snippets)
+    {
+      type: 'application/ld+json',
+      innerHTML: JSON.stringify({
+        '@context': 'https://schema.org',
+        '@graph': [
+          // Organisation
+          {
+            '@type': 'Organization',
+            '@id': 'https://www.uber-market.com/#organization',
+            name: 'UberMarket',
+            url: 'https://www.uber-market.com',
+            logo: {
+              '@type': 'ImageObject',
+              url: 'https://www.uber-market.com/uber-market.png',
+              width: 200,
+              height: 60
+            },
+            contactPoint: {
+              '@type': 'ContactPoint',
+              email: 'contact@uber-market.com',
+              contactType: 'customer service',
+              availableLanguage: 'French'
+            },
+            sameAs: [
+              'https://twitter.com/ubermarket',
+              'https://instagram.com/ubermarket'
+            ]
+          },
+          // Site web
+          {
+            '@type': 'WebSite',
+            '@id': 'https://www.uber-market.com/#website',
+            url: 'https://www.uber-market.com',
+            name: 'UberMarket',
+            publisher: { '@id': 'https://www.uber-market.com/#organization' },
+            potentialAction: {
+              '@type': 'SearchAction',
+              target: 'https://www.uber-market.com/marketplace?q={search_term_string}',
+              'query-input': 'required name=search_term_string'
+            }
+          },
+          // Logiciel SaaS
+          {
+            '@type': 'SoftwareApplication',
+            name: 'UberMarket',
+            applicationCategory: 'BusinessApplication',
+            operatingSystem: 'Web',
+            offers: [
+              {
+                '@type': 'Offer',
+                name: 'Plan Welcome',
+                price: '0',
+                priceCurrency: 'EUR',
+                description: 'Gratuit avec 15% de commission'
+              },
+              {
+                '@type': 'Offer',
+                name: 'Plan Standard',
+                price: '14.99',
+                priceCurrency: 'EUR',
+                description: '3 boutiques, 200 produits, domaine personnalisé'
+              },
+              {
+                '@type': 'Offer',
+                name: 'Plan Premium',
+                price: '24.99',
+                priceCurrency: 'EUR',
+                description: '10 boutiques, 1000 produits, support prioritaire'
+              }
+            ],
+            aggregateRating: {
+              '@type': 'AggregateRating',
+              ratingValue: '4.9',
+              reviewCount: '1000',
+              bestRating: '5'
+            }
+          },
+          // FAQ Schema (apparaît directement dans les résultats Google)
+          {
+            '@type': 'FAQPage',
+            mainEntity: [
+              {
+                '@type': 'Question',
+                name: "Qu'est-ce qu'UberMarket ?",
+                acceptedAnswer: {
+                  '@type': 'Answer',
+                  text: "UberMarket est une plateforme SaaS qui vous permet de créer votre boutique en ligne en quelques minutes avec un sous-domaine personnalisé, des paiements intégrés et de nombreuses fonctionnalités e-commerce."
+                }
+              },
+              {
+                '@type': 'Question',
+                name: 'Est-ce vraiment gratuit pour commencer ?',
+                acceptedAnswer: {
+                  '@type': 'Answer',
+                  text: "Oui ! Le plan Welcome est 100% gratuit avec 15% de commission sur les ventes. Vous pouvez aussi essayer le plan Gratuit pendant 7 jours sans engagement."
+                }
+              },
+              {
+                '@type': 'Question',
+                name: 'Quels moyens de paiement sont acceptés ?',
+                acceptedAnswer: {
+                  '@type': 'Answer',
+                  text: "Via notre partenaire de paiement, vous acceptez les cartes (Visa, Mastercard), portefeuilles mobiles / Mobile Money (Orange, MTN, Wave) et autres méthodes locales."
+                }
+              },
+              {
+                '@type': 'Question',
+                name: 'Puis-je utiliser mon propre domaine ?',
+                acceptedAnswer: {
+                  '@type': 'Answer',
+                  text: "Oui, à partir du plan Standard. Vous pouvez connecter votre propre domaine à votre boutique UberMarket."
+                }
+              },
+              {
+                '@type': 'Question',
+                name: 'Comment recevoir mes paiements ?',
+                acceptedAnswer: {
+                  '@type': 'Answer',
+                  text: "Vos gains sont disponibles dans votre tableau de bord. Demandez un retrait vers votre compte bancaire ou Mobile Money à tout moment."
+                }
+              }
+            ]
+          }
+        ]
+      })
+    }
   ]
 })
 </script>

@@ -2,7 +2,7 @@
   <div class="p-6 max-w-5xl mx-auto">
     <!-- En-tête -->
     <div class="mb-8">
-      <h1 class="text-2xl font-semibold text-slate-900">Programme d'affiliation</h1>
+      <h1 class="text-2xl font-semibold text-slate-900">Programme de parrainage</h1>
       <p class="mt-1 text-sm text-slate-500">Parrainez de nouveaux vendeurs et gagnez des commissions sur leurs abonnements</p>
     </div>
 
@@ -19,7 +19,7 @@
       <div class="bg-gradient-to-br from-primary to-primary/80 rounded-2xl p-6 text-white mb-8">
         <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
-            <p class="text-white/80 text-sm font-medium mb-1">Votre code d'affiliation</p>
+            <p class="text-white/80 text-sm font-medium mb-1">Votre code de parrainage</p>
             <div class="flex items-center gap-3">
               <span class="text-3xl font-bold tracking-wider">{{ referralData?.code || '--------' }}</span>
               <button 
@@ -57,10 +57,30 @@
           <p class="text-xs font-medium text-slate-500 uppercase tracking-wide">Total gagné</p>
           <p class="mt-2 text-2xl font-semibold text-green-600">{{ formatCurrency(referralData?.total_earnings || 0) }}</p>
         </div>
-        <div class="bg-white border border-slate-200 rounded-xl p-4">
-          <p class="text-xs font-medium text-slate-500 uppercase tracking-wide">Solde disponible</p>
-          <p class="mt-2 text-2xl font-semibold text-primary">{{ formatCurrency(referralData?.available_balance || 0) }}</p>
+        <div class="bg-white border border-slate-200 rounded-xl p-4 flex flex-col justify-between">
+          <div>
+            <p class="text-xs font-medium text-slate-500 uppercase tracking-wide">Solde disponible</p>
+            <p class="mt-2 text-2xl font-semibold text-primary">{{ formatCurrency(referralData?.available_balance || 0) }}</p>
+          </div>
+          
+          <!-- Bouton de retrait conditionnel -->
+          <div class="mt-4">
+            <button 
+              @click="requestWithdrawal"
+              :disabled="!referralData || referralData.available_balance < 100"
+              :class="[
+                'w-full py-2 px-3 rounded-lg text-sm font-medium transition-colors text-center block',
+                referralData?.available_balance >= 100 
+                  ? 'bg-primary text-white hover:bg-primary/90' 
+                  : 'bg-slate-100 text-slate-400 cursor-not-allowed'
+              ]"
+            >
+              <span v-if="referralData?.available_balance >= 100">Demander un retrait</span>
+              <span v-else>Minimum 100 € requis</span>
+            </button>
+          </div>
         </div>
+
       </div>
 
       <!-- Comment ça marche -->
@@ -113,7 +133,7 @@
                 <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Plan</th>
                 <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Taux</th>
                 <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Commission</th>
-                <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Date</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Effectué le</th>
               </tr>
             </thead>
             <tbody class="divide-y divide-slate-200">
@@ -146,107 +166,138 @@
 </template>
 
 <script setup lang="ts">
-definePageMeta({
-  layout: 'dashboard'
-})
-
-const config = useRuntimeConfig()
-const route = useRoute()
-const { user } = useAuth()
-
-const isLoading = ref(true)
-const codeCopied = ref(false)
-
-// Données d'affiliation
-const referralData = ref<{
-  code: string
-  commission_rate: number
-  referral_count: number
-  active_referrals: number
-  total_earnings: number
-  available_balance: number
-  currency: string
-} | null>(null)
-
-const commissions = ref<any[]>([])
-
-
-
-// Charger les données
-const loadReferralData = async () => {
-  isLoading.value = true
-  
-  try {
-    const token = localStorage.getItem('auth_token')
-    if (!token) return
-
-    // Charger les infos d'affiliation
-    const response = await fetch(`${config.public.apiBase}/vendor/referral`, {
-      headers: {
-        'Authorization': `Bearer ${token}`,
-        'Accept': 'application/json'
-      }
-    })
-    
-    const data = await response.json()
-    if (data.success) {
-      referralData.value = data.referral
-    }
-
-    // Charger l'historique des commissions
-    const commissionsResponse = await fetch(`${config.public.apiBase}/vendor/referral/commissions`, {
-      headers: {
-        'Authorization': `Bearer ${token}`,
-        'Accept': 'application/json'
-      }
-    })
-    
-    const commissionsData = await commissionsResponse.json()
-    if (commissionsData.success) {
-      commissions.value = commissionsData.commissions?.data || []
-    }
-
-  } catch (error) {
-    console.error('Erreur chargement affiliation:', error)
-  } finally {
-    isLoading.value = false
-  }
-}
-
-// Copier le code
-const copyCode = async () => {
-  if (!referralData.value?.code) return
-  
-  try {
-    await navigator.clipboard.writeText(referralData.value.code)
-    codeCopied.value = true
-    setTimeout(() => {
-      codeCopied.value = false
-    }, 2000)
-  } catch (error) {
-    console.error('Erreur copie:', error)
-  }
-}
-
-// Formatage monétaire
-const formatCurrency = (amount: number) => {
-  const currency = referralData.value?.currency || 'EUR'
-  return new Intl.NumberFormat('fr-FR', {
-    style: 'currency',
-    currency: currency
-  }).format(amount)
-}
-
-// Formatage date
-const formatDate = (dateStr: string) => {
-  return new Date(dateStr).toLocaleDateString('fr-FR', {
-    day: '2-digit',
-    month: 'short',
-    year: 'numeric'
+  definePageMeta({
+    layout: 'dashboard'
   })
-}
 
-onMounted(() => {
-  loadReferralData()
-})
+  const config = useRuntimeConfig()
+  const route = useRoute()
+  const { user } = useAuth()
+
+  const isLoading = ref(true)
+  const codeCopied = ref(false)
+
+  // Données d'affiliation
+  const referralData = ref<{
+    code: string
+    commission_rate: number
+    referral_count: number
+    active_referrals: number
+    total_earnings: number
+    available_balance: number
+    currency: string
+  } | null>(null)
+
+  const commissions = ref<any[]>([])
+
+
+
+  // Charger les données
+  const loadReferralData = async () => {
+    isLoading.value = true
+    
+    try {
+      const token = localStorage.getItem('auth_token')
+      if (!token) return
+
+      // Charger les infos d'affiliation
+      const response = await fetch(`${config.public.apiBase}/vendor/referral`, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Accept': 'application/json'
+        }
+      })
+      
+      const data = await response.json()
+      if (data.success) {
+        referralData.value = data.referral
+      }
+
+      // Charger l'historique des commissions
+      const commissionsResponse = await fetch(`${config.public.apiBase}/vendor/referral/commissions`, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Accept': 'application/json'
+        }
+      })
+      
+      const commissionsData = await commissionsResponse.json()
+      if (commissionsData.success) {
+        commissions.value = commissionsData.commissions?.data || []
+      }
+
+    } catch (error) {
+      console.error('Erreur chargement affiliation:', error)
+    } finally {
+      isLoading.value = false
+    }
+  }
+
+  // Copier le code
+  const copyCode = async () => {
+    if (!referralData.value?.code) return
+    
+    try {
+      await navigator.clipboard.writeText(referralData.value.code)
+      codeCopied.value = true
+      setTimeout(() => {
+        codeCopied.value = false
+      }, 2000)
+    } catch (error) {
+      console.error('Erreur copie:', error)
+    }
+  }
+
+  // Formatage monétaire
+  const formatCurrency = (amount: number) => {
+    const currency = referralData.value?.currency || 'EUR'
+    return new Intl.NumberFormat('fr-FR', {
+      style: 'currency',
+      currency: currency
+    }).format(amount)
+  }
+
+  // Formatage date
+  const formatDate = (dateStr: string) => {
+    return new Date(dateStr).toLocaleDateString('fr-FR', {
+      day: '2-digit',
+      month: 'short',
+      year: 'numeric'
+    })
+  }
+
+  onMounted(() => {
+    loadReferralData()
+  })
+
+  // Demander un retrait
+  const requestWithdrawal = async () => {
+    if (!referralData.value || referralData.value.available_balance < 100) return
+
+    if (confirm(`Souhaitez-vous demander le retrait de vos ${formatCurrency(referralData.value.available_balance)} ?`)) {
+      try {
+        const token = localStorage.getItem('auth_token')
+        const response = await fetch(`${config.public.apiBase}/vendor/referral/withdraw`, {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
+          }
+        })
+        
+        const data = await response.json()
+        if (data.success) {
+          alert('Votre demande de retrait a bien été enregistrée !')
+          // Recharger les données pour mettre les compteurs à jour
+          loadReferralData()
+        } else {
+          alert(data.message || 'Une erreur est survenue.')
+        }
+      } catch (error) {
+        console.error('Erreur lors de la demande de retrait:', error)
+      }
+    }
+  }
+
 </script>

@@ -98,7 +98,90 @@ onMounted(() => {
   loadProductData()
 })
 
-useHead(() => ({
+// En se basant sur le faite que product est un ref chargé depuis l'API
+useHead(() => {
+  if (!product.value) return { title: 'Produit — UberMarket' }
+
+  const p            = product.value
+  const productName  = p.name
+  const productDesc  = p.description?.replace(/<[^>]+>/g, '').slice(0, 155) || ''
+  const productPrice = p.price
+  const productImage = p.product_images?.[0]?.image_url || p.preview_image || ''
+  const category     = p.subcategory?.name || ''
+  const parentCat    = p.subcategory?.category?.name || ''
+  const shopName     = shop.value?.name || 'Boutique'
+  const productUrl   = `https://uber-market.com/boutique/${subdomain}/produit/${p.id}`
+
+  // Mots-clés extraits de la description
+  const descWords = productDesc
+    .split(/\s+/)
+    .filter(w => w.length > 4)
+    .slice(0, 10)
+    .join(', ')
+
+  return {
+    title: `${productName} — ${shopName} | UberMarket`,
+    meta: [
+      { name: 'description', content: `${productDesc} — Disponible sur ${shopName}. Commandez en ligne avec livraison.` },
+      { name: 'robots', content: 'index, follow' },
+      { name: 'keywords', content: `${productName}, ${category}, ${parentCat}, ${descWords}, ${shopName}, acheter en ligne` },
+
+      // Open Graph Product
+      { property: 'og:type',              content: 'product' },
+      { property: 'og:url',               content: productUrl },
+      { property: 'og:title',             content: `${productName} — ${shopName}` },
+      { property: 'og:description',       content: productDesc },
+      { property: 'og:image',             content: productImage },
+      { property: 'product:price:amount', content: String(productPrice) },
+      { property: 'product:price:currency', content: 'XOF' },
+
+      // Twitter
+      { name: 'twitter:card',        content: 'summary_large_image' },
+      { name: 'twitter:title',       content: `${productName} — ${shopName}` },
+      { name: 'twitter:description', content: productDesc },
+      { name: 'twitter:image',       content: productImage },
+    ],
+    link: [
+      { rel: 'canonical', href: productUrl }
+    ],
+    script: [
+      {
+        type: 'application/ld+json',
+        innerHTML: JSON.stringify({
+          '@context': 'https://schema.org',
+          '@type': 'Product',
+          name: productName,
+          description: productDesc,
+          image: productImage,
+          url: productUrl,
+          brand: { '@type': 'Brand', name: shopName },
+          ...(category && {
+            category: parentCat ? `${parentCat} > ${category}` : category
+          }),
+          offers: {
+            '@type': 'Offer',
+            price: productPrice,
+            priceCurrency: 'XOF',
+            availability: p.stock_quantity > 0
+              ? 'https://schema.org/InStock'
+              : 'https://schema.org/OutOfStock',
+            url: productUrl,
+            seller: { '@type': 'Organization', name: shopName }
+          },
+          ...(p.reviews_count > 0 && {
+            aggregateRating: {
+              '@type': 'AggregateRating',
+              ratingValue: p.average_rating || 5,
+              reviewCount: p.reviews_count
+            }
+          })
+        })
+      }
+    ]
+  }
+})
+
+/*useHead(() => ({
   title: product.value ? `${product.value.name} - ${shop.value?.name}` : 'Chargement...',
   meta: [
     {
@@ -106,5 +189,5 @@ useHead(() => ({
       content: product.value ? stripHtml(product.value.description) : 'Découvrez ce produit'
     }
   ]
-}))
+}))*/
 </script>
