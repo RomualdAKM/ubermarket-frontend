@@ -1,5 +1,92 @@
-// https://nuxt.com/docs/api/configuration/nuxt-config
+// nuxt.config.ts
 import tailwindcss from "@tailwindcss/vite"
+
+export default defineNuxtConfig({
+  compatibilityDate: '2025-07-15',
+  devtools: { enabled: true },
+
+  css: ['~/assets/css/main.css'],
+  ssr: true,
+
+  app: {
+    head: {
+      htmlAttrs: { lang: 'fr' },
+      title: 'UberMarket — Créez votre boutique en ligne en 1m30s | Gratuit',
+      meta: [
+        { charset: 'utf-8' },
+        { name: 'viewport', content: 'width=device-width, initial-scale=1' },
+        { name: 'description', content: 'Lancez votre boutique e-commerce en 1m30s...' },
+        // ... conservez le reste de vos metas inchangé
+      ],
+      link: [
+        { rel: 'canonical', href: 'https://www.uber-market.com/' },
+        { rel: 'icon', type: 'image/png', href: '/uber-market.png' },
+        { rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' },
+        { rel: 'apple-touch-icon', href: '/apple-touch-icon.png' },
+        // On conserve les polices mais on empêche Vite de bloquer dessus au démarrage
+        { rel: 'preconnect', href: 'https://fonts.googleapis.com' },
+        { rel: 'preconnect', href: 'https://fonts.gstatic.com', crossorigin: '' },
+        {
+          rel: 'stylesheet',
+          href: 'https://fonts.googleapis.com/css2?family=Urbanist:wght@400;500;600;700&family=Inter:wght@400;500;600;700;800&family=Montserrat:wght@400;500;600;700;800&family=Poppins:wght@400;500;600;700;800&display=swap'
+        }
+      ]
+    }
+  },
+
+  // ✅ CONFIGURATION VITE CORRIGÉE POUR ÉVITER LE TIMEOUT
+  vite: {
+    plugins: [
+      tailwindcss(),
+    ],
+    server: {
+      // Augmente le délai d'attente de compilation de 10s à 60s pour les modules complexes
+      watch: {
+        usePolling: true, // Crucial sous Windows pour détecter les changements instantanément
+        interval: 30000//100
+      }
+    }
+  },
+
+  // Empêche le processus interne Nuxt (vite-node) de crash si un fichier met plus de 10s à s'associer
+  nitro: {
+    devServer: {
+      watch: []
+    }
+  },
+
+  runtimeConfig: {
+    public: {
+      apiBase: process.env.NUXT_PUBLIC_API_BASE || 'https://ubermarket.fga-numerik.fr/api',
+      backendUrl: process.env.NUXT_PUBLIC_BACKEND_URL || 'https://ubermarket.fga-numerik.fr',
+      siteUrl: process.env.NUXT_PUBLIC_SITE_URL || 'http://localhost:3000'
+    }
+  },
+
+  modules: [
+    '@nuxtjs/sitemap',
+    '@nuxtjs/robots',
+  ],
+
+  sitemap: {
+    hostname: 'https://www.uber-market.com',
+    routes: ['/', '/marketplace', '/conditions'],
+    exclude: ['/dashboard-admin/**', '/dashboard-vendor/**', '/dashboard-client/**', '/dashboard-courier/**', '/dashboard-affiliate/**', '/mes-boutiques', '/connexion-vendeur']
+  },
+
+  robots: {
+    rules: [{ UserAgent: '*', Allow: '/', Disallow: ['/dashboard-admin/', '/dashboard-vendor/', '/dashboard-client/', '/mes-boutiques'], Sitemap: 'https://www.uber-market.com/sitemap.xml' }]
+  },
+
+  typescript: {
+    strict: false,
+    typeCheck: false
+  }
+})
+
+
+// https://nuxt.com/docs/api/configuration/nuxt-config
+/*import tailwindcss from "@tailwindcss/vite"
 
 export default defineNuxtConfig({
   compatibilityDate: '2025-07-15',

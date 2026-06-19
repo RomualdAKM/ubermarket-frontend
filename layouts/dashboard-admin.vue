@@ -160,6 +160,7 @@
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
+import type Connexions from '~/pages/dashboard-admin/connexions.vue'
 
 const { user, logout } = useAuth()
 const router = useRouter()
@@ -199,7 +200,11 @@ const icons = {
   categories: '<svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9.568 3H5.25A2.25 2.25 0 0 0 3 5.25v4.318c0 .597.237 1.17.659 1.591l9.581 9.581c.699.699 1.78.872 2.607.33a18.095 18.095 0 0 0 5.223-5.223c.542-.827.369-1.908-.33-2.607L11.16 3.66A2.25 2.25 0 0 0 9.568 3Z"/><path stroke-linecap="round" stroke-linejoin="round" d="M6 6h.008v.008H6V6Z"/></svg>',
   delivery: '<svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 18.75a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m3 0h6m-9 0H3.375a1.125 1.125 0 0 1-1.125-1.125V14.25m17.25 4.5a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m3 0h1.125c.621 0 1.129-.504 1.09-1.124a17.902 17.902 0 0 0-3.213-9.193 2.056 2.056 0 0 0-1.58-.86H14.25"/></svg>',
   couriers: '<svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 18.75a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m3 0h6m-9 0H3.375a1.125 1.125 0 0 1-1.125-1.125V14.25m17.25 4.5a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m3 0h1.125c.621 0 1.129-.504 1.09-1.124a17.902 17.902 0 0 0-3.213-9.193 2.056 2.056 0 0 0-1.58-.86H14.25M16.5 18.75h-2.25m0-11.177v-.958c0-.568-.422-1.048-.987-1.106a48.554 48.554 0 0 0-10.026 0 1.106 1.106 0 0 0-.987 1.106v7.635m12-6.677v6.677m0 4.5v-4.5m0 0h-12"/></svg>',
-  analytics: '<svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 3v18h18"/><path stroke-linecap="round" stroke-linejoin="round" d="m19 9-5 5-4-4-3 3"/></svg>'
+  analytics: '<svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 3v18h18"/><path stroke-linecap="round" stroke-linejoin="round" d="m19 9-5 5-4-4-3 3"/></svg>',
+  Connexions: '<svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 3a9 9 0 1 0 9 9m-1.5-5.5L21 12h-5.5" /><!-- Symbole de signal/connexion (Wi-Fi) au centre --><path stroke-linecap="round" stroke-linejoin="round" d="M12 12v.008M9.5 14.5a3.5 3.5 0 0 1 5 0M7 17a7 7 0 0 1 10 0" /></svg>',
+  Abonnements: '<svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24" xmlns="http://w3.org"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 12c0-1.232-.046-2.453-.138-3.662a4.006 4.006 0 00-3.7-3.7 48.656 48.656 0 00-7.324 0 4.006 4.006 0 00-3.7 3.7c-.017.22-.032.441-.046.662M19.5 12l3-3m-3 3l-3-3M4.5 12a48.554 48.554 0 00.138 3.662 4.006 4.006 0 003.7 3.7c2.422.193 4.887.193 7.309 0a4.006 4.006 0 003.7-3.7c.01-.137.02-.274.03-.411M4.5 12l-3 3m3-3l3 3" /><path stroke-linecap="round" stroke-linejoin="round" d="M12 11v.008M9.5 13.5a3.5 3.5 0 0 1 5 0M7 16a7 7 0 0 1 10 0" /></svg>'
+  //bonnements: '<svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24" xmlns="http://w3.org"><path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182" /><path stroke-linecap="round" stroke-linejoin="round" d="M12 12v.008M9.5 14.5a3.5 3.5 0 0 1 5 0M7 17a7 7 0 0 1 10 0" /></svg>'
+  //Connexions: '<svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 3v18h18"/><path stroke-linecap="round" stroke-linejoin="round" d="m19 9-5 5-4-4-3 3"/></svg>'
 }
 
 const menuItems = [
@@ -212,7 +217,9 @@ const menuItems = [
   { label: 'Catégories', to: '/dashboard-admin/categories', icon: icons.categories },
   { label: 'Livraisons', to: '/dashboard-admin/livraisons', icon: icons.delivery },
   { label: 'Affiliés', to: '/dashboard-admin/affilies', icon: icons.affiliates },
-  { label: 'Analytics', to: '/dashboard-admin/analytics', icon: icons.analytics }
+  { label: 'Analytics', to: '/dashboard-admin/analytics', icon: icons.analytics },
+  { label: 'Historique de Connexions', to: '/dashboard-admin/connexions', icon: icons.Connexions },
+  { label: 'Abonnements', to: '/dashboard-admin/abonnements', icon: icons.Abonnements }
 ]
 
 // Bottom bar: mêmes items mais limités pour l'espace mobile

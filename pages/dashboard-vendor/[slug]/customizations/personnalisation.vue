@@ -237,7 +237,7 @@
                   Aperçu
                 </button>
                 <button
-                  v-if="currentThemeslug !== theme.slug"
+                  v-if="currentThemeSlug !== theme.slug"
                   @click="confirmActivate(theme)"
                   class="flex-1 py-2 text-sm font-medium text-white rounded-lg transition-colors"
                   :style="{ backgroundColor: theme.primaryColor || '#5B6AC5' }">
@@ -1213,8 +1213,7 @@
       await fetchCustomizationsByShopId(shopId.value)
       
       // Charger le thème actif de la boutique
-     
-      const shop = shops.value?.find((s: any) => s.subdomain === shopSlug || s.slug === shopSlug)
+      /*const shop = shops.value?.find((s: any) => s.subdomain === shopSlug || s.slug === shopSlug)
       if (shop?.theme?.slug) {
         currentThemeSlug.value = shop.theme.slug
       } else if (shop?.theme_id) {
@@ -1223,6 +1222,32 @@
           // Chercher via position si pas de slug disponible
           return t.id === shop.theme_id
         })?.slug || null
+      }*/
+      // ✅ APRÈS — appel API direct pour avoir le thème à jour
+      try {
+        const { token } = useAuth()
+        const res = await fetch(
+          `${config.public.apiBase}/shops/${shopSlug}`,
+          {
+            headers: {
+              'Authorization': `Bearer ${token.value}`,
+              'Accept': 'application/json'
+            }
+          }
+        )
+        const data = await res.json()
+        if (data.success && data.data) {
+          const freshShop = data.data
+          // Priorité : slug de la relation theme chargée
+          if (freshShop.theme?.slug) {
+            currentThemeSlug.value = freshShop.theme.slug
+          } else if (freshShop.theme_id) {
+            // Fallback : chercher dans allThemes par theme_id
+            currentThemeSlug.value = allThemes.value.find(t => t.id === freshShop.theme_id)?.slug || null
+          }
+        }
+      } catch (err) {
+        console.error('Erreur chargement thème actif:', err)
       }
 
       // Pré-remplir les champs avec les données existantes
@@ -1525,6 +1550,18 @@
       palette: ['#8B1A1A', '#C9A84C', '#FAF7F2'],
       screenshot: '/themes/cuisine-preview.png',
       features: ['Hero plein écran', 'Menu filtrable', 'Spécialités', 'Témoignages'],
+    },
+    {
+      id: 6,
+      slug: 'theme-nature-vert',
+      name: 'Nature-vert',
+      description: 'Thème organique pour produits naturels et bio',
+      is_free: true,
+      price: 0,
+      primaryColor: '#2d6a4f',
+      palette: ['#2d6a4f', '#f4a261', '#fefae0'],
+      screenshot: null,
+      features: ['Hero plein écran', 'Grille produits', 'Témoignages'],
     },
   ])
 

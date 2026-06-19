@@ -108,7 +108,7 @@ useHead(() => {
 
   const shopName = shop.value.name
   const shopDesc = shop.value.description || `Site officiel de ${shopName}`
-  const shopUrl  = `https://uber-market.com/site/${subdomain}`
+  const shopUrl  = `https://www.uber-market.com/site/${subdomain}`
 
   return {
     title: `${shopName} — Site officiel`,

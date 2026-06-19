@@ -1,8 +1,6 @@
 <template>
   <div class="min-h-screen flex items-center justify-center bg-white py-4 px-4 sm:px-6 lg:px-8">
     <div class="max-w-md w-full space-y-6">
-
-      <!-- Titre + lien vers la connexion -->
       <div>
         <h2 class="mt-4 text-center text-2xl font-extrabold text-gray-900">Inscription vendeur</h2>
         <p class="mt-2 text-center text-sm text-gray-600">
@@ -13,25 +11,7 @@
         </p>
       </div>
 
-      <!--
-        Bannière plan sélectionné — affichée si un plan est passé en query param (?plan=standard).
-        Permet à l'utilisateur de confirmer visuellement son choix avant de s'inscrire.
-        Le nom du plan est chargé depuis l'API via loadSelectedPlanName().
-      -->
-      <div v-if="selectedPlanCode" class="bg-blue-50 border border-blue-200 rounded-lg p-4">
-        <p class="text-sm font-medium text-blue-800">
-          📋 Plan sélectionné :
-          <strong>{{ selectedPlanName || selectedPlanCode }}</strong>
-        </p>
-        <p class="text-xs text-blue-600 mt-1">
-          Vous serez redirigé vers le paiement après la création de votre compte.
-        </p>
-      </div>
-
-      <!--
-        Bannière affilié — affichée si un code de parrainage valide a été détecté.
-        detectedAffiliate est peuplé après validation via POST /api/referral/validate.
-      -->
+      <!-- Bannière affilié détecté automatiquement -->
       <div v-if="detectedAffiliate" class="bg-primary/5 border border-primary/20 rounded-lg p-4">
         <p class="text-sm font-medium text-primary">
           🎉 Vous avez été invité par <strong>{{ detectedAffiliate.name }}</strong>
@@ -47,7 +27,7 @@
       <form class="mt-4 space-y-4" @submit.prevent="handleSignup">
         <div class="space-y-4">
 
-          <!-- Prénom + Nom côte à côte -->
+          <!-- Prénom + Nom -->
           <div class="grid grid-cols-2 gap-3">
             <div>
               <label for="first_name" class="block text-sm font-medium text-gray-700">Prénom</label>
@@ -73,7 +53,6 @@
             </div>
           </div>
 
-          <!-- E-mail -->
           <div>
             <label for="email-address" class="block text-sm font-medium text-gray-700">E-mail</label>
             <input
@@ -86,7 +65,6 @@
             <p v-if="errors.email" class="mt-1 text-sm text-red-600">{{ errors.email }}</p>
           </div>
 
-          <!-- Téléphone (format international E.164) -->
           <div>
             <label for="phone" class="block text-sm font-medium text-gray-700">Téléphone</label>
             <input
@@ -99,7 +77,6 @@
             <p v-if="errors.phone" class="mt-1 text-sm text-red-600">{{ errors.phone }}</p>
           </div>
 
-          <!-- Pays — chargé dynamiquement depuis GET /api/countries -->
           <div>
             <label for="country" class="block text-sm font-medium text-gray-700">Pays</label>
             <select
@@ -113,12 +90,7 @@
             <p v-if="errors.country" class="mt-1 text-sm text-red-600">{{ errors.country }}</p>
           </div>
 
-          <!--
-            Code parrainage / affiliation.
-            - Si présent dans l'URL (?ref=XXXXX), pré-rempli et en lecture seule.
-            - Validé en temps réel via POST /api/referral/validate au @blur.
-            - L'indicateur visuel (spinner / check vert) s'affiche pendant/après validation.
-          -->
+          <!-- Code parrainage / affiliation -->
           <div>
             <label for="referral-code" class="block text-sm font-medium text-gray-700">
               Code parrain / affilié
@@ -140,14 +112,12 @@
                 placeholder="Ex : 0UGIYNRC"
                 maxlength="10"
               >
-              <!-- Spinner pendant la validation API -->
               <span v-if="isValidatingReferral" class="absolute right-2 top-1/2 -translate-y-1/2">
                 <svg class="animate-spin h-4 w-4 text-gray-400" fill="none" viewBox="0 0 24 24">
                   <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
                   <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/>
                 </svg>
               </span>
-              <!-- Icône succès si code valide -->
               <span v-else-if="referralCodeValid" class="absolute right-2 top-1/2 -translate-y-1/2 text-green-500">
                 <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
@@ -160,7 +130,6 @@
             </p>
           </div>
 
-          <!-- Mot de passe -->
           <div>
             <label for="password" class="block text-sm font-medium text-gray-700">Mot de passe</label>
             <input
@@ -173,7 +142,6 @@
             <p v-if="errors.password" class="mt-1 text-sm text-red-600">{{ errors.password }}</p>
           </div>
 
-          <!-- Confirmation du mot de passe -->
           <div>
             <label for="password-confirm" class="block text-sm font-medium text-gray-700">Confirmation du mot de passe</label>
             <input
@@ -187,21 +155,10 @@
           </div>
         </div>
 
-        <!--
-          Bloc d'erreur global.
-          canUpgrade=true → réponse 409 : compte client existant pouvant passer en vendeur.
-          Dans ce cas, un lien de mise à niveau est proposé.
-        -->
         <div v-if="submitError" class="bg-red-50 border border-red-200 text-red-800 px-4 py-3 rounded relative">
           {{ submitError }}
-          <div v-if="canUpgrade" class="mt-2">
-            <NuxtLink to="/upgrade-vendeur" class="text-sm font-medium text-primary underline">
-              Mettre à niveau mon compte client en compte vendeur →
-            </NuxtLink>
-          </div>
         </div>
 
-        <!-- Acceptation des CGU -->
         <div class="flex items-start">
           <input
             id="terms" type="checkbox" required v-model="acceptTerms"
@@ -220,7 +177,6 @@
           </div>
         </div>
 
-        <!-- Bouton de soumission — désactivé si formulaire invalide ou envoi en cours -->
         <button
           type="submit"
           :disabled="!isFormValid || isSubmitting"
@@ -238,7 +194,6 @@
           </span>
           {{ isSubmitting ? 'Inscription en cours...' : "S'inscrire" }}
         </button>
-
         <p class="mt-2 text-center text-sm text-gray-600">
           Ou
           <NuxtLink :to="connexionLink" class="font-medium text-primary hover:text-secondary">
@@ -256,7 +211,6 @@
   import type { RegisterData } from '~/types/auth'
   import { useAuth } from '~/composables/useAuth'
 
-  // ── SEO ────────────────────────────────────────────────────
   useHead({
     title: 'Inscription Vendeur - Lancez votre site en 1m30s | Uber-Market',
     meta: [
@@ -265,37 +219,16 @@
     ]
   })
 
-  const config       = useRuntimeConfig()
-  const route        = useRoute()
-  const router       = useRouter()
+  const config     = useRuntimeConfig()
+  const route      = useRoute()
+  const router     = useRouter()
   const { register } = useAuth()
 
-  // ─────────────────────────────────────────────────────────────
-  // QUERY PARAMS — extraits de l'URL à l'arrivée sur la page
-  // ─────────────────────────────────────────────────────────────
+  // Query params
   const redirectTo   = computed(() => route.query.redirect as string || '')
   const prefillEmail = computed(() => route.query.email as string || '')
-  // Code affilié/parrain dans l'URL (?ref=XXXXX)
   const refFromUrl   = computed(() => (route.query.ref as string || '').toUpperCase())
 
-  /**
-   * selectedPlanCode — code du plan passé dans l'URL lors du choix depuis la page tarifaire.
-   * Exemple : /inscription-vendeur?plan=standard
-   * Ce code est transmis au backend lors de l'inscription pour assigner le bon plan.
-   *
-   * BUG CORRIGÉ : ce param était ignoré dans handleSignup — il n'était ni lu ni envoyé.
-   * Le backend recevait donc toujours le plan par défaut ("welcome").
-   */
-  const selectedPlanCode = computed(() => (route.query.plan as string || '').toLowerCase())
-
-  /**
-   * selectedPlanName — nom lisible du plan, chargé depuis l'API des plans.
-   * Affiché dans la bannière "Plan sélectionné" pour confirmation visuelle.
-   * Chargé dans onMounted() si selectedPlanCode est présent.
-   */
-  const selectedPlanName = ref<string>('')
-
-  // Lien vers la page connexion en conservant les paramètres utiles
   const connexionLink = computed(() => {
     let link = '/connexion-vendeur'
     const params: string[] = []
@@ -304,42 +237,31 @@
     return params.length ? link + '?' + params.join('&') : link
   })
 
-  // ─────────────────────────────────────────────────────────────
-  // ÉTAT DU FORMULAIRE
-  // ─────────────────────────────────────────────────────────────
-  const firstName       = ref('')
-  const lastName        = ref('')
-  const email           = ref('')
-  const phone           = ref('')
-  const country         = ref('')
-  const password        = ref('')
+  // Champs formulaire
+  const firstName      = ref('')
+  const lastName       = ref('')
+  const email          = ref('')
+  const phone          = ref('')
+  const country        = ref('')
+  const password       = ref('')
   const passwordConfirm = ref('')
-  const acceptTerms     = ref(false)
-  const isSubmitting    = ref(false)
-  const submitError     = ref('')
+  const acceptTerms    = ref(false)
+  const isSubmitting   = ref(false)
+  const submitError    = ref('')
 
-  /**
-   * canUpgrade — true si l'API répond 409 avec can_upgrade=true.
-   * Signifie qu'un compte client existe avec cet e-mail et peut passer en vendeur.
-   */
-  const canUpgrade = ref(false)
-
-  // ─────────────────────────────────────────────────────────────
-  // PARRAINAGE & AFFILIATION
-  // ─────────────────────────────────────────────────────────────
-  const referralCode         = ref('')
-  const referralCodeError    = ref('')
-  const referralCodeValid    = ref(false)
-  const referrerName         = ref('')
-  const referralType         = ref<'standard' | 'commercial' | ''>('')
+  // Parrainage
+  const referralCode       = ref('')
+  const referralCodeError  = ref('')
+  const referralCodeValid  = ref(false)
+  const referrerName       = ref('')
+  const referralType       = ref<'standard' | 'commercial' | ''>('')
   const isValidatingReferral = ref(false)
-  // Peuplé si un code valide est détecté — affiche la bannière jaune
-  const detectedAffiliate    = ref<{ name: string; type: string } | null>(null)
+  const detectedAffiliate  = ref<{ name: string; type: string } | null>(null)
 
-  // Pré-remplir l'e-mail depuis le query param
+  // Pré-remplir depuis URL
   watch(prefillEmail, v => { if (v && !email.value) email.value = v }, { immediate: true })
 
-  // Auto-valider le code affilié si présent dans l'URL
+  // Détection automatique du code affilié depuis l'URL
   watch(refFromUrl, async (code) => {
     if (code) {
       referralCode.value = code
@@ -347,64 +269,22 @@
     }
   }, { immediate: true })
 
-  // ─────────────────────────────────────────────────────────────
-  // PAYS — chargés depuis GET /api/countries au montage
-  // ─────────────────────────────────────────────────────────────
+  // Pays
   const countries = ref<{ code: string; name: string }[]>([])
-
-  // ─────────────────────────────────────────────────────────────
-  // INITIALISATION — onMounted
-  // ─────────────────────────────────────────────────────────────
   onMounted(async () => {
-    // Charger la liste des pays
     try {
       const res  = await fetch(`${config.public.apiBase}/countries`)
       const data = await res.json()
       if (data.success) countries.value = data.countries
-    } catch {
-      // Échec silencieux — le select restera vide
-    }
-
-    // Charger le nom du plan sélectionné pour l'afficher dans la bannière
-    // Cela évite d'afficher un code brut ("standard") à l'utilisateur
-    if (selectedPlanCode.value) {
-      await loadSelectedPlanName(selectedPlanCode.value)
-    }
+    } catch {}
   })
 
-  /**
-   * loadSelectedPlanName — charge le nom lisible du plan sélectionné depuis l'API.
-   * Route : GET /api/subscription/plans (ou /api/plans selon le backend)
-   * Utilisé uniquement pour l'affichage dans la bannière de confirmation.
-   */
-  const loadSelectedPlanName = async (planCode: string) => {
-    try {
-      const res  = await fetch(`${config.public.apiBase}/subscription/plans`, {
-        headers: { 'Accept': 'application/json' }
-      })
-      const data = await res.json()
-      // L'API retourne un tableau de plans avec code et name
-      const plans = data.data || data.plans || data || []
-      const found = plans.find((p: any) => p.code === planCode)
-      if (found) selectedPlanName.value = found.name
-    } catch {
-      // Silencieux : le code brut sera affiché dans la bannière comme fallback
-    }
-  }
-
-  // ─────────────────────────────────────────────────────────────
-  // VALIDATION DES CHAMPS
-  // ─────────────────────────────────────────────────────────────
+  // Erreurs
   const errors = reactive({
     firstName: '', lastName: '', email: '', phone: '',
     country: '', password: '', passwordConfirm: '', acceptTerms: ''
   })
 
-  /**
-   * isFormValid — active/désactive le bouton submit.
-   * Vérifie tous les champs sans déclencher les messages d'erreur.
-   * Les messages sont gérés par validateField() au @blur.
-   */
   const isFormValid = computed(() =>
     firstName.value.trim() !== '' &&
     lastName.value.trim() !== '' &&
@@ -419,10 +299,6 @@
     acceptTerms.value === true
   )
 
-  /**
-   * validateField — valide un champ individuel à la perte de focus (@blur).
-   * Écrit le message d'erreur dans l'objet réactif `errors`.
-   */
   const validateField = (field: string) => {
     switch (field) {
       case 'firstName':
@@ -437,7 +313,6 @@
         else errors.email = ''
         break
       case 'phone':
-        // Format E.164 : +indicatif puis 7-14 chiffres
         if (!phone.value.trim()) errors.phone = 'Le téléphone est requis.'
         else if (!/^\+[1-9]\d{1,14}$/.test(phone.value)) errors.phone = 'Format international requis (ex: +22990000000).'
         else errors.phone = ''
@@ -452,7 +327,6 @@
         else if (!/[a-z]/.test(password.value)) errors.password = 'Au moins une minuscule.'
         else if (!/[0-9]/.test(password.value)) errors.password = 'Au moins un chiffre.'
         else errors.password = ''
-        // Revalider la confirmation si déjà saisie
         if (passwordConfirm.value) {
           errors.passwordConfirm = password.value !== passwordConfirm.value ? 'Les mots de passe ne correspondent pas.' : ''
         }
@@ -467,11 +341,7 @@
     }
   }
 
-  /**
-   * validateReferralCode — vérifie le code via POST /api/referral/validate.
-   * Peuple referrerName, referralType et detectedAffiliate si valide.
-   * Appelé automatiquement si le code vient de l'URL, ou au @blur du champ.
-   */
+  // Validation du code parrain/affilié
   const validateReferralCode = async () => {
     referralCodeError.value = ''
     referralCodeValid.value = false
@@ -493,22 +363,18 @@
       if (data.valid) {
         referralCodeValid.value = true
         referrerName.value      = data.referrer?.name || ''
-        referralType.value      = data.type  // 'commercial' | 'standard'
+        referralType.value      = data.type           // 'commercial' ou 'standard'
         detectedAffiliate.value = { name: data.referrer?.name || '', type: data.type }
       } else {
         referralCodeError.value = 'Code d\'affiliation invalide.'
       }
     } catch {
-      // Silencieux : le code sera vérifié côté serveur à la soumission
+      // Silencieux si réseau down
     } finally {
       isValidatingReferral.value = false
     }
   }
 
-  /**
-   * validateForm — déclenche la validation complète avant soumission.
-   * Retourne true si aucun champ n'a d'erreur.
-   */
   const validateForm = () => {
     validateField('firstName')
     validateField('lastName')
@@ -521,50 +387,9 @@
     return Object.values(errors).every(e => e === '')
   }
 
-  // ─────────────────────────────────────────────────────────────
-  // PARAMÈTRES UTM — tracking campagne
-  // Envoyés avec le payload d'inscription pour alimenter
-  // les analytics de conversion (GET /admin/analytics/campaigns).
-  // ─────────────────────────────────────────────────────────────
-  const utmParams = computed(() => ({
-    ref:               (route.query.ref              as string) || null,
-    utm_source:        (route.query.utm_source       as string) || null,
-    utm_medium:        (route.query.utm_medium       as string) || null,
-    utm_campaign:      (route.query.utm_campaign     as string) || null,
-    utm_content:       (route.query.utm_content      as string) || null,
-    landing_page:      (route.query.from             as string) || route.path || null,
-    acquisition_source:(route.query.ref              as string) || null,
-  }))
-
-  // ─────────────────────────────────────────────────────────────
-  // SOUMISSION DU FORMULAIRE
-  // ─────────────────────────────────────────────────────────────
-
-  /**
-   * handleSignup — soumet l'inscription et gère la redirection post-inscription.
-   *
-   * FLUX AVEC PLAN PAYANT :
-   *  1. Créer le compte → backend assigne le plan via `subscription_plan`
-   *  2. Rediriger vers /mes-boutiques?pending_plan=standard
-   *  3. Un middleware ou la page /mes-boutiques détecte pending_plan
-   *     et redirige vers /dashboard-vendor/[slug]/subscription/abonnement
-   *     où le paiement est déclenché automatiquement (déjà fonctionnel via
-   *     la logique openPaymentModal de abonnement.vue)
-   *
-   * ALTERNATIVE (plus directe) : rediriger directement vers la page
-   * abonnement avec ?plan=standard&autostart=1 pour déclencher le modal
-   * de paiement immédiatement après connexion.
-   *
-   * BUGS CORRIGÉS :
-   *  1. selectedPlanCode n'était pas envoyé dans le payload → le backend
-   *     assignait toujours "welcome" par défaut.
-   *  2. La redirection post-inscription ignorait le plan → l'utilisateur
-   *     atterrissait sur /mes-boutiques sans jamais payer.
-   */
   const handleSignup = async () => {
     submitError.value = ''
     canUpgrade.value  = false
-
     if (!validateForm()) return
     if (password.value !== passwordConfirm.value) {
       errors.passwordConfirm = 'Les mots de passe ne correspondent pas.'
@@ -573,7 +398,7 @@
 
     isSubmitting.value = true
     try {
-      // Construction du payload complet
+      // ✅ registerData avec UTM — remplace l'ancien registerData
       const registerData: any = {
         name:                  `${firstName.value} ${lastName.value}`.trim(),
         first_name:            firstName.value,
@@ -583,64 +408,35 @@
         country:               country.value,
         password:              password.value,
         password_confirmation: passwordConfirm.value,
-        // ── FIX 1 : envoyer le plan sélectionné au backend ──────────
-        // Le backend doit lire ce champ dans RegisterVendorRequest
-        // et l'utiliser dans VendorRegistrationService pour initialiser
-        // la subscription avec le bon plan au lieu du plan "welcome".
-        // Champ attendu : subscription_plan (string, ex: "standard")
-        subscription_plan: selectedPlanCode.value || null,
-        // ── Tracking UTM ──────────────────────────────────────────────
+        // Tracking campagnes : récupère automatiquement ref, utm_source etc. depuis l'URL
         ...utmParams.value,
       }
 
-      // Code de parrainage si présent
       if (referralCode.value.trim()) {
         registerData.referral_code = referralCode.value.trim()
         registerData.ref           = referralCode.value.trim()
       }
 
       const response = await register(registerData)
-
       if (response.success) {
-        // ── Redirection post-inscription selon le plan choisi ──────────
-        //
-        // Cas A — aucun plan / plan gratuit / welcome
-        //         → /mes-boutiques directement (plan déjà actif)
-        //
-        // Cas B — plan payant (premium, standard, etc.)
-        //         → /paiement-abonnement?plan=xxx
-        //           Cette page dédiée déclenche le paiement Moneroo
-        //           sans avoir besoin d'une boutique existante.
-        //           Elle réutilise exactement la même logique que
-        //           le composable useSubscription d'abonnement.vue.
-        //
-        // NOTE : la boutique n'existe pas encore à ce stade.
-        // /paiement-abonnement redirigera vers /mes-boutiques une fois
-        // le paiement confirmé (ou si l'utilisateur choisit de payer plus tard).
-        //
-        const isPaidPlan = selectedPlanCode.value
-          && selectedPlanCode.value !== 'welcome'
-          && selectedPlanCode.value !== 'gratuit'
-
-        if (isPaidPlan) {
-          // Stocker en sessionStorage comme filet de sécurité
-          // (récupéré par /mes-boutiques si la navigation échoue)
-          if (typeof window !== 'undefined') {
-            sessionStorage.setItem('pending_subscription_plan', selectedPlanCode.value)
-          }
-          // Redirection vers la page de paiement dédiée post-inscription
-          await router.push(`/paiement-abonnement?plan=${selectedPlanCode.value}`)
-        } else {
-          // Plan gratuit ou aucun plan → dashboard normal
-          await router.push(redirectTo.value || '/mes-boutiques')
-        }
+        await router.push(redirectTo.value || '/mes-boutiques')
       }
     } catch (err: any) {
       submitError.value = err.message || 'Une erreur est survenue.'
-      // 409 avec can_upgrade=true → le compte client peut devenir vendeur
       if (err.canUpgrade) canUpgrade.value = true
     } finally {
       isSubmitting.value = false
     }
   }
+
+  // UTM à l'inscription
+  const utmParams = computed(() => ({
+    ref:              (route.query.ref              as string) || null,
+    utm_source:       (route.query.utm_source       as string) || null,
+    utm_medium:       (route.query.utm_medium       as string) || null,
+    utm_campaign:     (route.query.utm_campaign     as string) || null,
+    utm_content:      (route.query.utm_content      as string) || null,
+    landing_page:     (route.query.from             as string) || route.path || null,
+    acquisition_source: (route.query.ref            as string) || null,
+  }))
 </script>
