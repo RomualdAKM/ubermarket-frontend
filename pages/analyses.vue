@@ -1,27 +1,10 @@
 <template>
   <div class="max-w-7xl mx-auto p-6">
+    <!-- En-tete -->
      <NuxtLink to="/">
         <img alt="UberMarket Logo" class="h-34 md:h-36" src="/uber-market.png">
     </NuxtLink>
-    <!--<div class="mb-8 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-      <div>
-        <h1 class="text-2xl font-bold text-gray-900">
-          Content de te revoir, {{ user?.name }}
-            <div class="px-4 py-3 border-b border-slate-100">
-              <!--<p class="text-sm font-medium text-slate-900">{{ user?.name }}</p>-->
-              <!--<p class="text-xs text-slate-500 truncate">{{ user?.email }}</p>
-            </div>
-        </h1>-->
-        <!-- <p class="text-gray-600 mt-1">Gérez vos boutiques en ligne</p> -->
-      <!--</div>
-      <div>
-        <h1 class="text-2xl font-bold text-gray-900">Mes sites /  Boutiques </h1>
-        <!-- <p class="text-gray-600 mt-1">Gérez vos boutiques en ligne</p> -->
-      <!--</div>
-      <NuxtLink to="/creer-boutique" class="px-4 py-2 bg-primary text-white text-sm font-medium hover:bg-secondary focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary rounded-md transition-colors duration-200">
-        + Nouveau projet
-      </NuxtLink>
-    </div>-->
+  
 
     <div class="mb-6 flex justify-between items-center">
       <div>
