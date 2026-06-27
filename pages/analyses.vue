@@ -1,6 +1,5 @@
 <template>
   <div class="max-w-7xl mx-auto p-6">
-    <!-- En-tete -->
      <NuxtLink to="/">
         <img alt="UberMarket Logo" class="h-34 md:h-36" src="/uber-market.png">
     </NuxtLink>
