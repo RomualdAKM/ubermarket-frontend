@@ -10,7 +10,6 @@
       :style="{ backgroundColor: `rgba(0, 0, 0, ${(section.style.backgroundOverlay || 0) / 100})` }"
     ></div>
     
-    <!-- Contenu de la section avec z-index relatif -->
     <div class="relative z-10">
     
     <!-- ==================== HERO ==================== -->
@@ -2320,7 +2319,7 @@
             </button>
           </div>
           <div class="flex justify-center gap-2 mt-4">
-            <button v-for="(_, index) in (section.content?.images || [])" :key="index" @click="currentSlide = index" class="w-2 h-2 rounded-full transition-all" :class="currentSlide === index ? 'bg-primary w-6' : 'bg-gray-300'"></button>
+            <button v-for="(_, index) in (section.content?.images || [])" :key="index" @click="currentSlide = Number(index)" class="w-2 h-2 rounded-full transition-all" :class="currentSlide === Number(index) ? 'bg-primary w-6' : 'bg-gray-300'"></button>
           </div>
         </div>
       </template>
