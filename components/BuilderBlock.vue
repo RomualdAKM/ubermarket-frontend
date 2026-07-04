@@ -10,7 +10,6 @@
       :style="{ backgroundColor: `rgba(0, 0, 0, ${(section.style.backgroundOverlay || 0) / 100})` }"
     ></div>
     
-    <!-- Contenu de la section avec z-index relatif -->
     <div class="relative z-10">
     
     <!-- ==================== HERO ==================== -->
