@@ -228,7 +228,7 @@ const handleForgotPassword = async () => {
   
   try {
     const config = useRuntimeConfig()
-    const response = await fetch(`${config.public.apiBase}/forgot-password`, {
+    const response = await fetch(`${config.public.apiBase}/vendor/password/forgot`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
