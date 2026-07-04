@@ -1553,15 +1553,15 @@
     },
     {
       id: 6,
-      slug: 'theme-nature-vert',
-      name: 'Nature-vert',
-      description: 'Thème organique pour produits naturels et bio',
+      slug: 'theme-épicerie-bio-produits-frais',
+      name: 'Natural Mystique',
+      description: 'Thème épicerie bio / produits frais',
       is_free: true,
       price: 0,
-      primaryColor: '#2d6a4f',
-      palette: ['#2d6a4f', '#f4a261', '#fefae0'],
+      primaryColor: '#ab9048',
+      palette: ['#ab9048', '#2d6a4f', '#d19ba6'],
       screenshot: null,
-      features: ['Hero plein écran', 'Grille produits', 'Témoignages'],
+      features: ['Hero plein écran', 'Slider', 'Grille produits', 'Catégories', 'Newsletter'],
     },
   ])
 
@@ -1607,12 +1607,24 @@
     })
 
   const config = useRuntimeConfig()
-  const frontendUrl = config.public.siteUrl || 'http://localhost:3000'
+  //const frontendUrl = config.public.siteUrl || 'http://localhost:3000'
 
+  // utilise l'origine actuelle du navigateur
+  // plutôt qu'un localhost codé en dur, si siteUrl n'est pas configuré
+  const frontendUrl = computed(() => {
+    if (config.public.siteUrl) return config.public.siteUrl
+    if (process.client) return window.location.origin
+    return 'http://localhost:3000'
+  })
+
+  // utilise le subdomain réel de la boutique
+ // const previewUrl = computed(() => {
+  //  if (!previewTheme.value || !currentShop.value?.subdomain) return ''
+  //  return `${frontendUrl}/boutique/${currentShop.value.subdomain}?preview_theme=${previewTheme.value.slug}`
+  //})
   const previewUrl = computed(() => {
-    if (!previewTheme.value || !shopSlug) return ''
-    // Passe le slug du thème en paramètre pour forcer l'aperçu
-    return `${frontendUrl}/boutique/${shopSlug}?preview_theme=${previewTheme.value.slug}`
+    if (!previewTheme.value || !currentShop.value?.subdomain) return ''
+    return `${frontendUrl.value}/boutique/${currentShop.value.subdomain}?preview_theme=${previewTheme.value.slug}`
   })
 
   const openPreview = (theme: any) => {

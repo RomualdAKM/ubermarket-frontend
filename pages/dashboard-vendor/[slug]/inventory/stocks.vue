@@ -46,10 +46,10 @@
           
           <div>
             <label for="status" class="block text-sm font-medium text-gray-700">Statut</label>
+            <!-- Filtre Statut -->
             <select 
               id="status" 
               v-model="filters.stockStatus"
-              @change="filterProducts"
               class="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-secondary focus:border-secondary"
             >
               <option value="">Tous</option>
@@ -66,10 +66,10 @@
                 <path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd" />
               </svg>
             </div>
+            <!-- Barre de recherche -->
             <input 
               id="search"
               v-model="filters.search"
-              @input="filterProducts"
               type="text" 
               class="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-secondary focus:border-secondary" 
               placeholder="Rechercher..."
@@ -79,7 +79,7 @@
       </div>
 
       <!-- Message si aucun produit -->
-      <div v-if="filteredProducts.length === 0" class="bg-white rounded-lg p-12 text-center">
+      <div v-if="!filteredProducts || filteredProducts.length === 0" class="bg-white rounded-lg p-12 text-center">
         <svg class="w-16 h-16 mx-auto text-gray-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
         </svg>
@@ -100,6 +100,7 @@
               </tr>
             </thead>
             <tbody class="bg-white divide-y divide-gray-200">
+              <!-- IMPORTANT : on garde toujours product.id comme clé (jamais l'index) -->
               <tr v-for="product in filteredProducts" :key="product.id">
                 <td class="px-6 py-4 whitespace-nowrap">
                   <div class="flex items-center">
@@ -235,6 +236,28 @@
 </template>
 
 <script setup lang="ts">
+/**
+ * Page : Gestion des stocks (vendeur)
+ * Route : /dashboard-vendor/[slug]/inventory/stocks
+ *
+ * BUGFIX (03/07/2026) :
+ * Erreur d'origine : "TypeError: can't access property 'value', products is undefined"
+ * Cause réelle (confirmée après lecture de composables/useProducts.ts) :
+ * le composable ne retournait AUCUNE propriété `products` — fetchProducts /
+ * fetchShopProducts renvoyait bien data.data à l'appelant, mais rien n'était
+ * stocké dans un état réactif partagé. `const { products } = useProducts()`
+ * récupérait donc `undefined` par conception, pas à cause d'un problème
+ * d'hydratation SSR/CSR.
+ * Correctif appliqué dans useProducts.ts : ajout d'un état réactif `products`
+ * (+ `pagination`), alimenté automatiquement par fetchProducts, avec gestion
+ * des deux formats de réponse API possibles (tableau brut ou pagination
+ * Laravel { data, meta / current_page... }). Cette page redevient une
+ * déstructuration simple ; les vérifications Array.isArray() dans les
+ * computed ci-dessous sont conservées par prudence (coût nul, robustesse
+ * en cas d'erreur réseau where products.value pourrait être temporairement
+ * incohérent).
+ */
+
 definePageMeta({
   layout: 'dashboard',
   middleware: ['shop-access']
@@ -245,7 +268,13 @@ const config = useRuntimeConfig()
 const shopSlug = route.params.slug as string
 
 const { fetchShops, shops, currentShop } = useShops()
+
+// ✅ CORRIGÉ (03/07/2026) : useProducts() expose désormais réellement `products`
+// (état réactif alimenté par fetchProducts/fetchShopProducts). La cause du crash
+// "products is undefined" était que ce ref n'existait tout simplement pas avant
+// dans le composable — voir composables/useProducts.ts pour le détail du fix.
 const { products, isLoading, error, fetchShopProducts } = useProducts()
+
 const { token } = useAuth()
 
 // Filtres
@@ -257,17 +286,22 @@ const filters = ref({
 
 // Produits filtrés - computed pour mise à jour automatique
 const filteredProducts = computed(() => {
-  let result = [...(products.value || [])]
+  // Assure un tableau sain dès le départ, même si products.value est
+  // undefined/null pendant une phase transitoire (chargement, erreur réseau, etc.)
+  const items = Array.isArray(products.value) ? products.value : []
+  let result = [...items]
   
   // Filtre par sous-catégorie
   if (filters.value.subcategory) {
-    result = result.filter(p => p.subcategory?.id == filters.value.subcategory)
+    result = result.filter(p => p?.subcategory?.id == filters.value.subcategory)
   }
   
   // Filtre par statut de stock
   if (filters.value.stockStatus) {
     result = result.filter(p => {
-      const stock = p.stock_quantity || 0
+      if (!p) return false
+      const stock = typeof p.stock_quantity === 'number' ? p.stock_quantity : 0
+      
       if (filters.value.stockStatus === 'in_stock') return stock > 10
       if (filters.value.stockStatus === 'low_stock') return stock > 0 && stock <= 10
       if (filters.value.stockStatus === 'out_of_stock') return stock === 0
@@ -279,19 +313,21 @@ const filteredProducts = computed(() => {
   if (filters.value.search) {
     const search = filters.value.search.toLowerCase()
     result = result.filter(p => 
-      p.name.toLowerCase().includes(search)
+      p?.name?.toLowerCase().includes(search)
     )
   }
   
   return result
 })
 
-// Sous-catégories extraites des produits
+
+// Sous-catégories extraites des produits (protégé contre products.value undefined)
 const subcategories = computed(() => {
   const uniqueSubcats = new Map()
   if (!products.value || !Array.isArray(products.value)) return []
+
   products.value.forEach(p => {
-    if (p.subcategory) {
+    if (p?.subcategory?.id) { // Vérifie l'existence de la sous-catégorie ET de son ID
       uniqueSubcats.set(p.subcategory.id, p.subcategory)
     }
   })
@@ -307,10 +343,10 @@ const updateNotes = ref('')
 const isUpdating = ref(false)
 const updateError = ref('')
 
-// Computed pour l'ID de la boutique (utilise currentShop du composable)
+// Computed pour l'ID de la boutique (utilise currentShop du composable useShops)
 const currentShopId = computed(() => currentShop.value?.id)
 
-// Charger les produits
+// Charger les produits de la boutique courante
 const loadProducts = async () => {
   if (!currentShopId.value) {
     await fetchShops()
@@ -320,7 +356,7 @@ const loadProducts = async () => {
   await fetchShopProducts(currentShopId.value)
 }
 
-// Obtenir l'image du produit
+// Construit l'URL de l'image du produit (image principale, sinon galerie, sinon placeholder)
 const getProductImage = (product: any) => {
   const backendUrl = config.public.apiBase.replace('/api', '')
   
@@ -335,21 +371,21 @@ const getProductImage = (product: any) => {
   return 'https://placehold.co/100x100?text=No+Image'
 }
 
-// Obtenir le statut du stock
+// Libellé du statut du stock
 const getStockStatus = (stock: number): string => {
   if (stock === 0) return 'Épuisé'
   if (stock <= 10) return 'Stock bas'
   return 'En stock'
 }
 
-// Obtenir la classe CSS du statut
+// Classe CSS associée au statut du stock
 const getStockStatusClass = (stock: number): string => {
   if (stock === 0) return 'bg-red-100 text-red-800'
   if (stock <= 10) return 'bg-yellow-100 text-yellow-800'
   return 'bg-green-100 text-green-800'
 }
 
-// Ouvrir le modal de mise à jour
+// Ouvre le modal de mise à jour de stock pour un produit donné
 const openUpdateModal = (product: any) => {
   currentProduct.value = product
   newStock.value = product.stock_quantity || 0
@@ -359,7 +395,7 @@ const openUpdateModal = (product: any) => {
   showModal.value = true
 }
 
-// Fermer le modal
+// Ferme le modal et réinitialise son état
 const closeModal = () => {
   showModal.value = false
   currentProduct.value = null
@@ -369,7 +405,7 @@ const closeModal = () => {
   updateError.value = ''
 }
 
-// Mettre à jour le stock
+// Envoie la mise à jour du stock au backend
 const updateStock = async () => {
   if (!currentProduct.value || !currentShopId.value) return
   
@@ -382,6 +418,9 @@ const updateStock = async () => {
   updateError.value = ''
   
   try {
+    // NOTE : ici on envoie du JSON (pas de FormData), donc Content-Type + Accept
+    // sont légitimes. Ne pas confondre avec les endpoints multipart (upload d'images)
+    // où seul le header Authorization doit être présent (cf. formDataHeaders()).
     const response = await fetch(
       `${config.public.apiBase}/shops/${currentShopId.value}/products/${currentProduct.value.id}/stock`,
       {
@@ -415,7 +454,7 @@ const updateStock = async () => {
   }
 }
 
-// Chargement initial
+// Chargement initial de la page
 onMounted(async () => {
   await fetchShops()
   await loadProducts()

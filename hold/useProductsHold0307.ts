@@ -8,19 +8,6 @@
 //   Jamais Content-Type ni Accept avec FormData
 //   → le navigateur injecte automatiquement le boundary multipart
 //   → Laravel peut décoder le body sans erreur
-//
-// BUGFIX (03/07/2026) :
-// Erreur d'origine : "TypeError: can't access property 'value', products is undefined"
-// dans pages/dashboard-vendor/[slug]/inventory/stocks.vue
-// Cause réelle : ce composable ne retournait JAMAIS de `products`. fetchProducts
-// (aliasé fetchShopProducts) renvoyait bien data.data à l'appelant, mais rien
-// n'était stocké dans un état réactif partagé — donc toute page qui déstructurait
-// `const { products } = useProducts()` récupérait `undefined` par conception.
-// Correctif : ajout d'un état réactif `products` + `pagination`, alimenté
-// automatiquement par fetchProducts, avec gestion des deux formats de réponse
-// possibles (tableau brut OU pagination Laravel { data: [...], meta / current_page... }),
-// cohérent avec la règle "paginate() nécessite un unwrap {data, meta}" déjà
-// appliquée ailleurs dans le projet (ex: liste des boutiques).
 // ============================================================
 
 import { ref } from 'vue'
@@ -31,21 +18,6 @@ export const useProducts = () => {
 
   const isLoading = ref(false)
   const error     = ref<string | null>(null)
-
-  // ── État réactif des produits (NOUVEAU) ──────────────────
-  // Alimenté par fetchProducts/fetchShopProducts. Toujours un tableau
-  // (jamais undefined/null) pour éviter tout crash côté template
-  // (ex: filteredProducts / subcategories dans stocks.vue).
-  const products = ref<any[]>([])
-
-  // ── Métadonnées de pagination (NOUVEAU) ──────────────────
-  // Null si la réponse API n'était pas paginée (tableau brut).
-  const pagination = ref<{
-    current_page: number
-    last_page:    number
-    total:        number
-    per_page:     number
-  } | null>(null)
 
   // ── Headers requêtes JSON (GET, DELETE sans body) ────────
   const jsonHeaders = () => ({
@@ -62,53 +34,6 @@ export const useProducts = () => {
   const formDataHeaders = () => ({
     'Authorization': `Bearer ${token.value}`,
   })
-
-  // ─────────────────────────────────────────────────────────
-  // applyProductsPayload — normalise data.data en tableau de produits
-  //
-  // Gère 2 formats possibles renvoyés par le backend Laravel :
-  //   1) Tableau brut          : data.data = [ {...}, {...} ]
-  //   2) Réponse paginée       : data.data = { data: [...], meta: {...} }
-  //                              ou { data: [...], current_page, last_page, total, per_page }
-  //                              (selon que le controller utilise ->toArray()
-  //                              ou une Resource Collection avec/sans meta)
-  // ─────────────────────────────────────────────────────────
-  const applyProductsPayload = (payload: any) => {
-    if (Array.isArray(payload)) {
-      // Cas 1 : tableau brut, pas de pagination
-      products.value   = payload
-      pagination.value = null
-      return
-    }
-
-    if (payload && Array.isArray(payload.data)) {
-      // Cas 2 : réponse paginée Laravel
-      products.value = payload.data
-
-      if (payload.meta) {
-        pagination.value = {
-          current_page: payload.meta.current_page,
-          last_page:    payload.meta.last_page,
-          total:        payload.meta.total,
-          per_page:     payload.meta.per_page,
-        }
-      } else {
-        // Pagination "à plat" (LengthAwarePaginator->toArray() sans Resource)
-        pagination.value = {
-          current_page: payload.current_page,
-          last_page:    payload.last_page,
-          total:        payload.total,
-          per_page:     payload.per_page,
-        }
-      }
-      return
-    }
-
-    // Cas imprévu (payload null/undefined/format inattendu) :
-    // on retombe sur un tableau vide plutôt que de crasher les pages consommatrices.
-    products.value   = []
-    pagination.value = null
-  }
 
   // ─────────────────────────────────────────────────────────
   // buildFormData — convertit productData en FormData multipart
@@ -187,9 +112,6 @@ export const useProducts = () => {
 
   // ─────────────────────────────────────────────────────────
   // fetchProducts — liste paginée des produits d'une boutique
-  // ✅ NOUVEAU : alimente désormais products.value / pagination.value
-  //    en plus de retourner le payload brut (rétrocompatible avec
-  //    les pages qui exploitaient déjà la valeur de retour).
   // ─────────────────────────────────────────────────────────
   const fetchProducts = async (shopId: number | string, params?: Record<string, any>) => {
     isLoading.value = true
@@ -203,17 +125,9 @@ export const useProducts = () => {
       })
       const data = await res.json()
       if (!res.ok || !data.success) throw new Error(data.message || 'Erreur chargement produits')
-
-      // Normalise et stocke dans l'état réactif du composable
-      applyProductsPayload(data.data)
-
       return data.data
     } catch (err: any) {
       error.value = err.message
-      // En cas d'erreur réseau/serveur, on vide la liste pour éviter
-      // d'afficher des données obsolètes à l'écran.
-      products.value   = []
-      pagination.value = null
       throw err
     } finally {
       isLoading.value = false
@@ -302,8 +216,6 @@ export const useProducts = () => {
 
   // ─────────────────────────────────────────────────────────
   // deleteProduct — DELETE avec headers JSON (pas de body)
-  // ✅ NOUVEAU : retire aussi le produit de products.value pour que
-  //    la liste affichée reste cohérente sans devoir tout recharger.
   // ─────────────────────────────────────────────────────────
   const deleteProduct = async (shopId: number | string, productId: number) => {
     isLoading.value = true
@@ -315,10 +227,6 @@ export const useProducts = () => {
       })
       const data = await res.json()
       if (!res.ok || !data.success) throw new Error(data.message || 'Erreur suppression')
-
-      // Synchronise l'état local sans requête réseau supplémentaire
-      products.value = products.value.filter(p => p.id !== productId)
-
       return true
     } catch (err: any) {
       error.value = err.message
@@ -329,12 +237,8 @@ export const useProducts = () => {
   }
 
   return {
-    // État réactif
-    products,
-    pagination,
     isLoading,
     error,
-    // Actions
     fetchProducts,
     fetchShopProducts,
     fetchProductDetails,

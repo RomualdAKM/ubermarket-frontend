@@ -346,7 +346,7 @@
         </div>
         <div>
           <h4 class="text-sm font-medium text-gray-900">Moneroo</h4>
-          <p class="text-xs text-gray-500">Mobile Money & Cartes bancaires</p>
+          <p class="text-xs text-gray-500">Portefeuille Mobile & Cartes bancaires</p>
         </div>
       </div>
       <button 
@@ -443,7 +443,7 @@
         <!-- Mobile Money -->
         <div class="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
           <div>
-            <h3 class="font-medium text-gray-900">Mobile Money</h3>
+            <h3 class="font-medium text-gray-900">Portefeuille Mobile</h3>
             <p class="text-sm text-gray-500">MTN, Moov, Orange Money</p>
           </div>
           <label class="relative inline-flex items-center cursor-pointer">
@@ -585,7 +585,7 @@
               <textarea 
                 v-model="statusForm.maintenanceMessage"
                 rows="3"
-                placeholder="Notre boutique est temporairement en maintenance. Nous serons bientôt de retour !"
+                placeholder="Notre site ou boutique est temporairement en maintenance. Nous serons bientôt de retour !"
                 class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary transition-colors duration-200"
               ></textarea>
               <p class="mt-1 text-xs text-gray-500">Ce message sera affiché aux visiteurs pendant la maintenance</p>

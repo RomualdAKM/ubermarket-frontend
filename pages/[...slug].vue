@@ -30,7 +30,7 @@
         
         <!-- Message -->
         <p class="text-slate-600 text-sm leading-relaxed mb-6">
-          {{ maintenanceData.maintenance_message || 'Cette boutique est temporairement indisponible. Nous serons bientôt de retour.' }}
+          {{ maintenanceData.maintenance_message || 'Cette boutique est temporairement indisponible. Votre boutique est temporairement en maintenance. Nous serons bientôt de retour.' }}
         </p>
         
         <!-- Date de fin -->

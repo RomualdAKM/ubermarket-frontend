@@ -5,6 +5,72 @@
       <p class="mt-4 text-gray-600">Chargement du site...</p>
     </div>
   </div>
+  <!--maintenance-->
+  <div
+      v-else-if="isInMaintenance"
+      class="min-h-screen flex items-center justify-center bg-slate-50"
+  >
+      <div class="text-center max-w-sm mx-auto px-6">
+
+          <img
+              v-if="maintenanceData.shop_logo"
+              :src="maintenanceData.shop_logo"
+              class="w-16 h-16 rounded-full mx-auto mb-6 object-cover"
+          >
+
+          <h1 class="text-xl font-semibold mb-3">
+              {{ maintenanceData.shop_name }}
+          </h1>
+
+          <div
+              class="inline-flex items-center px-3 py-1 rounded-full bg-amber-100 text-amber-700 text-sm mb-5"
+          >
+              Maintenance
+          </div>
+
+          <p class="text-gray-600">
+              {{ maintenanceData.maintenance_message }}
+          </p>
+
+          <p
+              v-if="maintenanceData.maintenance_end_date"
+              class="text-sm text-gray-400 mt-4"
+          >
+              Retour prévu le
+              {{ formatMaintenanceEndDate(maintenanceData.maintenance_end_date) }}
+          </p>
+
+      </div>
+  </div>
+
+  <div
+      v-else-if="isInactive"
+      class="min-h-screen flex items-center justify-center bg-slate-50"
+  >
+      <div class="text-center max-w-sm mx-auto px-6">
+
+          <img
+              v-if="inactiveData.shop_logo"
+              :src="inactiveData.shop_logo"
+              class="w-16 h-16 rounded-full mx-auto mb-6 grayscale opacity-60 object-cover"
+          >
+
+          <h1 class="text-xl font-semibold mb-3">
+              {{ inactiveData.shop_name }}
+          </h1>
+
+          <div
+              class="inline-flex items-center px-3 py-1 rounded-full bg-gray-200 text-gray-700 text-sm mb-5"
+          >
+              Site fermé
+          </div>
+
+          <p class="text-gray-600">
+              Ce site est actuellement indisponible.
+          </p>
+
+      </div>
+  </div>
 
   <div v-else-if="error" class="min-h-screen flex items-center justify-center bg-white">
     <div class="text-center">
@@ -41,9 +107,44 @@ const isLoading = ref(true)
 const error = ref('')
 const isEcommerce = ref(false)
 
+// Etat maintenance
+const isInMaintenance = ref(false)
+
+const maintenanceData = ref({
+  shop_name: '',
+  shop_logo: '',
+  maintenance_message: '',
+  maintenance_end_date: '',
+  primary_color: ''
+})
+
+// Etat boutique fermée
+const isInactive = ref(false)
+
+const inactiveData = ref({
+  shop_name: '',
+  shop_logo: '',
+  primary_color: ''
+})
+
+const formatMaintenanceEndDate = (dateString: string) => {
+  const date = new Date(dateString)
+
+  return date.toLocaleDateString('fr-FR', {
+    weekday: 'long',
+    day: 'numeric',
+    month: 'long',
+    hour: '2-digit',
+    minute: '2-digit'
+  })
+}
+
 const loadSite = async () => {
   isLoading.value = true
   error.value = ''
+
+  isInMaintenance.value = false
+  isInactive.value = false
 
   try {
     const config = useRuntimeConfig()
@@ -52,8 +153,48 @@ const loadSite = async () => {
     const response = await fetch(`${config.public.apiBase}/shop/${subdomain}`)
     const data = await response.json()
 
+    // =========================
+    // Maintenance
+    // =========================
+
+    if (response.status === 503 && data.is_maintenance) {
+
+        isInMaintenance.value = true
+
+        maintenanceData.value = {
+            shop_name: data.shop_name,
+            shop_logo: data.shop_logo,
+            maintenance_message: data.maintenance_message,
+            maintenance_end_date: data.maintenance_end_date,
+            primary_color: data.primary_color
+        }
+
+        return
+    }
+
+    // =========================
+    // Site désactivé
+    // =========================
+
+    if (response.status === 503 && data.is_inactive) {
+
+        isInactive.value = true
+
+        inactiveData.value = {
+            shop_name: data.shop_name,
+            shop_logo: data.shop_logo,
+            primary_color: data.primary_color
+        }
+
+        return
+    }
+
+    // =========================
+    // Erreurs classiques
+    // =========================
+
     if (!response.ok || !data.success) {
-      throw new Error(data.message || 'Site introuvable')
+        throw new Error(data.message || 'Site introuvable')
     }
 
     shop.value = data.data

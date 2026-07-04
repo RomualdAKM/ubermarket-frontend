@@ -1,0 +1,106 @@
+/*structure principal*/
+:root{
+  --green-primary:#4CAF50;
+  --green-secondary:#8BC34A;
+  --green-dark:#183B1D;
+  --green-light:#F8FCF6;
+  --text:#222;
+  --white:#fff;
+}
+/*Navig*/
+.green-navbar{
+  position:fixed;
+  top:0;
+  width:100%;
+  z-index:100;
+  background:white;
+  box-shadow:0 2px 15px rgba(0,0,0,.08);
+}
+
+/*Hero*/
+.green-hero{
+  min-height:100vh;
+  position:relative;
+  display:flex;
+  align-items:center;
+}
+
+.green-hero__content{
+  max-width:700px;
+}
+
+.green-hero h1{
+  font-size:4rem;
+  line-height:1.1;
+}
+
+/*Services*/
+.green-services{
+  padding:80px 0;
+}
+
+.green-services-grid{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:30px;
+}
+
+/*Produit vedettes*/
+.green-featured{
+  padding:100px 0;
+  background:#fff;
+}
+
+/*Catalogue*/
+.green-products{
+  padding:100px 0;
+  background:#f8fcf6;
+}
+
+/*Cartes produits*/
+.green-product-card{
+  background:white;
+  border-radius:20px;
+  overflow:hidden;
+  box-shadow:0 10px 25px rgba(0,0,0,.08);
+  transition:.3s;
+}
+
+.green-product-card:hover{
+  transform:translateY(-8px);
+}
+
+/*Section À propos*/
+.green-about{
+  padding:100px 0;
+}
+
+/*Statistiques*/
+.green-stats{
+  background:#183B1D;
+  color:white;
+}
+
+/*Témoignages*/
+.green-testimonials{
+  padding:100px 0;
+  background:#fff;
+}
+
+/*CTA*/
+.green-cta{
+  padding:120px 0;
+  text-align:center;
+  background:linear-gradient(
+      135deg,
+      #4CAF50,
+      #8BC34A
+  );
+  color:white;
+}
+
+/*Footer*/
+.green-footer{
+  background:#183B1D;
+  color:white;
+}

@@ -117,21 +117,14 @@
       <div class="bg-gray-50 border border-gray-200 rounded-lg p-4 text-xs text-gray-500">
         <p class="font-medium text-gray-700 mb-2">Grille tarifaire de référence :</p>
         <table class="w-full">
-          <thead>
-            <tr class="font-medium text-gray-600">
-              <!-- Utilisation de <th> pour les entêtes au lieu de <td> pour un HTML sémantique -->
-              <th class="pr-4 text-left font-medium">Distance</th>
-              <th class="pr-4 text-left font-medium">Standard</th>
-              <th class="text-left font-medium">Express</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr v-for="ref in refPricing" :key="ref.d">
-              <td class="pr-4 py-0.5">{{ ref.d }}</td>
-              <td class="pr-4">{{ ref.s }}</td>
-              <td>{{ ref.e }}</td>
-            </tr>
-          </tbody>
+          <tr class="font-medium text-gray-600">
+            <td class="pr-4">Distance</td><td class="pr-4">Standard</td><td>Express</td>
+          </tr>
+          <tr v-for="ref in refPricing" :key="ref.d">
+            <td class="pr-4 py-0.5">{{ ref.d }}</td>
+            <td class="pr-4">{{ ref.s }}</td>
+            <td>{{ ref.e }}</td>
+          </tr>
         </table>
       </div>
     </div>
