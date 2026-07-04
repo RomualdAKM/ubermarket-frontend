@@ -563,6 +563,7 @@ import { ref, reactive, computed, watch, onMounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import type { ProductData, VariantOption, VariantCombination } from '~/types/product'
 import type { Subcategory } from '~/types/product'
+import { sanitizeImage } from '~/utils/sanitizeImage'
 
 // ── Méta de page ──
 definePageMeta({
@@ -643,9 +644,11 @@ const removeVariantValue = (optIdx: number, valIdx: number) => {
   productForm.variant_options[optIdx].values.splice(valIdx, 1)
 }
 
-const handleVariantValueImage = (event: Event, optIdx: number, valIdx: number) => {
-  const file = (event.target as HTMLInputElement).files?.[0]
-  if (!file) return
+const handleVariantValueImage = async (event: Event, optIdx: number, valIdx: number) => {
+  const original = (event.target as HTMLInputElement).files?.[0]
+  if (!original) return
+  // Ré-encodage canvas : la data URL base64 est alors générée à partir d'octets propres.
+  const file = await sanitizeImage(original)
   const reader = new FileReader()
   reader.onload = (e) => {
     productForm.variant_options[optIdx].values[valIdx].image     = e.target?.result as string
@@ -710,10 +713,13 @@ const totalStockFromCombinations = computed(() =>
 
 const triggerImageUpload = () => { imageInput.value?.click() }
 
-const handleImageUpload = (event: Event) => {
+const handleImageUpload = async (event: Event) => {
   const input = event.target as HTMLInputElement
   if (!input.files) return
-  Array.from(input.files).slice(0, 10 - productForm.images.length).forEach(file => {
+  const filesToAdd = Array.from(input.files).slice(0, 10 - productForm.images.length)
+  for (const original of filesToAdd) {
+    // Ré-encodage canvas : neutralise les PNG IA/C2PA refusés par GD côté serveur.
+    const file = await sanitizeImage(original)
     const reader = new FileReader()
     reader.onload = (e) => {
       productForm.images.push({
@@ -724,7 +730,7 @@ const handleImageUpload = (event: Event) => {
       })
     }
     reader.readAsDataURL(file)
-  })
+  }
   input.value = ''
 }
 

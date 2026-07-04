@@ -626,6 +626,7 @@ import { ref, reactive, computed, watch, onMounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import type { ProductData, ProductImage, VariantOption, VariantValue, VariantCombination } from '~/types/product'
 import type { Subcategory } from '~/types/product'
+import { sanitizeImage } from '~/utils/sanitizeImage'
 
 // ── Méta de page ──────────────────────────────────────────────
 definePageMeta({
@@ -753,9 +754,11 @@ const removeVariantValue = (optIdx: number, valIdx: number) => {
 }
 
 /** Upload d'image pour une valeur de variante (ex: photo du coloris Rouge) */
-const handleVariantValueImage = (event: Event, optIdx: number, valIdx: number) => {
-  const file = (event.target as HTMLInputElement).files?.[0]
-  if (!file) return
+const handleVariantValueImage = async (event: Event, optIdx: number, valIdx: number) => {
+  const original = (event.target as HTMLInputElement).files?.[0]
+  if (!original) return
+  // Ré-encodage canvas : la data URL base64 est alors générée à partir d'octets propres.
+  const file = await sanitizeImage(original)
   const reader = new FileReader()
   reader.onload = (e) => {
     productForm.variant_options[optIdx].values[valIdx].image     = e.target?.result as string
@@ -863,22 +866,25 @@ const triggerImageUpload = () => { if (imageInput.value) imageInput.value.click(
  * Limites : 10 images max, 5 Mo/image, formats PNG/JPEG/WebP.
  * La première image ajoutée devient automatiquement l'image principale.
  */
-const handleImageUpload = (event: Event) => {
+const handleImageUpload = async (event: Event) => {
   const target = event.target as HTMLInputElement
   if (!target.files) return
 
   const remainingSlots = 10 - productForm.images.length
   const filesToAdd     = Array.from(target.files).slice(0, remainingSlots)
 
-  for (const file of filesToAdd) {
-    if (file.size > 5 * 1024 * 1024) {
-      alert(`L'image ${file.name} est trop volumineuse. Taille maximale : 5 Mo.`)
+  for (const original of filesToAdd) {
+    if (original.size > 5 * 1024 * 1024) {
+      alert(`L'image ${original.name} est trop volumineuse. Taille maximale : 5 Mo.`)
       continue
     }
-    if (!file.type.match('image/(png|jpeg|webp)')) {
-      alert(`Format non supporté pour ${file.name}. Formats acceptés : PNG, JPEG, WebP.`)
+    if (!original.type.match('image/(png|jpeg|webp)')) {
+      alert(`Format non supporté pour ${original.name}. Formats acceptés : PNG, JPEG, WebP.`)
       continue
     }
+    // Ré-encodage canvas : neutralise les PNG IA/C2PA refusés par GD côté serveur
+    // ("Unable to decode input"). Voir utils/sanitizeImage.ts.
+    const file = await sanitizeImage(original)
     const reader = new FileReader()
     reader.onload = (e) => {
       productForm.images.push({
