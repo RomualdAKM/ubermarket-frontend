@@ -1606,41 +1606,49 @@
       return styles[activeViewport.value] || {}
     })
 
-    const config = useRuntimeConfig()
+  const config = useRuntimeConfig()
+  //const frontendUrl = config.public.siteUrl || 'http://localhost:3000'
 
-    // l'origine réelle du site internet en production
-    const frontendUrl = computed(() => {
-      if (config.public.siteUrl) return config.public.siteUrl
-      if (typeof window !== 'undefined') return window.location.origin
-      return 'http://localhost:3000'
-    })
+  // utilise l'origine actuelle du navigateur
+  // plutôt qu'un localhost codé en dur, si siteUrl n'est pas configuré
+  const frontendUrl = computed(() => {
+    if (config.public.siteUrl) return config.public.siteUrl
+    if (process.client) return window.location.origin
+    return 'http://localhost:3000'
+  })
 
-    // URL dynamique pour l'iframe d'aperçu (zéro localhost en ligne)
-    const previewUrl = computed(() => {
-      if (!previewTheme.value || !currentShop.value?.subdomain) return ''
-      return `${frontendUrl.value}/boutique/${currentShop.value.subdomain}?preview_theme=${previewTheme.value.slug}`
-    })
+  // utilise le subdomain réel de la boutique
+ // const previewUrl = computed(() => {
+  //  if (!previewTheme.value || !currentShop.value?.subdomain) return ''
+  //  return `${frontendUrl}/boutique/${currentShop.value.subdomain}?preview_theme=${previewTheme.value.slug}`
+  //})
+  const previewUrl = computed(() => {
+    if (!previewTheme.value || !currentShop.value?.subdomain) return ''
+    return `${frontendUrl.value}/boutique/${currentShop.value.subdomain}?preview_theme=${previewTheme.value.slug}`
+  })
 
-    const openPreview = (theme: any) => {
+  const openPreview = (theme: any) => {
     previewTheme.value   = theme
     activeViewport.value = 'desktop'
     showPreviewModal.value = true
   }
 
   const onScreenshotError = (event: Event, theme: any) => {
-    // Si le screenshot ne charge pas, on masque l'image pour afficher le mockup CSS de secours
+    // Si le screenshot ne charge pas, on masque l'image pour afficher le fallback
     const img = event.target as HTMLImageElement
-    if (img) img.style.display = 'none'
+    img.style.display = 'none'
   }
 
-  // ===== LOGIQUE D'ACTIVATION DU THEME =====
+  // ===== ACTIVATION =====
   const showActivateModal = ref(false)
   const themeToActivate   = ref<any>(null)
   const activating        = ref(false)
 
+ 
   const confirmActivate = (theme: any) => {
     if (!theme.is_free) {
-      // ✅ Redirection sécurisée vers le module abonnement pour les thèmes payants
+      // ✅ Rediriger vers le module abonnement comme pour les plans
+      // On ouvre la modale de paiement existante ou on redirige vers subscription
       router.push(`/dashboard-vendor/${shopSlug}/subscription?theme=${theme.slug}&theme_name=${encodeURIComponent(theme.name)}&theme_price=${theme.price}`)
       return
     }
@@ -1648,43 +1656,45 @@
     showActivateModal.value = true
   }
 
-  // Actualisation et enregistrement du thème actif sur l'API
+  //Thème actif réactualisé après activation
   const activateTheme = async () => {
-    if (!themeToActivate.value || !shopSlug) return
-    activating.value = true
-    try {
-      const { token } = useAuth()
-      const res = await fetch(
-        `${config.public.apiBase}/shops/${shopSlug}`,
-        {
-          method: 'PUT',
-          headers: {
-            'Content-Type': 'application/json',
-            'Accept': 'application/json',
-            'Authorization': `Bearer ${token.value}`,
-          },
-          body: JSON.stringify({ theme_id: themeToActivate.value.slug })
-        }
-      )
-      const data = await res.json()
-
-      if (data.success) {
-        // ✅ Mise à jour réactive immédiate du badge à l'écran sans recharger la page
-        currentThemeSlug.value  = themeToActivate.value.slug
-        showActivateModal.value = false
-        themeToActivate.value   = null
-        showToast('Thème "' + allThemes.value.find(t => t.slug === currentThemeSlug.value)?.name + '" activé ✓', 'success')
-      } else {
-        showToast(data.message || 'Erreur lors de l\'activation', 'error')
-        showActivateModal.value = false
+  if (!themeToActivate.value || !shopSlug) return
+  activating.value = true
+  try {
+    const { token } = useAuth()
+    const res = await fetch(
+      `${config.public.apiBase}/shops/${shopSlug}`,
+      {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+          'Authorization': `Bearer ${token.value}`,
+        },
+        body: JSON.stringify({ theme_id: themeToActivate.value.slug })
       }
-    } catch (err) {
-      showToast('Erreur réseau, impossible de joindre le serveur', 'error')
+    )
+    const data = await res.json()
+
+    if (data.success) {
+      // ✅ Mettre à jour immédiatement avec le slug — pas besoin de rechargement
+      currentThemeSlug.value  = themeToActivate.value.slug
       showActivateModal.value = false
-    } finally {
-      activating.value = false
+      themeToActivate.value   = null
+      showToast('Thème "' + allThemes.value.find(t => t.slug === currentThemeSlug.value)?.name + '" activé ✓')
+    } else {
+      showToast(data.message || 'Erreur activation', 'error')
+      showActivateModal.value = false
     }
+  } catch (err) {
+    showToast('Erreur réseau', 'error')
+    showActivateModal.value = false
+  } finally {
+    activating.value = false
   }
+}
+
+
 </script>
 
 <style scoped>
