@@ -8,13 +8,13 @@
         </div>
         <div>
           <h3 class="text-sm font-semibold text-neutral-900 uppercase">{{ getSectionLabel(section.type) }}</h3>
-          <p class="text-[11px] text-neutral-400">Modifiez les propriétés</p>
+          <p class="text-[11px] text-neutral-400"> Modifiez les propriétés</p>
         </div>
       </div>
     </div>
 
-    <!-- Accordéons -->
     <div class="divide-y divide-neutral-100">
+      
       <!-- CONTENU -->
       <Accordion :defaultOpen="true">
         <template #trigger="{ isOpen }">
