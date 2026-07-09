@@ -1322,6 +1322,8 @@
 </script>
 
 <style scoped>
+    /* Ajoutez cette ligne tout en haut du bloc */
+    @reference "tailwindcss"; 
     /* ── Champs de formulaire standardisés ── */
     .input-field {
     @apply w-full px-3 py-2.5 text-sm border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-300 transition-all;

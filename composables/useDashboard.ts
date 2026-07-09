@@ -23,7 +23,7 @@ export interface RecentOrder {
   items_count: number
 }
 
-export interface PopularProduct {
+export interface PopularProductDashboard {
   id: number
   name: string
   price: number
@@ -38,7 +38,7 @@ export interface PopularProduct {
 export interface DashboardData {
   statistics: DashboardStatistics
   recent_orders: RecentOrder[]
-  popular_products: PopularProduct[]
+  popular_products: PopularProductDashboard[]
 }
 
 export const useDashboard = () => {
