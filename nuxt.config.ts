@@ -55,11 +55,12 @@ export default defineNuxtConfig({
     }
   },
 
+  //Variables d'environnement API
   runtimeConfig: {
     public: {
-      apiBase: process.env.NUXT_PUBLIC_API_BASE || 'https://ubermarket.fga-numerik.fr/api',
-      backendUrl: process.env.NUXT_PUBLIC_BACKEND_URL || 'https://ubermarket.fga-numerik.fr',
-      siteUrl: process.env.NUXT_PUBLIC_SITE_URL || 'http://localhost:3000'
+      apiBase: process.env.NUXT_PUBLIC_API_BASE || 'https://www.uber-market.com/api',
+      backendUrl: process.env.NUXT_PUBLIC_BACKEND_URL || 'https://www.uber-market.com/',
+      siteUrl: process.env.NUXT_PUBLIC_SITE_URL || 'https://www.uber-market.com/'
     }
   },
 

@@ -331,7 +331,7 @@
                   v-model="option.name"
                   type="text"
                   class="flex-1 px-3 py-1.5 text-sm font-medium border-0 border-b-2 border-gray-300 focus:border-primary focus:outline-none bg-transparent"
-                  placeholder="Nom de la dimension (ex: Couleur)"
+                  placeholder="Nom de la dimension (ex: Couleur / taille)"
                 />
                 <button type="button" @click="removeVariantOption(optIdx)"
                   class="ml-3 text-red-400 hover:text-red-600" title="Supprimer cette dimension"
