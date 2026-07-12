@@ -509,6 +509,15 @@
     'Beige': '#F5F5DC',
     'Bordeaux': '#800000',
     'Noisette': '#8B5A2B',
+    'Rose bonbon': '#FF1493',
+    'Rose bonbon doux': '#F4C2C2',
+    'Rose pâle / clair': '#FFB6C1',
+    'Rose poudré': '#F4C2C2', 
+    'Rose saumon': '#FF8181', 
+    'Rose fuchsia': '#FF00FF',
+    'Bleu marine': '#000080',
+    'ivoire': '#FFFFF0',
+    'Vert alpin': '#005F41',
   }
 
   const getColorStyle = (value: string): string => {
