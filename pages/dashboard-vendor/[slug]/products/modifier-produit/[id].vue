@@ -611,6 +611,7 @@ const productForm = reactive<ProductData>({
   preorder_payment_type:   null,
   deposit_amount:          null,
   deposit_percentage:      null,
+  variants:              [],
   variant_options:      [],
   variant_combinations: [],
   images:               []
@@ -845,27 +846,45 @@ const loadProductData = async () => {
     }
 
     // ── Chargement des variantes ──
-    if (product.variant_options && product.variant_combinations) {
-      // Nouveau format API (après migration backend)
+    if (product.product_variants && product.product_variants.length > 0) {
+      // Nouveau format : chaque ProductVariant a un `attributes` structuré
+      // {Couleur: "Noir", Taille: "M"} — c'est la source de vérité.
+      const optionsMap = new Map<string, VariantOption>()
+
+      product.product_variants.forEach((v: any) => {
+        if (v.attributes && typeof v.attributes === 'object') {
+          Object.entries(v.attributes).forEach(([key, value]) => {
+            const cleanKey = key.trim()
+            const cleanValue = String(value).trim()
+
+            if (!optionsMap.has(cleanKey)) {
+              optionsMap.set(cleanKey, { name: cleanKey, values: [] })
+            }
+            const dimension = optionsMap.get(cleanKey)!
+            if (!dimension.values.some(val => val.value === cleanValue)) {
+              dimension.values.push({ value: cleanValue })
+            }
+          })
+        }
+      })
+
+      productForm.variant_options = Array.from(optionsMap.values())
+
+      // Reconstruire les combinaisons directement depuis attributes (pas de devinette)
+      productForm.variant_combinations = product.product_variants
+        .filter((v: any) => v.attributes && typeof v.attributes === 'object')
+        .map((v: any) => ({
+          id:             v.id,
+          attributes:     v.attributes,
+          price_modifier: v.price_modifier ? parseFloat(v.price_modifier) : 0,
+          stock_quantity: v.stock_quantity ? parseInt(v.stock_quantity) : 0,
+          sku:            v.sku || ''
+        }))
+    } else if (product.variant_options && product.variant_combinations) {
+      // Ancien chemin théorique si jamais l'API renvoyait un jour ces champs
+      // directement sur `product` (actuellement non utilisé côté backend)
       productForm.variant_options      = product.variant_options
       productForm.variant_combinations = product.variant_combinations
-    } else if (product.product_variants) {
-      // Fallback : ancien format plat (product_variants) → reconstruction des dimensions
-      // Regrouper par nom d'attribut pour reconstituer les options
-      const optionsMap = new Map<string, VariantOption>()
-      product.product_variants.forEach((v: any) => {
-        if (!optionsMap.has(v.name)) optionsMap.set(v.name, { name: v.name, values: [] })
-        optionsMap.get(v.name)!.values.push({ value: v.value })
-      })
-      productForm.variant_options = Array.from(optionsMap.values())
-      // Reconstruire les combinaisons depuis l'ancien format (1 variante = 1 attribut seul)
-      productForm.variant_combinations = product.product_variants.map((v: any) => ({
-        id:             v.id,
-        attributes:     { [v.name]: v.value },
-        price_modifier: v.price_modifier ? parseFloat(v.price_modifier) : 0,
-        stock_quantity: v.stock_quantity ? parseInt(v.stock_quantity) : 0,
-        sku:            v.sku || ''
-      }))
     }
   } catch (err: any) {
     error.value = err.message || 'Erreur lors du chargement du produit'

@@ -507,50 +507,8 @@
     'Orange': '#FB923C',
     'Violet': '#A78BFA',
     'Beige': '#F5F5DC',
-    'rouge clair ou de corail': '#FF8080',
-    'Red': '#FF0000',
-    'Marron américain': '#804040',
     'Bordeaux': '#800000',
-    'Couleur': '#400000',
-    'Couleur1': '#FFFF80',
-    'Couleur2': '#FFFF00',
-    'Couleur3': '#FF8040',
-    'Couleur4': '#FF8000',
-    'Couleur5': '#804000',
-    'Couleur6': '#808000',
-    'Violet0': '#808040',
-    'Violet1': '#004000',
-    'Violet2': '#008000',
-    'Violet3': '#00FF00',
-    'Violet4': '#80FF00',
-    'Violet5': '#80FF80',
-    'Violet6': '#00FF40',
-    'Violet7': '#008080',
-    'Violet8': '#008040',
-    'Violet9': '#004040',
-    'Violet10': '#808080',
-    'Violet11': '#408080',
-    'Violet12': '#000080',
-    'Violet13': '#0000FF',
-    'Violet14': '#004080',
-    'Violet15': '#00FFFF',
-    'Violet16': '#80FFFF',
-    'Violet17': '#0080FF',
-    'Violet18': '#0080C0',
-    'Violet19': '#8080FF',
-    'Violet20': '#0000A0',
-    'Violet21': '#000040',
-    'Violet22':  '#C0C0C0',
-    'Violet23': '#400040',
-    'Violet24': '#800080',
-    'Violet25': '#800040',
-    'Violet26': '#8080C0',
-    'Violet27': '#FF80C0',
-    'Violet28': '#FF80FF',
-    'Violet29': '#FF00FF',
-    'Violet30': '#FF0080',
-    'Violet31': '#8000FF',
-    'Violet32': '#400080'
+    'Noisette': '#8B5A2B',
   }
 
   const getColorStyle = (value: string): string => {
@@ -561,70 +519,49 @@
   // CORRECTION INJECTÉE : Nettoyage automatique des espaces invisibles comme "Taille "
   const groupedVariants = computed(() => {
     const groups: Record<string, any[]> = {}
-    
+
     if (!productVariants.value || !Array.isArray(productVariants.value)) {
       return groups
     }
 
     productVariants.value.forEach((v: any) => {
-      try {
-        // 1. On cherche à savoir où se trouve le JSON (dans v.name ou v.value)
-        let attrs: any = null
-        
-        if (typeof v.name === 'string' && v.name.trim().startsWith('{')) {
-          attrs = JSON.parse(v.name)
-        } else if (typeof v.value === 'string' && v.value.trim().startsWith('{')) {
-          attrs = JSON.parse(v.value)
-        } else if (v.attributes) {
-          attrs = typeof v.attributes === 'string' ? JSON.parse(v.attributes) : v.attributes
-        }
+      if (v.attributes && typeof v.attributes === 'object') {
+        Object.entries(v.attributes).forEach(([key, value]) => {
+          const cleanedKey = key.trim()
+          const cleanedValue = String(value).trim()
 
-        // 2. CAS A : On a trouvé un objet JSON valide (ex: {"Taille": "M"} ou {"Couleur": "Rouge"})
-        if (attrs && typeof attrs === 'object') {
-          Object.entries(attrs).forEach(([key, value]) => {
-            const cleanedKey = key.trim()
-            const cleanedValue = String(value).trim()
-            
-            if (!groups[cleanedKey]) groups[cleanedKey] = []
-            
-            const alreadyExists = groups[cleanedKey].some(item => item.value === cleanedValue)
-            if (!alreadyExists) {
-              groups[cleanedKey].push({
-                id: v.id,
-                value: cleanedValue,
-                price_modifier: v.price_modifier || 0,
-                image_url: v.image_url || v.image_path || null,
-                stock: v.stock_quantity ?? v.stock ?? 0
-              })
-            }
-          })
-        } 
-        // 3. CAS B : Pas de JSON, ce sont des chaînes de caractères classiques plates
-        else {
-          // Si v.name est par exemple "Taille" et v.value est "M"
-          const cleanedKey = typeof v.name === 'string' ? v.name.trim() : 'Option'
-          const cleanedValue = typeof v.value === 'string' ? v.value.trim() : String(v.value || '')
-          
-          // Sécurité anti-bug : si le backend a mis la valeur dans le nom (v.name = "M")
-          // et que la clé est absente, on essaie de deviner ou on standardise
-          if (cleanedKey && cleanedValue) {
-            if (!groups[cleanedKey]) groups[cleanedKey] = []
-            if (!groups[cleanedKey].some(item => item.value === cleanedValue)) {
-              groups[cleanedKey].push({
-                id: v.id,
-                value: cleanedValue,
-                price_modifier: v.price_modifier || 0,
-                image_url: v.image_url || v.image_path || null,
-                stock: v.stock_quantity ?? v.stock ?? 0
-              })
-            }
+          if (!groups[cleanedKey]) groups[cleanedKey] = []
+
+          const alreadyExists = groups[cleanedKey].some(item => item.value === cleanedValue)
+          if (!alreadyExists) {
+            groups[cleanedKey].push({
+              id: v.id,
+              value: cleanedValue,
+              price_modifier: v.price_modifier || 0,
+              image_url: v.image_url || v.image_path || null,
+              stock: v.stock_quantity ?? v.stock ?? 0
+            })
+          }
+        })
+      } else {
+        const cleanedKey = typeof v.name === 'string' ? v.name.trim() : 'Option'
+        const cleanedValue = typeof v.value === 'string' ? v.value.trim() : String(v.value || '')
+
+        if (cleanedKey && cleanedValue) {
+          if (!groups[cleanedKey]) groups[cleanedKey] = []
+          if (!groups[cleanedKey].some(item => item.value === cleanedValue)) {
+            groups[cleanedKey].push({
+              id: v.id,
+              value: cleanedValue,
+              price_modifier: v.price_modifier || 0,
+              image_url: v.image_url || v.image_path || null,
+              stock: v.stock_quantity ?? v.stock ?? 0
+            })
           }
         }
-      } catch (e) {
-        console.error("Erreur critique lors du parsing de la variante vendeur :", v, e)
       }
     })
-    
+
     return groups
   })
 
@@ -660,6 +597,24 @@
     })
     
     return sorted
+  })
+
+  //selection des variantes
+  const selectedVariantId = computed(() => {
+    const selected = selectedVariants.value
+    const requiredKeys = Object.keys(sortedGroupedVariants.value)
+
+    if (requiredKeys.length === 0) return null
+    if (requiredKeys.some(k => !selected[k])) return null
+
+    const match = productVariants.value.find((v: any) => {
+      if (!v.attributes || typeof v.attributes !== 'object') return false
+      return requiredKeys.every(key =>
+        String(v.attributes[key]).trim() === String(selected[key]?.value).trim()
+      )
+    })
+
+    return match?.id ?? null
   })
 
   // Variantes sélectionnées (clé = nom de variante, valeur = variante complète)
@@ -729,21 +684,20 @@
     if (isDigitalProduct.value || isPreorder.value) {
       return 999999
     }
-    
+
     const requiredOptions = Object.keys(sortedGroupedVariants.value)
     const selectedOptionsList = Object.keys(selectedVariants.value)
-    
-    // Si des catégories ne sont pas encore choisies, le stock est verrouillé
+
     if (requiredOptions.length > selectedOptionsList.length) {
       return 0
     }
-    
-    const selectedVariantsList = Object.values(selectedVariants.value)
-    if (selectedVariantsList.length > 0) {
-      const lastVariant = selectedVariantsList[selectedVariantsList.length - 1]
-      return lastVariant?.stock !== undefined ? lastVariant.stock : (props.product?.stock_quantity || 0)
+
+    const matchedId = selectedVariantId.value
+    if (matchedId) {
+      const matchedVariant = productVariants.value.find((v: any) => v.id === matchedId)
+      return matchedVariant?.stock_quantity ?? 0
     }
-    
+
     return props.product?.stock_quantity || 0
   })
 
@@ -790,12 +744,9 @@
     
     let variantIds: number[] | null = null
     if (!isDigitalProduct.value && requiredOptions.length > 0) {
-      const selectedVariantIds = Object.values(selectedVariants.value)
-        .map((variant: any) => variant?.id)
-        .filter((id): id is number => id !== null && id !== undefined)
-      
-      if (selectedVariantIds.length > 0) {
-        variantIds = selectedVariantIds
+      const matchedId = selectedVariantId.value
+      if (matchedId) {
+        variantIds = [matchedId]
       }
     }
     
