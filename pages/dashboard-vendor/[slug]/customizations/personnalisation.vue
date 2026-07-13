@@ -1553,7 +1553,7 @@
     },
     {
       id: 6,
-      slug: 'theme-épicerie-bio-produits-frais',
+      slug: 'theme-epicerie-bio', //'theme-épicerie-bio-produits-frais',
       name: 'Natural Mystique',
       description: 'Thème épicerie bio / produits frais',
       is_free: true,
