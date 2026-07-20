@@ -69,7 +69,6 @@ export const useShops = () => {
 
   /**
    * Créer une boutique.
-   *
    * Le payload part en FormData car un logo (fichier) peut être joint.
    * Convention projet : uniquement le header 'Authorization' est fourni
    * explicitement ici — 'Accept'/'Content-Type' ne doivent PAS être définis,
