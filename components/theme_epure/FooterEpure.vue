@@ -31,7 +31,7 @@
         </a>
       </div>
 
-      <div class="mt-8 pt-8 border-t border-gray-200 text-center">
+      <div class="mt-4 pt-4 border-t border-gray-200 text-center">
         <p class="text-gray-600 text-sm">{{ footerText }}</p>
       </div>
     </div>

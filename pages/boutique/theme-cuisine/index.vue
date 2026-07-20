@@ -1,61 +1,7 @@
 <template>
   <div class="theme-cuisine" :style="cssVars">
 
-    <!-- ===== NAVIGATION ===== -->
-    <header
-      class="cuisine-nav"
-      :class="{ 'cuisine-nav--scrolled': isScrolled, 'cuisine-nav--open': menuOpen }"
-    >
-      <div class="cuisine-nav__inner">
-
-        <!-- Logo -->
-        <NuxtLink :to="`/boutique/${shop?.subdomain}`" class="cuisine-nav__logo">
-          <img
-            v-if="shop?.logo"
-            :src="getImageUrl(shop.logo)"
-            :alt="shop?.name"
-            class="cuisine-nav__logo-img"
-          />
-          <span v-else class="cuisine-nav__logo-text">{{ shop?.name }}</span>
-        </NuxtLink>
-
-        <!-- Navigation desktop -->
-        <nav class="cuisine-nav__links">
-          <a href="#accueil"   class="cuisine-nav__link" @click.prevent="scrollTo('#accueil')">Accueil</a>
-          <a href="#menu"      class="cuisine-nav__link" @click.prevent="scrollTo('#menu')">Notre Menu</a>
-          <a href="#specialites" class="cuisine-nav__link" @click.prevent="scrollTo('#specialites')">Spécialités</a>
-          <a href="#apropos"   class="cuisine-nav__link" @click.prevent="scrollTo('#apropos')">À propos</a>
-          <a href="#contact"   class="cuisine-nav__link" @click.prevent="scrollTo('#contact')">Contact</a>
-        </nav>
-
-        <!-- CTA panier -->
-        <div class="cuisine-nav__actions">
-          <NuxtLink
-            v-if="shop?.shop_type !== 'website'"
-            :to="`/boutique/${shop?.subdomain}/panier`"
-            class="cuisine-nav__cart"
-          >
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-              <path d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 0 0-3 3h15.75m-12.75-3h11.218c1.121-2.3 2.1-4.684 2.924-7.138a60.114 60.114 0 0 0-16.536-1.84M7.5 14.25 5.106 5.272M6 20.25a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Zm12.75 0a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Z"/>
-            </svg>
-          </NuxtLink>
-
-          <!-- Burger mobile -->
-          <button class="cuisine-nav__burger" @click="menuOpen = !menuOpen" aria-label="Menu">
-            <span></span><span></span><span></span>
-          </button>
-        </div>
-      </div>
-
-      <!-- Menu mobile -->
-      <div class="cuisine-nav__mobile" :class="{ 'is-open': menuOpen }">
-        <a href="#accueil"    @click="closeMenu('#accueil')"    class="cuisine-nav__mobile-link">Accueil</a>
-        <a href="#menu"       @click="closeMenu('#menu')"       class="cuisine-nav__mobile-link">Notre Menu</a>
-        <a href="#specialites"@click="closeMenu('#specialites')"class="cuisine-nav__mobile-link">Spécialités</a>
-        <a href="#apropos"    @click="closeMenu('#apropos')"    class="cuisine-nav__mobile-link">À propos</a>
-        <a href="#contact"    @click="closeMenu('#contact')"    class="cuisine-nav__mobile-link">Contact</a>
-      </div>
-    </header>
+    <HeaderCuisine :shop="shop" :primaryColor="primaryColor" />
 
     <main>
 
@@ -124,12 +70,12 @@
         </div>
       </section>
 
-      <!-- ===== CATÉGORIES / FILTRES ===== -->
+      <!-- ===== APERÇU DU MENU ===== -->
       <section id="menu" class="cuisine-menu">
         <div class="cuisine-container">
           <div class="cuisine-section-header">
-            <p class="cuisine-eyebrow">Découvrez</p>
-            <h2 class="cuisine-section-title">Notre Menu</h2>
+            <p class="cuisine-eyebrow">Votre</p>
+            <h2 class="cuisine-section-title">Voyage Culinaire</h2>
             <div class="cuisine-divider">
               <span class="cuisine-divider__ornament">✦</span>
             </div>
@@ -138,30 +84,21 @@
             </p>
           </div>
 
-          <!-- Filtres catégories -->
-          <div class="cuisine-filters">
-            <button
-              class="cuisine-filter"
-              :class="{ 'is-active': activeCategory === 'all' }"
-              @click="activeCategory = 'all'"
-            >Tout</button>
-            <button
-              v-for="cat in categories"
-              :key="cat"
-              class="cuisine-filter"
-              :class="{ 'is-active': activeCategory === cat }"
-              @click="activeCategory = cat"
-            >{{ cat }}</button>
+          <div class="cuisine-menu__cta">
+            <NuxtLink :to="`/boutique/${shop?.subdomain}/produits`" class="cuisine-filter">Notre Menu Complet</NuxtLink>
           </div>
 
-          <!-- Grille de produits -->
-          <div v-if="filteredProducts.length === 0" class="cuisine-empty">
+          <!-- Message d'erreur ajout panier -->
+          <div v-if="addToCartError" class="cuisine-cart-error">{{ addToCartError }}</div>
+
+          <!-- Grille de 5 produits maximum, sélection aléatoire, avec carte "voir plus" -->
+          <div v-if="randomProducts.length === 0" class="cuisine-empty">
             <p>Aucun plat disponible pour le moment.</p>
           </div>
 
           <div v-else class="cuisine-grid">
             <NuxtLink
-              v-for="product in filteredProducts"
+              v-for="product in randomProducts"
               :key="product.id"
               :to="`/boutique/${shop?.subdomain}/produit/${product.id}`"
               class="cuisine-card"
@@ -214,10 +151,11 @@
                   <button
                     v-if="shop?.shop_type !== 'website'"
                     class="cuisine-card__btn"
-                    @click.prevent="addToCart(product)"
+                    @click.prevent="handleQuickAddToCart(product)"
+                    :disabled="addingProductId === product.id"
                     aria-label="Commander"
                   >
-                    Commander
+                    {{ addingProductId === product.id ? '...' : 'Commander' }}
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
                       <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3"/>
                     </svg>
@@ -225,11 +163,26 @@
                 </div>
               </div>
             </NuxtLink>
+
+            <!-- Carte "voir plus" si la boutique a plus de produits que ceux affichés ici -->
+            <NuxtLink
+              v-if="allProducts.length > randomProducts.length"
+              :to="`/boutique/${shop?.subdomain}/produits`"
+              class="cuisine-card cuisine-card--more"
+            >
+              <div class="cuisine-card--more__inner">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3"/>
+                </svg>
+                <span>Voir tout le menu</span>
+                <span class="cuisine-card--more__count">{{ allProducts.length }} plats au total</span>
+              </div>
+            </NuxtLink>
           </div>
         </div>
       </section>
 
-      <!-- ===== SECTION SPÉCIALITÉS (produits vedettes) ===== -->
+      <!-- ===== SECTION SPÉCIALITÉS (catégories du menu) ===== -->
       <section id="specialites" class="cuisine-specialites">
         <div class="cuisine-specialites__bg"></div>
         <div class="cuisine-container cuisine-specialites__inner">
@@ -237,30 +190,31 @@
           <!-- Gauche : texte -->
           <div class="cuisine-specialites__text">
             <p class="cuisine-eyebrow cuisine-eyebrow--light">À la une</p>
-            <h2 class="cuisine-specialites__title">Nos Spécialités<br/>de la Maison</h2>
+            <h2 class="cuisine-specialites__title">{{ specialitesTitle }}</h2>
             <div class="cuisine-divider cuisine-divider--light">
               <span class="cuisine-divider__ornament">✦</span>
             </div>
             <p class="cuisine-specialites__desc">
-              Chaque plat est une invitation au voyage, une expérience culinaire unique préparée avec les meilleurs ingrédients de saison.
+              {{ specialitesText }}
             </p>
-            <a href="#menu" @click.prevent="scrollTo('#menu')" class="cuisine-btn cuisine-btn--gold mt-8 inline-flex">
+            <NuxtLink :to="`/boutique/${shop?.subdomain}/produits`" class="cuisine-btn cuisine-btn--gold mt-8 inline-flex">
               Voir tout le menu
-            </a>
+            </NuxtLink>
           </div>
 
-          <!-- Droite : produits vedettes -->
+          <!-- Droite : catégories de produits avec compteur -->
           <div class="cuisine-specialites__list">
-            <div
-              v-for="product in featuredProducts"
-              :key="product.id"
+            <NuxtLink
+              v-for="cat in categoriesWithCount"
+              :key="cat.name"
+              :to="`/boutique/${shop?.subdomain}/produits?categorie=${encodeURIComponent(cat.name)}`"
               class="cuisine-specialite-item"
             >
               <div class="cuisine-specialite-item__img">
                 <img
-                  v-if="product.preview_image"
-                  :src="getImageUrl(product.preview_image)"
-                  :alt="product.name"
+                  v-if="cat.image"
+                  :src="cat.image"
+                  :alt="cat.name"
                   loading="lazy"
                   @contextmenu.prevent
                   @dragstart.prevent
@@ -271,16 +225,20 @@
               </div>
               <div class="cuisine-specialite-item__info">
                 <div class="cuisine-specialite-item__top">
-                  <h3 class="cuisine-specialite-item__name">{{ product.name }}</h3>
+                  <h3 class="cuisine-specialite-item__name">{{ cat.name }}</h3>
                   <span class="cuisine-specialite-item__dots"></span>
                   <span class="cuisine-specialite-item__price">
-                    {{ formatPrice(product.promotional_price || product.price) }}
+                    {{ cat.count }} plat{{ cat.count > 1 ? 's' : '' }}
                   </span>
                 </div>
                 <p class="cuisine-specialite-item__desc">
-                  {{ getCleanDesc(product.description, 70) }}
+                  Découvrez notre sélection {{ cat.name.toLowerCase() }}
                 </p>
               </div>
+            </NuxtLink>
+
+            <div v-if="categoriesWithCount.length === 0" class="cuisine-specialites__empty">
+              Les catégories de plats apparaîtront ici une fois votre menu organisé.
             </div>
           </div>
         </div>
@@ -382,87 +340,23 @@
 
     </main>
 
-    <!-- ===== FOOTER ===== -->
-    <footer id="contact" class="cuisine-footer">
-      <div class="cuisine-footer__top">
-        <div class="cuisine-container cuisine-footer__grid">
-
-          <!-- Colonne logo + desc -->
-          <div class="cuisine-footer__col cuisine-footer__col--brand">
-            <div class="cuisine-footer__logo">
-              <img v-if="shop?.logo" :src="getImageUrl(shop.logo)" :alt="shop?.name" />
-              <span v-else>{{ shop?.name }}</span>
-            </div>
-            <p class="cuisine-footer__desc">
-              {{ shop?.description || 'Une expérience gastronomique inoubliable, au cœur de la tradition culinaire.' }}
-            </p>
-            <!-- Réseaux sociaux -->
-            <div class="cuisine-footer__social">
-              <a v-if="socialLinks.facebook"  :href="socialLinks.facebook"  target="_blank" class="cuisine-footer__social-link" aria-label="Facebook">
-                <svg viewBox="0 0 24 24" fill="currentColor"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg>
-              </a>
-              <a v-if="socialLinks.instagram" :href="socialLinks.instagram" target="_blank" class="cuisine-footer__social-link" aria-label="Instagram">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect width="20" height="20" x="2" y="2" rx="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" x2="17.51" y1="6.5" y2="6.5"/></svg>
-              </a>
-              <a v-if="socialLinks.twitter"   :href="socialLinks.twitter"   target="_blank" class="cuisine-footer__social-link" aria-label="Twitter">
-                <svg viewBox="0 0 24 24" fill="currentColor"><path d="M22 4s-.7 2.1-2 3.4c1.6 10-9.4 17.3-18 11.6 2.2.1 4.4-.6 6-2C3 15.5.5 9.6 3 5c2.2 2.6 5.6 4.1 9 4-.9-4.2 4-6.6 7-3.8 1.1 0 3-1.2 3-1.2z"/></svg>
-              </a>
-            </div>
-          </div>
-
-          <!-- Colonne navigation -->
-          <div class="cuisine-footer__col">
-            <h4 class="cuisine-footer__col-title">Navigation</h4>
-            <ul class="cuisine-footer__links">
-              <li><a href="#accueil"    @click.prevent="scrollTo('#accueil')">Accueil</a></li>
-              <li><a href="#menu"       @click.prevent="scrollTo('#menu')">Notre menu</a></li>
-              <li><a href="#specialites"@click.prevent="scrollTo('#specialites')">Spécialités</a></li>
-              <li><a href="#apropos"    @click.prevent="scrollTo('#apropos')">À propos</a></li>
-            </ul>
-          </div>
-
-          <!-- Colonne contact -->
-          <div class="cuisine-footer__col">
-            <h4 class="cuisine-footer__col-title">Contact</h4>
-            <ul class="cuisine-footer__contact">
-              <li v-if="shop?.phone">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2.25 6.75c0 8.284 6.716 15 15 15h2.25a2.25 2.25 0 0 0 2.25-2.25v-1.372c0-.516-.351-.966-.852-1.091l-4.423-1.106c-.44-.11-.902.055-1.173.417l-.97 1.293c-.282.376-.769.542-1.21.38a12.035 12.035 0 0 1-7.143-7.143c-.162-.441.004-.928.38-1.21l1.293-.97c.363-.271.527-.734.417-1.173L6.963 3.102a1.125 1.125 0 0 0-1.091-.852H4.5A2.25 2.25 0 0 0 2.25 4.5v2.25z"/></svg>
-                {{ shop.phone }}
-              </li>
-              <li>
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21.75 6.75v10.5a2.25 2.25 0 0 1-2.25 2.25h-15a2.25 2.25 0 0 1-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0 0 19.5 4.5h-15a2.25 2.25 0 0 0-2.25 2.25m19.5 0v.243a2.25 2.25 0 0 1-1.07 1.916l-7.5 4.615a2.25 2.25 0 0 1-2.36 0L3.32 8.91a2.25 2.25 0 0 1-1.07-1.916V6.75"/></svg>
-                <a href="mailto:contact@uber-market.com">contact@uber-market.com</a>
-              </li>
-            </ul>
-          </div>
-
-          <!-- Colonne horaires -->
-          <div class="cuisine-footer__col">
-            <h4 class="cuisine-footer__col-title">Horaires</h4>
-            <ul class="cuisine-footer__hours">
-              <li><span>Lun – Ven</span><span>08:00 – 22:00</span></li>
-              <li><span>Samedi</span><span>09:00 – 23:00</span></li>
-              <li><span>Dimanche</span><span>10:00 – 21:00</span></li>
-            </ul>
-          </div>
-        </div>
-      </div>
-
-      <!-- Footer bottom -->
-      <div class="cuisine-footer__bottom">
-        <p>{{ footerText }}</p>
-        <p class="cuisine-footer__powered">
-          Propulsé par <a href="https://uber-market.com" target="_blank">UberMarket</a>
-        </p>
-      </div>
-    </footer>
+    <FooterCuisine
+      :shop="shop"
+      :backgroundColor="bgColor"
+      :primaryColor="primaryColor"
+      :footerText="footerText"
+      :socialLinks="socialLinks"
+    />
 
   </div>
 </template>
 
 <script setup lang="ts">
-  import { ref, computed, onMounted, onUnmounted, watch } from 'vue'
+  import { ref, computed, onMounted, onUnmounted } from 'vue'
   import { getCleanDescription } from '~/utils/string'
+  import HeaderCuisine from '@/components/theme_cuisine/HeaderCuisine.vue'
+  import FooterCuisine from '@/components/theme_cuisine/FooterCuisine.vue'
+  import { useCart } from '~/composables/useCart'
 
   // ============================
   // RÈGLES DE LA PLATEFORME
@@ -506,6 +400,9 @@
     return `${backendUrl}/storage/${path}`
   }
 
+  const shop = computed(() => props.shop)
+  const shopSubdomain = computed(() => props.shop?.subdomain || '')
+
   const bannerEyebrow  = computed(() => 'Bienvenue')
   const bannerTitle    = computed(() =>
     props.customizations?.home?.banner?.title    || props.shop?.name || 'Cuisine Authentique'
@@ -540,27 +437,47 @@
   const socialLinks = computed(() => props.customizations?.footer?.socialLinks || {})
   const termsText   = computed(() => props.customizations?.terms?.text || '')
 
+  // ── Section Spécialités (personnalisable depuis le dashboard) ──
+  const specialitesTitle = computed(() =>
+    props.customizations?.specialites?.title || 'Nos Spécialités de la Maison'
+  )
+  const specialitesText = computed(() =>
+    props.customizations?.specialites?.text ||
+    'Chaque plat est une invitation au voyage, une expérience culinaire unique préparée avec les meilleurs ingrédients de saison.'
+  )
+
   // ============================
   // PRODUITS
   // ============================
   const allProducts = computed(() => props.shop?.products || [])
 
-  const activeCategory = ref('all')
+  // ── Sélection aléatoire de 5 produits pour l'aperçu du menu ──
+  // Se recalcule uniquement quand la liste de produits change (pas à
+  // chaque re-render), pour éviter que la grille "saute" sans raison.
+  const randomProducts = computed(() => {
+    const list = allProducts.value
+    if (list.length <= 5) return list
+    const shuffled = [...list].sort(() => Math.random() - 0.5)
+    return shuffled.slice(0, 5)
+  })
 
-  const categories = computed(() => {
-    const cats = new Set<string>()
+  // ── Catégories du menu avec nombre de plats et image représentative ──
+  const categoriesWithCount = computed(() => {
+    const map = new Map<string, { name: string; count: number; image: string | null }>()
     allProducts.value.forEach((p: any) => {
-      if (p.subcategory?.name) cats.add(p.subcategory.name)
+      const catName = p.subcategory?.name
+      if (!catName) return
+      if (!map.has(catName)) {
+        map.set(catName, {
+          name: catName,
+          count: 0,
+          image: p.preview_image ? getImageUrl(p.preview_image) : null
+        })
+      }
+      map.get(catName)!.count++
     })
-    return Array.from(cats)
+    return Array.from(map.values()).slice(0, 5)
   })
-
-  const filteredProducts = computed(() => {
-    if (activeCategory.value === 'all') return allProducts.value
-    return allProducts.value.filter((p: any) => p.subcategory?.name === activeCategory.value)
-  })
-
-  const featuredProducts = computed(() => allProducts.value.slice(0, 5))
 
   const formatPrice = (price: number) => {
     const currency = props.shop?.currency || 'XOF'
@@ -573,9 +490,52 @@
     return clean.length > max ? clean.slice(0, max) + '…' : clean
   }
 
-  // Panier simplifié
-  const addToCart = (product: any) => {
-    console.log('Ajout au panier:', product.name)
+  // ============================
+  // AJOUT RAPIDE AU PANIER (depuis la grille d'aperçu)
+  //
+  // Comme il n'y a pas de sélecteur de variantes sur une carte produit,
+  // on ajoute automatiquement la PREMIÈRE combinaison en stock si le
+  // produit a des variantes. Si aucune combinaison n'a de stock,
+  // ou si le produit n'a pas de variantes mais un stock global à 0,
+  // on affiche une erreur plutôt que d'ajouter un article invalide.
+  // Pour un choix précis de variante, le client passe par la page produit.
+  // ============================
+  const { addToCart } = useCart()
+  const addingProductId = ref<number | null>(null)
+  const addToCartError = ref('')
+
+  const handleQuickAddToCart = async (product: any) => {
+    if (!shopSubdomain.value) return
+    addToCartError.value = ''
+
+    const variants = product.productVariants || product.product_variants || []
+    let variantIds: number[] | null = null
+
+    if (variants.length > 0) {
+      // Regrouper par dimension pour ne prendre qu'UNE valeur par dimension
+      // (ex: si Couleur+Taille, on veut 1 combinaison complète, pas toutes les lignes)
+      const firstInStock = variants.find((v: any) => (v.stock_quantity ?? 0) > 0)
+      if (!firstInStock) {
+        addToCartError.value = `"${product.name}" n'a plus de stock disponible pour le moment.`
+        return
+      }
+      variantIds = [firstInStock.id]
+    } else if (product.availability_type !== 'preorder' && (product.stock_quantity ?? 0) <= 0) {
+      addToCartError.value = `"${product.name}" est en rupture de stock.`
+      return
+    }
+
+    addingProductId.value = product.id
+    try {
+      const success = await addToCart(shopSubdomain.value, product.id, 1, variantIds)
+      if (!success) {
+        addToCartError.value = `Erreur lors de l'ajout de "${product.name}" au panier.`
+      }
+    } catch (err: any) {
+      addToCartError.value = err.message || "Erreur lors de l'ajout au panier"
+    } finally {
+      addingProductId.value = null
+    }
   }
 
   // ============================
@@ -592,29 +552,22 @@
   }
 
   // ============================
-  // SCROLL & NAV
+  // SCROLL vers ancre (utilisé par les CTA internes du hero)
   // ============================
-  const isScrolled = ref(false)
-  const menuOpen   = ref(false)
-
-  const onScroll = () => { isScrolled.value = window.scrollY > 60 }
-
   const scrollTo = (hash: string) => {
-    menuOpen.value = false
     const el = document.querySelector(hash)
     if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' })
   }
-  const closeMenu = (hash: string) => scrollTo(hash)
 
   // ============================
   // DONNÉES STATIQUES
   // ============================
-  const stats = [
+  const stats = computed(() => [
     { value: '10+', label: "Années d'expérience" },
-    { value: '50+', label: 'Plats au menu' },
+    { value: `${allProducts.value.length}+`, label: 'Plats au menu' },
     { value: '1k+', label: 'Clients satisfaits' },
     { value: '100%', label: 'Ingrédients frais' },
-  ]
+  ])
 
   const values = [
     { icon: '🌿', label: 'Fraîcheur',    desc: 'Ingrédients sélectionnés chaque matin' },
@@ -632,12 +585,10 @@
   // LIFECYCLE
   // ============================
   onMounted(() => {
-    window.addEventListener('scroll', onScroll, { passive: true })
     slideTimer = setInterval(nextSlide, 5500)
   })
 
   onUnmounted(() => {
-    window.removeEventListener('scroll', onScroll)
     clearInterval(slideTimer)
   })
 </script>
@@ -787,170 +738,6 @@
 }
 
 .mt-8 { margin-top: 2rem; }
-
-/* ==========================================
-   NAVIGATION
-   ========================================== */
-.cuisine-nav {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  z-index: 100;
-  transition: all 0.4s ease;
-  padding: 0 24px;
-}
-
-.cuisine-nav__inner {
-  max-width: 1200px;
-  margin: 0 auto;
-  display: flex;
-  align-items: center;
-  height: 80px;
-  gap: 32px;
-  transition: height 0.3s ease;
-}
-
-.cuisine-nav--scrolled {
-  background: rgba(255,255,255,0.97);
-  backdrop-filter: blur(12px);
-  box-shadow: 0 2px 20px rgba(0,0,0,0.08);
-}
-
-.cuisine-nav--scrolled .cuisine-nav__inner {
-  height: 64px;
-}
-
-.cuisine-nav--scrolled .cuisine-nav__link {
-  color: var(--c-text);
-}
-
-.cuisine-nav--scrolled .cuisine-nav__link:hover,
-.cuisine-nav--scrolled .cuisine-nav__link::after {
-  color: var(--c-primary);
-}
-
-.cuisine-nav__logo {
-  text-decoration: none;
-  flex-shrink: 0;
-}
-.cuisine-nav__logo-img {
-  height: 48px;
-  width: auto;
-  object-fit: contain;
-}
-.cuisine-nav__logo-text {
-  font-family: var(--c-font);
-  font-size: 1.5rem;
-  font-weight: 600;
-  color: white;
-  transition: color 0.3s;
-}
-.cuisine-nav--scrolled .cuisine-nav__logo-text {
-  color: var(--c-primary);
-}
-
-.cuisine-nav__links {
-  display: flex;
-  gap: 32px;
-  margin: 0 auto;
-}
-@media (max-width: 900px) { .cuisine-nav__links { display: none; } }
-
-.cuisine-nav__link {
-  font-size: 0.75rem;
-  font-weight: 500;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: rgba(255,255,255,0.9);
-  text-decoration: none;
-  position: relative;
-  padding-bottom: 4px;
-  transition: color 0.2s;
-}
-.cuisine-nav__link::after {
-  content: '';
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  width: 0;
-  height: 1px;
-  background: var(--c-gold);
-  transition: width 0.3s ease;
-}
-.cuisine-nav__link:hover { color: var(--c-gold); }
-.cuisine-nav__link:hover::after { width: 100%; }
-
-.cuisine-nav__actions {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  margin-left: auto;
-}
-
-.cuisine-nav__cart {
-  width: 40px;
-  height: 40px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: white;
-  text-decoration: none;
-  transition: color 0.2s;
-}
-.cuisine-nav__cart svg { width: 22px; height: 22px; }
-.cuisine-nav--scrolled .cuisine-nav__cart { color: var(--c-text); }
-.cuisine-nav__cart:hover { color: var(--c-gold); }
-
-/* Burger */
-.cuisine-nav__burger {
-  display: none;
-  flex-direction: column;
-  gap: 5px;
-  background: none;
-  border: none;
-  cursor: pointer;
-  padding: 4px;
-}
-.cuisine-nav__burger span {
-  display: block;
-  width: 24px;
-  height: 1.5px;
-  background: white;
-  transition: all 0.3s;
-}
-.cuisine-nav--scrolled .cuisine-nav__burger span { background: var(--c-text); }
-@media (max-width: 900px) { .cuisine-nav__burger { display: flex; } }
-
-/* Menu mobile */
-.cuisine-nav__mobile {
-  display: none;
-  flex-direction: column;
-  background: white;
-  padding: 16px 0;
-  max-height: 0;
-  overflow: hidden;
-  transition: max-height 0.4s ease;
-}
-.cuisine-nav__mobile.is-open { max-height: 400px; }
-@media (max-width: 900px) { .cuisine-nav__mobile { display: flex; } }
-
-.cuisine-nav__mobile-link {
-  display: block;
-  padding: 12px 24px;
-  font-size: 0.8rem;
-  font-weight: 500;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  color: var(--c-text);
-  text-decoration: none;
-  border-bottom: 1px solid #f0f0f0;
-  transition: color 0.2s, padding-left 0.2s;
-}
-.cuisine-nav__mobile-link:hover {
-  color: var(--c-primary);
-  padding-left: 32px;
-}
 
 /* ==========================================
    HERO
@@ -1159,15 +946,25 @@
   background: var(--c-bg);
 }
 
-/* Filtres */
-.cuisine-filters {
+.cuisine-menu__cta {
   display: flex;
-  gap: 8px;
   justify-content: center;
-  flex-wrap: wrap;
   margin-bottom: 48px;
 }
+
+.cuisine-cart-error {
+  max-width: 560px;
+  margin: 0 auto 24px;
+  padding: 12px 16px;
+  background: #FDECEC;
+  color: #A32020;
+  font-size: 0.85rem;
+  text-align: center;
+}
+
+/* Filtres / lien "Notre Menu Complet" */
 .cuisine-filter {
+  display: inline-block;
   padding: 8px 20px;
   font-size: 0.75rem;
   font-weight: 500;
@@ -1178,13 +975,9 @@
   cursor: pointer;
   transition: all 0.25s;
   color: #666;
+  text-decoration: none;
 }
 .cuisine-filter:hover { border-color: var(--c-primary); color: var(--c-primary); }
-.cuisine-filter.is-active {
-  background: var(--c-primary);
-  border-color: var(--c-primary);
-  color: white;
-}
 
 /* Empty state */
 .cuisine-empty {
@@ -1343,10 +1136,46 @@
   cursor: pointer;
   transition: all 0.25s;
 }
+.cuisine-card__btn:disabled { opacity: 0.6; cursor: not-allowed; }
 .cuisine-card__btn svg { width: 14px; height: 14px; }
-.cuisine-card__btn:hover {
+.cuisine-card__btn:hover:not(:disabled) {
   background: color-mix(in srgb, var(--c-primary) 80%, black);
   gap: 10px;
+}
+
+/* Carte "voir plus" */
+.cuisine-card--more {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--c-cream);
+  border: 2px dashed #ddd;
+  box-shadow: none;
+  min-height: 260px;
+}
+.cuisine-card--more:hover {
+  border-color: var(--c-primary);
+  transform: translateY(-6px);
+  box-shadow: 0 16px 40px rgba(0,0,0,0.08);
+}
+.cuisine-card--more__inner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  color: var(--c-primary);
+  text-align: center;
+  padding: 24px;
+}
+.cuisine-card--more__inner svg { width: 28px; height: 28px; }
+.cuisine-card--more__inner span:nth-child(2) {
+  font-family: var(--c-font);
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+.cuisine-card--more__count {
+  font-size: 0.78rem;
+  color: #888;
 }
 
 /* ==========================================
@@ -1404,6 +1233,12 @@
   margin-top: 20px;
 }
 
+.cuisine-specialites__empty {
+  color: rgba(255,255,255,0.45);
+  font-size: 0.9rem;
+  padding: 20px 0;
+}
+
 /* Items liste */
 .cuisine-specialites__list {
   display: flex;
@@ -1418,8 +1253,10 @@
   padding: 20px 0;
   border-bottom: 1px solid rgba(255,255,255,0.08);
   transition: background 0.2s;
+  text-decoration: none;
 }
 .cuisine-specialite-item:first-child { border-top: 1px solid rgba(255,255,255,0.08); }
+.cuisine-specialite-item:hover { background: rgba(255,255,255,0.03); }
 
 .cuisine-specialite-item__img {
   width: 72px;
@@ -1675,166 +1512,6 @@
   line-height: 1.9;
   color: #666;
   white-space: pre-wrap;
-}
-
-/* ==========================================
-   FOOTER
-   ========================================== */
-.cuisine-footer {
-  background: #0D0D0D;
-  color: rgba(255,255,255,0.7);
-}
-
-.cuisine-footer__top { padding: 70px 24px; }
-
-.cuisine-footer__grid {
-  display: grid;
-  grid-template-columns: 2fr 1fr 1fr 1fr;
-  gap: 48px;
-}
-@media (max-width: 900px) {
-  .cuisine-footer__grid {
-    grid-template-columns: 1fr 1fr;
-    gap: 32px;
-  }
-}
-@media (max-width: 600px) {
-  .cuisine-footer__grid { grid-template-columns: 1fr; }
-}
-
-.cuisine-footer__col {}
-
-.cuisine-footer__logo {
-  margin-bottom: 16px;
-}
-.cuisine-footer__logo img {
-  height: 40px;
-  width: auto;
-  filter: brightness(0) invert(1);
-  opacity: 0.9;
-}
-.cuisine-footer__logo span {
-  font-family: var(--c-font);
-  font-size: 1.4rem;
-  font-weight: 600;
-  color: white;
-}
-
-.cuisine-footer__desc {
-  font-size: 0.85rem;
-  line-height: 1.8;
-  color: rgba(255,255,255,0.45);
-  margin-bottom: 20px;
-}
-
-.cuisine-footer__social {
-  display: flex;
-  gap: 12px;
-}
-.cuisine-footer__social-link {
-  width: 36px;
-  height: 36px;
-  border: 1px solid rgba(255,255,255,0.15);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: rgba(255,255,255,0.5);
-  text-decoration: none;
-  transition: all 0.25s;
-}
-.cuisine-footer__social-link svg { width: 16px; height: 16px; }
-.cuisine-footer__social-link:hover {
-  border-color: var(--c-gold);
-  color: var(--c-gold);
-  background: rgba(201,168,76,0.1);
-}
-
-.cuisine-footer__col-title {
-  font-size: 0.65rem;
-  font-weight: 700;
-  letter-spacing: 0.2em;
-  text-transform: uppercase;
-  color: var(--c-gold);
-  margin-bottom: 20px;
-}
-
-.cuisine-footer__links {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-.cuisine-footer__links a {
-  font-size: 0.85rem;
-  color: rgba(255,255,255,0.5);
-  text-decoration: none;
-  transition: color 0.2s;
-}
-.cuisine-footer__links a:hover { color: white; }
-
-.cuisine-footer__contact {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-.cuisine-footer__contact li {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  font-size: 0.85rem;
-  color: rgba(255,255,255,0.5);
-}
-.cuisine-footer__contact svg {
-  width: 16px;
-  height: 16px;
-  flex-shrink: 0;
-  color: var(--c-gold);
-}
-.cuisine-footer__contact a {
-  color: inherit;
-  text-decoration: none;
-  transition: color 0.2s;
-}
-.cuisine-footer__contact a:hover { color: white; }
-
-.cuisine-footer__hours {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-.cuisine-footer__hours li {
-  display: flex;
-  justify-content: space-between;
-  font-size: 0.8rem;
-  color: rgba(255,255,255,0.5);
-  padding-bottom: 8px;
-  border-bottom: 1px solid rgba(255,255,255,0.05);
-}
-
-.cuisine-footer__bottom {
-  border-top: 1px solid rgba(255,255,255,0.06);
-  padding: 20px 24px;
-  max-width: 1200px;
-  margin: 0 auto;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 8px;
-  font-size: 0.75rem;
-  color: rgba(255,255,255,0.3);
-}
-.cuisine-footer__powered a {
-  color: var(--c-gold);
-  text-decoration: none;
 }
 
 /* ==========================================

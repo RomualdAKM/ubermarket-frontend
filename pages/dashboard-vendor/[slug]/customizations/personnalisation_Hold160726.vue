@@ -5,33 +5,98 @@
       <p class="text-gray-600">Personnalisez l'apparence et le contenu de votre boutique</p>
     </div>
 
-    <!-- Navigation par onglets — générée dynamiquement selon les features du thème actif -->
+    <!-- Navigation par onglets -->
     <div class="border-b border-gray-200 mb-6">
-      <nav class="-mb-px flex space-x-8 overflow-x-auto">
-        <button
+      <nav class="-mb-px flex space-x-8">
+        <button 
           @click="activeTab = 'themes'"
           :class="[
             'whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm',
-            activeTab === 'themes'
-              ? 'border-secondary text-secondary'
+            activeTab === 'themes' 
+              ? 'border-secondary text-secondary' 
               : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
           ]"
         >
           Thèmes
         </button>
-
-        <button
-          v-for="tab in availableTabs"
-          :key="tab.key"
-          @click="activeTab = tab.key"
+        <button 
+          @click="activeTab = 'accueil'"
           :class="[
             'whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm',
-            activeTab === tab.key
-              ? 'border-secondary text-secondary'
+            activeTab === 'accueil' 
+              ? 'border-secondary text-secondary' 
               : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
           ]"
         >
-          {{ tab.label }}
+          Page d'accueil
+        </button>
+        <button 
+          @click="activeTab = 'apropos'"
+          :class="[
+            'whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm',
+            activeTab === 'apropos' 
+              ? 'border-secondary text-secondary' 
+              : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+          ]"
+        >
+          À propos
+        </button>
+       
+        <button 
+          @click="activeTab = 'cgu'"
+          :class="[
+            'whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm',
+            activeTab === 'cgu' 
+              ? 'border-secondary text-secondary' 
+              : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+          ]"
+        >
+          CGU
+        </button>
+        <button 
+          @click="activeTab = 'cgv'"
+          :class="[
+            'whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm',
+            activeTab === 'cgv' 
+              ? 'border-secondary text-secondary' 
+              : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+          ]"
+        >
+          CGV
+        </button>
+        <button 
+          @click="activeTab = 'pied'"
+          :class="[
+            'whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm',
+            activeTab === 'pied' 
+              ? 'border-secondary text-secondary' 
+              : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+          ]"
+        >
+          Pied de page
+        </button>
+        <!-- Ajout de l'onglet Couleurs -->
+        <button 
+          @click="activeTab = 'couleurs'"
+          :class="[
+            'whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm',
+            activeTab === 'couleurs' 
+              ? 'border-secondary text-secondary' 
+              : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+          ]"
+        >
+          Couleurs
+        </button>
+        <button 
+          @click="activeTab = 'police'"
+          :class="[
+            'whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm',
+            activeTab === 'police' 
+              ? 'border-secondary text-secondary' 
+              : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+          ]"
+        >
+          police
         </button>
       </nav>
     </div>
@@ -55,11 +120,12 @@
             v-for="theme in allThemes"
             :key="theme.id"
             class="group relative border-2 rounded-xl overflow-hidden transition-all duration-200"
-
-            :class="currentThemeSlug === theme.slug
+            
+            :class="currentThemeSlug === theme.slug //active
               ? 'border-primary shadow-md'
               : 'border-gray-200 hover:border-gray-300'"
           >
+            <!-- Badge thème actif 
             <!-- Badge actif -->
             <div v-if="currentThemeSlug === theme.slug"
               class="absolute top-3 left-3 z-10 px-2.5 py-1 bg-primary text-white text-xs font-semibold rounded-full flex items-center gap-1">
@@ -123,7 +189,7 @@
                   class="px-4 py-2 bg-white text-gray-900 text-sm font-medium rounded-lg hover:bg-gray-100 transition-colors shadow-lg">
                   Aperçu
                 </button>
-
+                
                 <!-- Bouton Activer -->
                 <button v-if="currentThemeSlug !== theme.slug" @click="confirmActivate(theme)"
                   class="px-4 py-2 text-white text-sm font-medium rounded-lg transition-colors shadow-lg"
@@ -191,12 +257,31 @@
       <div v-if="activeTab === 'accueil'">
         <div class="flex justify-between items-center mb-4">
           <h2 class="text-lg font-medium text-gray-900">Page d'accueil</h2>
+          <!-- <div class="flex items-center">
+            <span class="mr-2 text-sm text-gray-700">Afficher la section</span>
+            <button
+              @click="sectionVisibility.homepage = !sectionVisibility.homepage"
+              :class="[
+                sectionVisibility.homepage ? 'bg-primary' : 'bg-gray-200',
+                'relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-secondary focus:ring-offset-2'
+              ]"
+              role="switch"
+              :aria-checked="sectionVisibility.homepage"
+            >
+              <span
+                :class="[
+                  sectionVisibility.homepage ? 'translate-x-5' : 'translate-x-0',
+                  'pointer-events-none inline-block h-5 w-5 transform bg-white shadow ring-0 transition duration-200 ease-in-out'
+                ]"
+              />
+            </button>
+          </div> -->
         </div>
-
+        
         <!-- Bannière -->
         <div class="border-b border-gray-200 pb-6 mb-6">
           <h3 class="text-md font-medium text-gray-900 mb-3">Bannière</h3>
-
+          
           <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <!-- Carrousel d'images -->
             <div>
@@ -228,7 +313,7 @@
                     </svg>
                   </button>
                 </div>
-
+                
                 <div
                   v-if="homepageBanner.images.length < 5"
                   class="border-2 border-dashed border-gray-300 aspect-video flex flex-col items-center justify-center cursor-pointer hover:border-gray-400"
@@ -249,12 +334,12 @@
                 </div>
               </div>
             </div>
-
+            
             <!-- Textes et couleur -->
             <div class="space-y-4">
               <div>
                 <label for="banner-title" class="block text-sm font-medium text-gray-700 mb-1">
-                  Texte principal
+                  Texte principal 
                 </label>
                 <input
                   type="text"
@@ -267,10 +352,10 @@
                   {{ homepageBanner.title.length }}/100
                 </div>
               </div>
-
+              
               <div>
                 <label for="banner-subtitle" class="block text-sm font-medium text-gray-700 mb-1">
-                  Texte secondaire
+                  Texte secondaire 
                 </label>
                 <textarea
                   id="banner-subtitle"
@@ -283,7 +368,7 @@
                   {{ homepageBanner.subtitle.length }}/200
                 </div>
               </div>
-
+              
               <div>
                 <label for="banner-button-text" class="block text-sm font-medium text-gray-700 mb-1">
                   Texte du bouton
@@ -300,16 +385,18 @@
                   {{ homepageBanner.button_text?.length || 0 }}/50
                 </div>
               </div>
+              
 
             </div>
           </div>
         </div>
-
+        
         <!-- Section produits -->
         <div>
           <h3 class="text-md font-medium text-gray-900 mb-3">Section produits</h3>
-
+          
           <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+
             <div>
               <label for="products-per-page" class="block text-sm font-medium text-gray-700 mb-1">
                 Produits par page
@@ -333,12 +420,31 @@
       <div v-if="activeTab === 'apropos'">
         <div class="flex justify-between items-center mb-4">
           <h2 class="text-lg font-medium text-gray-900">Page À propos</h2>
+          <!-- <div class="flex items-center">
+            <span class="mr-2 text-sm text-gray-700">Afficher la section</span>
+            <button
+              @click="sectionVisibility.about = !sectionVisibility.about"
+              :class="[
+                sectionVisibility.about ? 'bg-primary' : 'bg-gray-200',
+                'relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-secondary focus:ring-offset-2'
+              ]"
+              role="switch"
+              :aria-checked="sectionVisibility.about"
+            >
+              <span
+                :class="[
+                  sectionVisibility.about ? 'translate-x-5' : 'translate-x-0',
+                  'pointer-events-none inline-block h-5 w-5 transform bg-white shadow ring-0 transition duration-200 ease-in-out'
+                ]"
+              />
+            </button>
+          </div> -->
         </div>
-
+        
         <div class="space-y-6">
           <div>
             <label for="about-text" class="block text-sm font-medium text-gray-700 mb-1">
-              Texte
+              Texte 
             </label>
             <textarea
               id="about-text"
@@ -352,7 +458,7 @@
               {{ aboutPage.text.length }}/20000
             </div>
           </div>
-
+          
           <div>
             <label class="block text-sm font-medium text-gray-700 mb-2">Image (max 2 Mo)</label>
             <div class="flex items-start">
@@ -386,127 +492,48 @@
               </div>
             </div>
           </div>
+          
+          
+          <!-- <div>
+            <button
+              @click="duplicateAboutSection"
+              class="inline-flex items-center px-3 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50"
+            >
+              <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+              </svg>
+              Dupliquer la section
+            </button>
+          </div> -->
         </div>
       </div>
 
-      <!-- ===== Onglet Spécialités (feature "menu") ===== -->
-      <div v-if="activeTab === 'menu'">
-        <div class="flex justify-between items-center mb-4">
-          <h2 class="text-lg font-medium text-gray-900">Section "Nos Spécialités"</h2>
-        </div>
-        <p class="text-sm text-gray-500 mb-6">
-          Cette section affiche automatiquement les sous-catégories de vos plats, avec le nombre de plats
-          dans chacune. Vous ne personnalisez ici que le texte d'introduction — les catégories et leurs
-          images viennent directement de vos produits.
-        </p>
-
-        <div class="space-y-6">
-          <div>
-            <label for="specialites-title" class="block text-sm font-medium text-gray-700 mb-1">
-              Titre de la section
-            </label>
-            <input
-              type="text"
-              id="specialites-title"
-              v-model="specialitesPage.title"
-              maxlength="100"
-              placeholder="Nos Spécialités de la Maison"
-              class="mt-1 block w-full px-3 py-2 border-0 border-b-2 border-gray-300 placeholder-gray-300 placeholder:italic text-gray-900 focus:outline-none focus:ring-0 focus:border-primary transition-colors duration-200"
-            />
-            <div class="text-right text-sm text-gray-500 mt-1">
-              {{ specialitesPage.title.length }}/100
-            </div>
-          </div>
-
-          <div>
-            <label for="specialites-text" class="block text-sm font-medium text-gray-700 mb-1">
-              Texte de description
-            </label>
-            <textarea
-              id="specialites-text"
-              v-model="specialitesPage.text"
-              rows="3"
-              maxlength="500"
-              placeholder="Chaque plat est une invitation au voyage, une expérience culinaire unique..."
-              class="mt-1 block w-full px-3 py-2 border-0 border-b-2 border-gray-300 placeholder-gray-300 placeholder:italic text-gray-900 focus:outline-none focus:ring-0 focus:border-primary transition-colors duration-200"
-            ></textarea>
-            <div class="text-right text-sm text-gray-500 mt-1">
-              {{ specialitesPage.text.length }}/500
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- ===== Onglet Contact (feature "contact") ===== -->
-      <div v-if="activeTab === 'contact'">
-        <div class="flex justify-between items-center mb-4">
-          <h2 class="text-lg font-medium text-gray-900">Page Contact</h2>
-        </div>
-        <p class="text-sm text-gray-500 mb-6">
-          Ces informations s'affichent sur la page de contact de votre boutique.
-        </p>
-
-        <div class="space-y-4">
-          <div>
-            <label for="contact-phone" class="block text-sm font-medium text-gray-700 mb-1">
-              Téléphone
-            </label>
-            <input
-              type="tel"
-              id="contact-phone"
-              v-model="contactPage.phone"
-              maxlength="30"
-              placeholder="+229 00 00 00 00"
-              class="mt-1 block w-full px-3 py-2 border-0 border-b-2 border-gray-300 placeholder-gray-300 placeholder:italic text-gray-900 focus:outline-none focus:ring-0 focus:border-primary transition-colors duration-200"
-            />
-          </div>
-
-          <div>
-            <label for="contact-address" class="block text-sm font-medium text-gray-700 mb-1">
-              Adresse physique
-            </label>
-            <input
-              type="text"
-              id="contact-address"
-              v-model="contactPage.address"
-              maxlength="255"
-              placeholder="Rue, quartier, ville"
-              class="mt-1 block w-full px-3 py-2 border-0 border-b-2 border-gray-300 placeholder-gray-300 placeholder:italic text-gray-900 focus:outline-none focus:ring-0 focus:border-primary transition-colors duration-200"
-            />
-          </div>
-
-          <div>
-            <label for="contact-hours" class="block text-sm font-medium text-gray-700 mb-1">
-              Horaires d'ouverture
-            </label>
-            <textarea
-              id="contact-hours"
-              v-model="contactPage.hours"
-              rows="4"
-              maxlength="500"
-              placeholder="Lun - Ven : 08:00 - 22:00&#10;Samedi : 09:00 - 23:00&#10;Dimanche : 10:00 - 21:00"
-              class="mt-1 block w-full px-3 py-2 border-0 border-b-2 border-gray-300 placeholder-gray-300 placeholder:italic text-gray-900 focus:outline-none focus:ring-0 focus:border-primary transition-colors duration-200"
-            ></textarea>
-            <div class="text-right text-sm text-gray-500 mt-1">
-              {{ contactPage.hours.length }}/500
-            </div>
-          </div>
-
-          <div class="p-3 bg-blue-50 border border-blue-200 rounded-md">
-            <p class="text-xs text-blue-700">
-              Le formulaire de contact permettant aux visiteurs de vous envoyer un message directement
-              sera disponible prochainement.
-            </p>
-          </div>
-        </div>
-      </div>
 
       <!-- Onglet CGU -->
       <div v-if="activeTab === 'cgu'">
         <div class="flex justify-between items-center mb-4">
           <h2 class="text-lg font-medium text-gray-900">Page CGU</h2>
+          <!-- <div class="flex items-center">
+            <span class="mr-2 text-sm text-gray-700">Afficher la section</span>
+            <button
+              @click="sectionVisibility.terms = !sectionVisibility.terms"
+              :class="[
+                sectionVisibility.terms ? 'bg-primary' : 'bg-gray-200',
+                'relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-secondary focus:ring-offset-2'
+              ]"
+              role="switch"
+              :aria-checked="sectionVisibility.terms"
+            >
+              <span
+                :class="[
+                  sectionVisibility.terms ? 'translate-x-5' : 'translate-x-0',
+                  'pointer-events-none inline-block h-5 w-5 transform bg-white shadow ring-0 transition duration-200 ease-in-out'
+                ]"
+              />
+            </button>
+          </div> -->
         </div>
-
+        
         <div>
           <label for="terms-text" class="block text-sm font-medium text-gray-700 mb-1">
             Texte des conditions générales d'utilisation
@@ -530,7 +557,7 @@
         <div class="flex justify-between items-center mb-4">
           <h2 class="text-lg font-medium text-gray-900">Page CGV</h2>
         </div>
-
+        
         <div>
           <label for="sales-terms-text" class="block text-sm font-medium text-gray-700 mb-1">
             Texte des conditions générales de vente
@@ -550,15 +577,34 @@
       </div>
 
       <!-- Onglet Pied de page -->
-      <div v-if="activeTab === 'pied_de_page'">
+      <div v-if="activeTab === 'pied'">
         <div class="flex justify-between items-center mb-4">
           <h2 class="text-lg font-medium text-gray-900">Pied de page</h2>
+          <!-- <div class="flex items-center">
+            <span class="mr-2 text-sm text-gray-700">Afficher la section</span>
+            <button
+              @click="sectionVisibility.footer = !sectionVisibility.footer"
+              :class="[
+                sectionVisibility.footer ? 'bg-primary' : 'bg-gray-200',
+                'relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-secondary focus:ring-offset-2'
+              ]"
+              role="switch"
+              :aria-checked="sectionVisibility.footer"
+            >
+              <span
+                :class="[
+                  sectionVisibility.footer ? 'translate-x-5' : 'translate-x-0',
+                  'pointer-events-none inline-block h-5 w-5 transform bg-white shadow ring-0 transition duration-200 ease-in-out'
+                ]"
+              />
+            </button>
+          </div> -->
         </div>
-
+        
         <div class="space-y-6">
           <div>
             <label for="footer-text" class="block text-sm font-medium text-gray-700 mb-1">
-              Texte
+              Texte 
             </label>
             <textarea
               id="footer-text"
@@ -572,10 +618,10 @@
               {{ footer.text.length }}/20000
             </div>
           </div>
-
+          
           <div>
             <h3 class="text-md font-medium text-gray-900 mb-3">Liens vers les réseaux sociaux</h3>
-
+            
             <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <div>
                 <label for="social-facebook" class="block text-sm font-medium text-gray-700 mb-1">
@@ -589,7 +635,7 @@
                   placeholder="https://facebook.com/votre-page"
                 />
               </div>
-
+              
               <div>
                 <label for="social-instagram" class="block text-sm font-medium text-gray-700 mb-1">
                   Instagram
@@ -602,7 +648,7 @@
                   placeholder="https://instagram.com/votre-compte"
                 />
               </div>
-
+              
               <div>
                 <label for="social-twitter" class="block text-sm font-medium text-gray-700 mb-1">
                   Twitter
@@ -615,7 +661,7 @@
                   placeholder="https://twitter.com/votre-compte"
                 />
               </div>
-
+              
               <div>
                 <label for="social-linkedin" class="block text-sm font-medium text-gray-700 mb-1">
                   LinkedIn
@@ -636,7 +682,7 @@
       <!-- Onglet Couleurs -->
       <div v-if="activeTab === 'couleurs'">
         <h2 class="text-lg font-medium text-gray-900 mb-4">Couleurs personnalisées</h2>
-
+        
         <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
           <div>
             <label for="primary-color" class="block text-sm font-medium text-gray-700 mb-1">
@@ -652,7 +698,7 @@
               <span class="ml-3 text-sm text-gray-700">{{ customColors.primary }}</span>
             </div>
           </div>
-
+          
           <div>
             <label for="secondary-color" class="block text-sm font-medium text-gray-700 mb-1">
               Couleur secondaire
@@ -667,7 +713,7 @@
               <span class="ml-3 text-sm text-gray-700">{{ customColors.secondary }}</span>
             </div>
           </div>
-
+          
           <div>
             <label for="background-color" class="block text-sm font-medium text-gray-700 mb-1">
               Couleur de fond
@@ -682,7 +728,7 @@
               <span class="ml-3 text-sm text-gray-700">{{ customColors.background }}</span>
             </div>
           </div>
-
+          
           <div>
             <label for="text-color" class="block text-sm font-medium text-gray-700 mb-1">
               Couleur du texte
@@ -698,11 +744,11 @@
             </div>
           </div>
         </div>
-
+        
         <div class="mt-6 pt-6 border-t border-gray-200">
           <h3 class="text-md font-medium text-gray-900 mb-3">Couleurs prédéfinies</h3>
           <div class="grid grid-cols-2 gap-4">
-            <div
+            <div 
               @click="setPredefinedColors('default')"
               class="border border-gray-200 p-4 cursor-pointer hover:border-gray-300"
             >
@@ -713,8 +759,8 @@
               </div>
               <p class="text-xs text-gray-500 mt-1">#e56a19, #5b6ac5</p>
             </div>
-
-            <div
+            
+            <div 
               @click="setPredefinedColors('blue')"
               class="border border-gray-200 p-4 cursor-pointer hover:border-gray-300"
             >
@@ -728,10 +774,10 @@
           </div>
         </div>
       </div>
-
+      
       <div v-if="activeTab === 'police'">
         <h2 class="text-lg font-medium text-gray-900 mb-4">Police d'écriture</h2>
-
+        
         <div class="grid grid-cols-1 gap-6">
           <div>
             <label for="font-family" class="block text-sm font-medium text-gray-700 mb-1">
@@ -752,10 +798,11 @@
               <option value="'Montserrat', sans-serif">Montserrat</option>
             </select>
           </div>
-
+          
+          
           <div class="pt-4">
             <h3 class="text-md font-medium text-gray-900 mb-3">Aperçu</h3>
-            <div
+            <div 
               class="p-4 border border-gray-200 rounded-md"
               :style="{
                 fontFamily: customFonts.family,
@@ -776,14 +823,14 @@
       <button type="button" class="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50">
         Annuler
       </button>
-      <button
+      <button 
         @click="saveCustomization"
         :disabled="isSavingCustomizations"
-        type="button"
+        type="button" 
         :class="[
           'ml-3 px-4 py-2 text-white text-sm font-medium',
-          isSavingCustomizations
-            ? 'bg-gray-400 cursor-not-allowed'
+          isSavingCustomizations 
+            ? 'bg-gray-400 cursor-not-allowed' 
             : 'bg-primary hover:bg-secondary cursor-pointer'
         ]"
       >
@@ -798,10 +845,10 @@
       </button>
     </div>
   </div>
-
   <!-- ===== MODAL APERÇU THÈME ===== -->
   <Teleport to="body">
     <div v-if="showPreviewModal" class="fixed inset-0 z-[100] flex flex-col bg-gray-900">
+      <!-- Barre de contrôle -->
       <div class="flex items-center justify-between px-4 h-14 bg-gray-800 flex-shrink-0">
         <div class="flex items-center gap-4">
           <button @click="showPreviewModal = false"
@@ -821,6 +868,7 @@
           </span>
         </div>
 
+        <!-- Sélecteur de viewport -->
         <div class="flex items-center gap-1 bg-gray-700 p-1 rounded-lg">
           <button
             v-for="vp in viewports"
@@ -835,6 +883,9 @@
           </button>
         </div>
 
+        <!-- Bouton activer dans le preview
+        <button v-if="previewTheme && currentThemeId !== previewTheme.id"-->
+        <!-- Dans la modal aperçu -->
         <button v-if="previewTheme && currentThemeSlug !== previewTheme.slug"
           @click="confirmActivate(previewTheme); showPreviewModal = false"
           class="px-5 py-2 text-white text-sm font-medium rounded-lg transition-colors"
@@ -846,10 +897,12 @@
         </div>
       </div>
 
+      <!-- Zone d'aperçu -->
       <div class="flex-1 overflow-hidden flex items-center justify-center bg-gray-700 p-4">
         <div
           class="bg-white rounded-lg overflow-hidden shadow-2xl transition-all duration-300"
           :style="viewportStyleObj">
+          <!-- Barre d'adresse simulée -->
           <div class="flex items-center gap-2 px-3 py-2 bg-gray-100 border-b border-gray-200">
             <div class="flex gap-1.5">
               <div class="w-3 h-3 rounded-full bg-red-400"></div>
@@ -860,6 +913,7 @@
               {{ previewUrl }}
             </div>
           </div>
+          <!-- iframe de la boutique -->
           <iframe
             v-if="previewUrl"
             :src="previewUrl"
@@ -921,7 +975,7 @@
 </template>
 
 <script setup lang="ts">
-  import { ref, reactive, onMounted, computed, watch } from 'vue'
+  import { ref, reactive, onMounted, computed } from 'vue'
 
   definePageMeta({
     layout: 'dashboard'
@@ -929,9 +983,9 @@
 
   const route = useRoute()
   const { shops, currentShop } = useShops()
-  const router = useRouter()
+  const router = useRouter()  // ✅ Manquant
 
-  // Toast simple
+  // Toast simple (remplace showToast)
   const toastMessage = ref('')
   const toastType    = ref<'success' | 'error'>('success')
   const toastVisible = ref(false)
@@ -943,60 +997,32 @@
     setTimeout(() => { toastVisible.value = false }, 4000)
   }
 
-  const {
-    customizations,
-    isLoading: isLoadingCustomizations,
-    isSaving: isSavingCustomizations,
-    fetchCustomizationsByShopId,
-    saveCustomization: saveCustomizationAPI
+  const { 
+    customizations, 
+    isLoading: isLoadingCustomizations, 
+    isSaving: isSavingCustomizations, 
+    fetchCustomizationsByShopId, 
+    saveCustomization: saveCustomizationAPI 
   } = useCustomization()
 
+  // Recuperer l'ID de la boutique depuis le slug
   const shopSlug = route.params.slug as string
   const shopId = computed(() => currentShop.value?.id)
 
-  const activeTab = ref('accueil')
+  // Onglet actif
+  const activeTab = ref('accueil') // Démarrer directement sur Page d'accueil
 
-  // ─────────────────────────────────────────────────────────
-  // ONGLETS DYNAMIQUES — catalogue fixe de tous les onglets
-  // possibles, filtré selon les features du thème actif.
-  // ─────────────────────────────────────────────────────────
-  const TAB_CATALOG: { key: string; label: string }[] = [
-    { key: 'accueil',      label: "Page d'accueil" },
-    { key: 'apropos',      label: 'À propos' },
-    { key: 'menu',         label: 'Spécialités' },
-    { key: 'contact',      label: 'Contact' },
-    { key: 'cgu',          label: 'CGU' },
-    { key: 'cgv',          label: 'CGV' },
-    { key: 'pied_de_page', label: 'Pied de page' },
-    { key: 'couleurs',     label: 'Couleurs' },
-    { key: 'police',       label: 'Police' },
-  ]
-
-  // Features du thème actuellement actif sur la boutique (chargées au montage)
-  const activeThemeFeatures = ref<string[]>([])
-
-  const availableTabs = computed(() =>
-    TAB_CATALOG.filter(tab => activeThemeFeatures.value.includes(tab.key))
-  )
-
-  // Si l'onglet actuellement sélectionné disparaît de la liste
-  // (ex: changement de thème en cours de session), on retombe
-  // sur "accueil" pour éviter un écran vide.
-  watch(availableTabs, (tabs) => {
-    if (activeTab.value === 'themes') return
-    if (!tabs.some(t => t.key === activeTab.value)) {
-      activeTab.value = 'accueil'
-    }
-  })
-
+  // Thème sélectionné
   const selectedTheme = ref('gratuit')
 
+  // Thèmes payants
   const paidThemes = ref([
     { id: 'premium1', name: 'Thème Premium 1', price: '29', description: 'Design moderne et élégant' },
     { id: 'premium2', name: 'Thème Premium 2', price: '39', description: 'Design épuré et professionnel' },
     { id: 'premium3', name: 'Thème Premium 3', price: '49', description: 'Design coloré et dynamique' }
   ])
 
+  // Page d'accueil - Bannière
   const homepageBanner = reactive({
     images: [] as Array<{ file: File | null; preview: string }>,
     title: '',
@@ -1005,30 +1031,20 @@
     color: '#FFFFFF'
   })
 
+  // Page d'accueil - Produits
   const homepageProducts = reactive({
     display: 'grid',
     perPage: '12'
   })
 
+  // Page À propos
   const aboutPage = reactive({
     text: '',
     image: { file: null as File | null, preview: '' },
     cta: ''
   })
 
-  // ── Spécialités (feature "menu") ──
-  const specialitesPage = reactive({
-    title: '',
-    text: ''
-  })
-
-  // ── Contact (feature "contact") ──
-  const contactPage = reactive({
-    phone: '',
-    address: '',
-    hours: ''
-  })
-
+  // Témoignages
   const testimonials = ref([
     { name: '', text: '', image: { file: null as File | null, preview: '' } }
   ])
@@ -1037,14 +1053,17 @@
     cta: ''
   })
 
+  // Page CGU
   const termsPage = reactive({
     text: ''
   })
 
+  // Page CGV
   const salesTermsPage = reactive({
     text: ''
   })
 
+  // Pied de page
   const footer = reactive({
     text: '',
     socialLinks: {
@@ -1055,6 +1074,7 @@
     }
   })
 
+  // Gestion de la visibilité des sections
   const sectionVisibility = reactive({
     homepage: true,
     about: true,
@@ -1063,6 +1083,7 @@
     footer: true
   })
 
+  // Ajout de la gestion des couleurs personnalisées
   const customColors = reactive({
     primary: '#e56a19',
     secondary: '#5b6ac5',
@@ -1070,19 +1091,23 @@
     text: '#000000'
   })
 
+  // Ajout de la gestion des polices personnalisées
   const customFonts = reactive({
     family: 'sans-serif',
     size: 'medium',
     weight: 'normal'
   })
 
+  // Références pour les inputs de fichiers
   const bannerImageInput = ref<HTMLInputElement | null>(null)
   const aboutImageInput = ref<HTMLInputElement | null>(null)
 
+  // Fonctions pour gérer les thèmes
   const selectTheme = (themeId: string) => {
     selectedTheme.value = themeId
   }
 
+  // Fonctions pour gérer les images de la bannière
   const triggerBannerImageUpload = () => {
     if (bannerImageInput.value) {
       bannerImageInput.value.click()
@@ -1092,22 +1117,25 @@
   const handleBannerImageUpload = (event: Event) => {
     const target = event.target as HTMLInputElement
     const files = target.files
-
+    
     if (files && homepageBanner.images.length < 5) {
+      // Limiter à 5 images maximum
       const remainingSlots = 5 - homepageBanner.images.length
       const filesToAdd = Array.from(files).slice(0, remainingSlots)
-
+      
       for (const file of filesToAdd) {
+        // Vérifier la taille du fichier (max 5 Mo)
         if (file.size > 5 * 1024 * 1024) {
           alert(`L'image ${file.name} est trop volumineuse. Taille maximale : 5 Mo.`)
           continue
         }
-
+        
+        // Vérifier le type de fichier
         if (!file.type.match('image/png') && !file.type.match('image/jpeg')) {
           alert(`Format de fichier non supporté pour ${file.name}. Formats acceptés : PNG, JPEG.`)
           continue
         }
-
+        
         const reader = new FileReader()
         reader.onload = (e) => {
           homepageBanner.images.push({
@@ -1124,6 +1152,7 @@
     homepageBanner.images.splice(index, 1)
   }
 
+  // Fonctions pour gérer l'image de la page À propos
   const triggerAboutImageUpload = () => {
     if (aboutImageInput.value) {
       aboutImageInput.value.click()
@@ -1133,18 +1162,20 @@
   const handleAboutImageUpload = (event: Event) => {
     const target = event.target as HTMLInputElement
     const file = target.files?.[0]
-
+    
     if (file) {
+      // Vérifier la taille du fichier (max 2 Mo)
       if (file.size > 2 * 1024 * 1024) {
         alert('L\'image est trop volumineuse. Taille maximale : 2 Mo.')
         return
       }
-
+      
+      // Vérifier le type de fichier
       if (!file.type.match('image/png') && !file.type.match('image/jpeg')) {
         alert('Format de fichier non supporté. Formats acceptés : PNG, JPEG.')
         return
       }
-
+      
       const reader = new FileReader()
       reader.onload = (e) => {
         aboutPage.image.preview = e.target?.result as string
@@ -1154,21 +1185,45 @@
     }
   }
 
+  // Fonction pour dupliquer la section À propos
   const duplicateAboutSection = () => {
+    // Dans une vraie application, cela créerait une nouvelle section
     alert('Section dupliquée. Dans une vraie application, cela créerait une nouvelle section.')
   }
 
   // Charger les customizations au montage de la page
   onMounted(async () => {
+    console.log('🔍 Débogage onMounted:')
+    console.log('  - shopSlug:', shopSlug)
+    console.log('  - shops.value:', shops.value)
+    console.log('  - currentShop:', currentShop.value)
+    console.log('  - shopId:', shopId.value)
+    
+    // Attendre que les boutiques soient chargées si nécessaire
     if (!shops.value || shops.value.length === 0) {
+      console.log('⏳ Chargement des boutiques...')
       const { fetchShops } = useShops()
       await fetchShops()
+      console.log('  - Boutiques après fetch:', shops.value)
     }
-
+    
+    // Vérifier que shopId existe après le chargement
     if (shopId.value) {
+      console.log('✅ ShopId trouvé:', shopId.value)
       await fetchCustomizationsByShopId(shopId.value)
-
-      // Charger le thème actif de la boutique ET ses features
+      
+      // Charger le thème actif de la boutique
+      /*const shop = shops.value?.find((s: any) => s.subdomain === shopSlug || s.slug === shopSlug)
+      if (shop?.theme?.slug) {
+        currentThemeSlug.value = shop.theme.slug
+      } else if (shop?.theme_id) {
+        // Fallback : charger le thème depuis l'API
+        currentThemeSlug.value = allThemes.value.find(t => {
+          // Chercher via position si pas de slug disponible
+          return t.id === shop.theme_id
+        })?.slug || null
+      }*/
+      // ✅ APRÈS — appel API direct pour avoir le thème à jour
       try {
         const { token } = useAuth()
         const res = await fetch(
@@ -1183,70 +1238,68 @@
         const data = await res.json()
         if (data.success && data.data) {
           const freshShop = data.data
-
+          // Priorité : slug de la relation theme chargée
           if (freshShop.theme?.slug) {
             currentThemeSlug.value = freshShop.theme.slug
           } else if (freshShop.theme_id) {
+            // Fallback : chercher dans allThemes par theme_id
             currentThemeSlug.value = allThemes.value.find(t => t.id === freshShop.theme_id)?.slug || null
-          }
-
-          // ── Features du thème actif ──
-          // Priorité à la relation "theme" déjà chargée par l'API (features réelles en base).
-          // Fallback sur un jeu d'onglets de base si l'API ne renvoie rien,
-          // pour ne jamais afficher une page de personnalisation totalement vide.
-          if (freshShop.theme?.features && Array.isArray(freshShop.theme.features)) {
-            activeThemeFeatures.value = freshShop.theme.features
-          } else {
-            activeThemeFeatures.value = ['accueil', 'apropos', 'cgu', 'cgv', 'pied_de_page', 'couleurs', 'police']
           }
         }
       } catch (err) {
         console.error('Erreur chargement thème actif:', err)
-        activeThemeFeatures.value = ['accueil', 'apropos', 'cgu', 'cgv', 'pied_de_page', 'couleurs', 'police']
       }
 
       // Pré-remplir les champs avec les données existantes
       if (customizations.value.home) {
         const home = customizations.value.home
-
+        
+        // Banner
         if (home.banner) {
           homepageBanner.title = home.banner.title || ''
           homepageBanner.subtitle = home.banner.subtitle || ''
           homepageBanner.button_text = home.banner.button_text || ''
-
+          
+          // Charger les images existantes (en tant que previews)
           if (home.banner.images && home.banner.images.length > 0) {
             const config = useRuntimeConfig()
             const backendUrl = config.public.apiBase.replace('/api', '')
-
+            
             homepageBanner.images = home.banner.images.map((imagePath: string) => ({
               file: null,
               preview: `${backendUrl}/storage/${imagePath}`
             }))
           }
         }
-
+        
+        // Couleurs
         if (home.colors) {
           customColors.primary = home.colors.primary
           customColors.secondary = home.colors.secondary
           customColors.background = home.colors.background
           customColors.text = home.colors.text
         }
-
+        
+        // Polices
         if (home.fonts) {
           customFonts.family = home.fonts.family
           customFonts.size = home.fonts.size
           customFonts.weight = home.fonts.weight
         }
-
+        
+        // Visibilité des sections
         if (home.sections_visibility) {
           sectionVisibility.homepage = home.sections_visibility.products ?? true
         }
       }
-
+      
+      // Charger les données "À propos" si elles existent
       if (customizations.value.about) {
         const about = customizations.value.about
+        
         aboutPage.text = about.text || ''
-
+        
+        // Charger l'image existante si elle existe
         if (about.image) {
           const config = useRuntimeConfig()
           const backendUrl = config.public.apiBase.replace('/api', '')
@@ -1254,32 +1307,23 @@
           aboutPage.image.file = null
         }
       }
-
-      // ── Spécialités ──
-      if (customizations.value.specialites) {
-        specialitesPage.title = customizations.value.specialites.title || ''
-        specialitesPage.text  = customizations.value.specialites.text  || ''
-      }
-
-      // ── Contact ──
-      if (customizations.value.contact) {
-        contactPage.phone   = customizations.value.contact.phone   || ''
-        contactPage.address = customizations.value.contact.address || ''
-        contactPage.hours   = customizations.value.contact.hours   || ''
-      }
-
+      
+      // Charger les données "CGU" si elles existent
       if (customizations.value.terms) {
         termsPage.text = customizations.value.terms.text || ''
       }
-
+      
+      // Charger les données "CGV" si elles existent
       if (customizations.value.sales_terms) {
         salesTermsPage.text = customizations.value.sales_terms.text || ''
       }
-
+      
+      // Charger les données du pied de page si elles existent
       if (customizations.value.footer) {
         const footerData = customizations.value.footer
+        
         footer.text = footerData.text || ''
-
+        
         if (footerData.socialLinks) {
           footer.socialLinks.facebook = footerData.socialLinks.facebook || ''
           footer.socialLinks.instagram = footerData.socialLinks.instagram || ''
@@ -1288,28 +1332,31 @@
         }
       }
     } else {
-      console.error('Impossible de trouver l\'ID de la boutique:', {
+      console.error('❌ Impossible de trouver l\'ID de la boutique:', {
         shopSlug,
         shops: shops.value?.map(s => ({ id: s.id, name: s.name, subdomain: s.subdomain }))
       })
     }
   })
 
+
   // Fonction pour enregistrer la personnalisation
   const saveCustomization = async () => {
     if (!shopId.value) {
-      alert('Impossible de trouver l\'ID de la boutique')
+      alert('❌ Impossible de trouver l\'ID de la boutique')
       return
     }
 
     try {
+      // Récupérer les images déjà uploadées (celles qui n'ont pas de file)
       const existingImages = homepageBanner.images
         .filter(img => img.file === null && img.preview.includes('/storage/'))
-        .map(img => img.preview.replace(/.*\/storage\//, ''))
-
+        .map(img => img.preview.replace(/.*\/storage\//, '')) // Extraire juste le chemin
+      
+      // Préparer le contenu pour la page d'accueil
       const homeContent = {
         banner: {
-          images: existingImages,
+          images: existingImages, // Conserver les images existantes
           title: homepageBanner.title,
           subtitle: homepageBanner.subtitle,
           button_text: homepageBanner.button_text,
@@ -1332,10 +1379,12 @@
         }
       }
 
+      // Préparer les fichiers d'images du banner (nouvelles images uniquement)
       const bannerFiles = homepageBanner.images
         .map(img => img.file)
         .filter((file): file is File => file !== null)
 
+      // Sauvegarder via l'API
       const success = await saveCustomizationAPI(
         shopId.value,
         'home',
@@ -1343,42 +1392,52 @@
         { banner_images: bannerFiles }
       )
 
+      // Sauvegarder la page "À propos" si elle contient du texte
       if (aboutPage.text.trim()) {
-        const aboutContent = { text: aboutPage.text }
+        const aboutContent = {
+          text: aboutPage.text
+        }
+        
+        // Si une nouvelle image a été uploadée
         const aboutFiles = aboutPage.image.file ? { about_image: aboutPage.image.file } : {}
-        await saveCustomizationAPI(shopId.value, 'about', aboutContent, aboutFiles)
-      }
-
-      // ── Sauvegarde Spécialités — seulement si l'onglet est disponible pour ce thème ──
-      if (availableTabs.value.some(t => t.key === 'menu') &&
-          (specialitesPage.title.trim() || specialitesPage.text.trim())) {
+        
         await saveCustomizationAPI(
           shopId.value,
-          'specialites',
-          { title: specialitesPage.title, text: specialitesPage.text },
-          {}
+          'about',
+          aboutContent,
+          aboutFiles
         )
       }
-
-      // ── Sauvegarde Contact — seulement si l'onglet est disponible pour ce thème ──
-      if (availableTabs.value.some(t => t.key === 'contact') &&
-          (contactPage.phone.trim() || contactPage.address.trim() || contactPage.hours.trim())) {
-        await saveCustomizationAPI(
-          shopId.value,
-          'contact',
-          { phone: contactPage.phone, address: contactPage.address, hours: contactPage.hours },
-          {}
-        )
-      }
-
+      
+      // Sauvegarder la page "CGU" si elle contient du texte
       if (termsPage.text.trim()) {
-        await saveCustomizationAPI(shopId.value, 'terms', { text: termsPage.text }, {})
+        const termsContent = {
+          text: termsPage.text
+        }
+        
+        await saveCustomizationAPI(
+          shopId.value,
+          'terms',
+          termsContent,
+          {}
+        )
       }
-
+      
+      // Sauvegarder la page "CGV" si elle contient du texte
       if (salesTermsPage.text.trim()) {
-        await saveCustomizationAPI(shopId.value, 'sales_terms', { text: salesTermsPage.text }, {})
+        const salesTermsContent = {
+          text: salesTermsPage.text
+        }
+        
+        await saveCustomizationAPI(
+          shopId.value,
+          'sales_terms',
+          salesTermsContent,
+          {}
+        )
       }
-
+      
+      // Sauvegarder les données du pied de page
       const footerContent = {
         text: footer.text,
         socialLinks: {
@@ -1388,8 +1447,13 @@
           linkedin: footer.socialLinks.linkedin
         }
       }
-
-      await saveCustomizationAPI(shopId.value, 'footer', footerContent, {})
+      
+      await saveCustomizationAPI(
+        shopId.value,
+        'footer',
+        footerContent,
+        {}
+      )
 
       if (success) {
         alert('Personnalisation enregistrée avec succès !')
@@ -1402,6 +1466,7 @@
     }
   }
 
+  // Fonction pour définir des couleurs prédéfinies
   const setPredefinedColors = (preset: 'default' | 'blue') => {
     if (preset === 'default') {
       customColors.primary = '#e56a19'
@@ -1412,6 +1477,7 @@
     }
   }
 
+  // Fonction pour calculer la taille de police
   const getFontSizeValue = (size: string) => {
     if (size === 'small') {
       return '14px'
@@ -1434,7 +1500,7 @@
       price: 0,
       primaryColor: '#e56a19',
       palette: ['#e56a19', '#5b6ac5', '#ffffff'],
-      screenshot: null,
+      screenshot: null, // Mettre le chemin vers screenshot : '/themes/epure-preview.png'
       features: ['Slider', 'Produits vedettes', 'Responsive'],
     },
     {
@@ -1487,7 +1553,7 @@
     },
     {
       id: 6,
-      slug: 'theme-epicerie-bio',
+      slug: 'theme-epicerie-bio', //'theme-épicerie-bio-produits-frais',
       name: 'Natural Mystique',
       description: 'Thème épicerie bio / produits frais',
       is_free: true,
@@ -1499,7 +1565,10 @@
     },
   ])
 
+  // Thème actuellement actif
+
   const currentThemeSlug = ref<string | null>(null)
+  // activeThemeName
   const activeThemeName = computed(() =>
     allThemes.value.find(t => t.slug === currentThemeSlug.value)?.name || 'Aucun'
   )
@@ -1527,35 +1596,39 @@
     },
   ]
 
-  const viewportStyleObj = computed(() => {
-    const styles: Record<string, object> = {
-      desktop: { width: '100%', height: '100%', maxWidth: '1200px' },
-      tablet:  { width: '768px', height: '90%', maxWidth: '768px' },
-      mobile:  { width: '390px', height: '90%', maxWidth: '390px' },
-    }
-    return styles[activeViewport.value] || {}
-  })
+  
+    const viewportStyleObj = computed(() => {
+      const styles: Record<string, object> = {
+        desktop: { width: '100%', height: '100%', maxWidth: '1200px' },
+        tablet:  { width: '768px', height: '90%', maxWidth: '768px' },
+        mobile:  { width: '390px', height: '90%', maxWidth: '390px' },
+      }
+      return styles[activeViewport.value] || {}
+    })
 
-  const config = useRuntimeConfig()
+    const config = useRuntimeConfig()
 
-  const frontendUrl = computed(() => {
-    if (config.public.siteUrl) return config.public.siteUrl
-    if (typeof window !== 'undefined') return window.location.origin
-    return 'http://localhost:3000'
-  })
+    // l'origine réelle du site internet en production
+    const frontendUrl = computed(() => {
+      if (config.public.siteUrl) return config.public.siteUrl
+      if (typeof window !== 'undefined') return window.location.origin
+      return 'http://localhost:3000'
+    })
 
-  const previewUrl = computed(() => {
-    if (!previewTheme.value || !currentShop.value?.subdomain) return ''
-    return `${frontendUrl.value}/boutique/${currentShop.value.subdomain}?preview_theme=${previewTheme.value.slug}`
-  })
+    // URL dynamique pour l'iframe d'aperçu (zéro localhost en ligne)
+    const previewUrl = computed(() => {
+      if (!previewTheme.value || !currentShop.value?.subdomain) return ''
+      return `${frontendUrl.value}/boutique/${currentShop.value.subdomain}?preview_theme=${previewTheme.value.slug}`
+    })
 
-  const openPreview = (theme: any) => {
+    const openPreview = (theme: any) => {
     previewTheme.value   = theme
     activeViewport.value = 'desktop'
     showPreviewModal.value = true
   }
 
   const onScreenshotError = (event: Event, theme: any) => {
+    // Si le screenshot ne charge pas, on masque l'image pour afficher le mockup CSS de secours
     const img = event.target as HTMLImageElement
     if (img) img.style.display = 'none'
   }
@@ -1567,6 +1640,7 @@
 
   const confirmActivate = (theme: any) => {
     if (!theme.is_free) {
+      // ✅ Redirection sécurisée vers le module abonnement pour les thèmes payants
       router.push(`/dashboard-vendor/${shopSlug}/subscription?theme=${theme.slug}&theme_name=${encodeURIComponent(theme.name)}&theme_price=${theme.price}`)
       return
     }
@@ -1595,35 +1669,8 @@
       const data = await res.json()
 
       if (data.success) {
+        // ✅ Mise à jour réactive immédiate du badge à l'écran sans recharger la page
         currentThemeSlug.value  = themeToActivate.value.slug
-
-        // ── Recharger les features du nouveau thème actif ──
-        // Sans ça, les onglets resteraient calés sur l'ancien thème
-        // jusqu'au prochain rechargement complet de la page.
-        try {
-          const themeRes = await fetch(`${config.public.apiBase}/shops/${shopSlug}`, {
-            headers: { 'Authorization': `Bearer ${token.value}`, 'Accept': 'application/json' }
-          })
-          const themeData = await themeRes.json()
-          if (themeData.success && themeData.data?.theme?.features) {
-            activeThemeFeatures.value = themeData.data.theme.features
-          }
-        } catch (e) {
-          console.error('Erreur rechargement features après activation:', e)
-        }
-
-        // ── Resynchroniser currentShop (state global partagé) ──
-        // dashboard.vue (menu latéral) lit currentShop.theme.features
-        // directement depuis useShops(). Sans ce rafraîchissement,
-        // le menu garderait l'ancien thème en mémoire jusqu'à un
-        // rechargement complet de la page.
-        try {
-          const { fetchShopDetails } = useShops()
-          await fetchShopDetails(shopSlug)
-        } catch (e) {
-          console.error('Erreur resynchronisation currentShop après activation:', e)
-        }
-
         showActivateModal.value = false
         themeToActivate.value   = null
         showToast('Thème "' + allThemes.value.find(t => t.slug === currentThemeSlug.value)?.name + '" activé ✓', 'success')

@@ -143,7 +143,7 @@ export const useCustomization = () => {
    */
   const saveCustomization = async (
     shopId: number,
-    pageType: 'home' | 'about' | 'testimonials' | 'terms' | 'sales_terms' | 'footer',
+    pageType: 'home' | 'about' | 'testimonials' | 'terms' | 'sales_terms' | 'footer' | 'specialites' | 'contact',
     content: any,
     files?: { banner_images?: File[], about_image?: File }
   ): Promise<boolean> => {
@@ -218,7 +218,7 @@ export const useCustomization = () => {
    */
   const deleteCustomization = async (
     shopId: number,
-    pageType: 'home' | 'about' | 'testimonials' | 'terms' | 'sales_terms' | 'footer'
+    pageType: 'home' | 'about' | 'testimonials' | 'terms' | 'sales_terms' | 'footer' | 'specialites' | 'contact'
   ): Promise<boolean> => {
     try {
       const response = await apiRequest<any>(

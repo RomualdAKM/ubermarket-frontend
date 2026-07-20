@@ -60,7 +60,8 @@ export default defineNuxtConfig({
     public: {
       apiBase: process.env.NUXT_PUBLIC_API_BASE || 'https://www.uber-market.com/api',
       backendUrl: process.env.NUXT_PUBLIC_BACKEND_URL || 'https://www.uber-market.com/',
-      siteUrl: process.env.NUXT_PUBLIC_SITE_URL || 'https://www.uber-market.com/'
+      siteUrl: process.env.NUXT_PUBLIC_SITE_URL || 'https://www.uber-market.com/',
+      recaptchaSiteKey: process.env.NUXT_PUBLIC_RECAPTCHA_SITE_KEY, //clé captcha
     }
   },
 

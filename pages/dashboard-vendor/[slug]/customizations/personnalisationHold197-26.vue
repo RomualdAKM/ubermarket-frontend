@@ -1612,18 +1612,6 @@
           console.error('Erreur rechargement features après activation:', e)
         }
 
-        // ── Resynchroniser currentShop (state global partagé) ──
-        // dashboard.vue (menu latéral) lit currentShop.theme.features
-        // directement depuis useShops(). Sans ce rafraîchissement,
-        // le menu garderait l'ancien thème en mémoire jusqu'à un
-        // rechargement complet de la page.
-        try {
-          const { fetchShopDetails } = useShops()
-          await fetchShopDetails(shopSlug)
-        } catch (e) {
-          console.error('Erreur resynchronisation currentShop après activation:', e)
-        }
-
         showActivateModal.value = false
         themeToActivate.value   = null
         showToast('Thème "' + allThemes.value.find(t => t.slug === currentThemeSlug.value)?.name + '" activé ✓', 'success')

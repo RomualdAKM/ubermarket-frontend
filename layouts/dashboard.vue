@@ -180,6 +180,20 @@
                 </svg>
                 <span :class="isSidebarOpen ? '' : 'lg:hidden'">Avis clients</span>
               </NuxtLink>
+
+              <!-- ═══  Messages clients ═══ -->
+              <NuxtLink 
+                v-if="canViewMessages"
+                :to="getDashboardLink('messagesclient')" 
+                class="sidebar-link group flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-all"
+                :class="[isSidebarOpen ? '' : 'justify-center', 'text-slate-600 hover:text-slate-900 hover:bg-white']"
+                @click="closeSidebar"
+              >
+                <svg class="w-5 h-5 text-slate-400 group-hover:text-primary transition-colors" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M8 10.5h8m-8 3h5.25M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/>
+                </svg>
+                <span :class="isSidebarOpen ? '' : 'lg:hidden'">Messages clients</span>
+              </NuxtLink>
             </div>
           </div>
         </div>
@@ -500,6 +514,19 @@ const canViewCustomers = computed(() => hasPermission('customers.view'))
 const canViewPromoCodes = computed(() => hasPermission('promos.view'))
 const canViewStock = computed(() => hasPermission('products.view')) // Stock lié aux produits
 const canViewReviews = computed(() => hasPermission('reviews.view'))
+
+// ── Messages clients — visible seulement si :
+//    1. L'utilisateur a la permission de voir les avis/messages
+//       (on réutilise reviews.view par cohérence, à ajuster si
+//       une permission dédiée "messages.view" existe déjà côté
+//       backend)
+//    2. Le thème actif de la boutique supporte la feature "contact"
+const canViewMessages = computed(() => {
+  const hasPerm = hasPermission('reviews.view')
+  const themeFeatures = currentShop.value?.theme?.features
+  const themeSupportsContact = Array.isArray(themeFeatures) && themeFeatures.includes('contact')
+  return hasPerm && themeSupportsContact
+})
 const canViewDeliveries = computed(() => hasPermission('deliveries.view'))
 const canViewCouriers = computed(() => hasPermission('deliveries.view'))
 const canViewCustomization = computed(() => hasPermission('settings.view'))

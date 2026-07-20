@@ -16,15 +16,32 @@ export const useShops = () => {
   const currentShop = useState<Shop | null>('shops.current', () => null)
   const currentAccess = useState<ShopAccess | null>('shops.access', () => null)
 
-  // Fonction utilitaire pour les requêtes API
+  /**
+   * Fonction utilitaire pour les requêtes API.
+   *
+   * ⚠️ CONVENTION PROJET (Uber-Market) — NE JAMAIS ajouter les headers
+   * 'Content-Type' ou 'Accept' quand le body est une instance de FormData.
+   * Le navigateur doit injecter lui-même le Content-Type multipart avec
+   * le bon "boundary". Ajouter manuellement un header ici (même 'Accept')
+   * peut perturber le parsing du payload côté Laravel (champs manquants
+   * ou mal interprétés, ex: shop_type absent → règles required_unless
+   * échouent silencieusement).
+   *
+   * Cette fonction ne fixe donc les headers 'Accept' / 'Content-Type' par
+   * défaut QUE si le body n'est PAS un FormData.
+   */
   const apiRequest = async <T>(endpoint: string, options: RequestInit = {}): Promise<ApiResponse<T>> => {
+    const isFormData = options.body instanceof FormData
+
     const headers: Record<string, string> = {
-      'Accept': 'application/json',
+      // ✅ On n'ajoute Accept/Content-Type que si ce n'est PAS un FormData
+      ...(!isFormData && { 'Accept': 'application/json' }),
       ...(options.headers as Record<string, string> || {})
     }
 
-    // Ajouter Content-Type: application/json si le corps est une chaîne (JSON)
-    if (typeof options.body === 'string') {
+    // Ajouter Content-Type: application/json uniquement si le corps est une chaîne (JSON)
+    // et qu'on n'est pas en FormData (double sécurité, cas déjà couvert ci-dessus).
+    if (!isFormData && typeof options.body === 'string') {
       headers['Content-Type'] = 'application/json'
     }
 
@@ -50,12 +67,20 @@ export const useShops = () => {
     }
   }
 
-  // Créer une boutique
+  /**
+   * Créer une boutique.
+   *
+   * Le payload part en FormData car un logo (fichier) peut être joint.
+   * Convention projet : uniquement le header 'Authorization' est fourni
+   * explicitement ici — 'Accept'/'Content-Type' ne doivent PAS être définis,
+   * apiRequest se charge de ne pas les ajouter automatiquement pour un FormData.
+   */
   const createShop = async (shopData: ShopData): Promise<ApiResponse<Shop>> => {
     try {
       const formData = new FormData()
 
       // Ajouter les données texte
+      // ✅ Les valeurs undefined/null sont déjà filtrées ici (pas de "undefined" en string envoyé)
       Object.entries(shopData).forEach(([key, value]) => {
         if (key !== 'logo' && value !== undefined && value !== null) {
           formData.append(key, value.toString())
@@ -71,6 +96,7 @@ export const useShops = () => {
         method: 'POST',
         body: formData,
         headers: {
+          // ✅ Uniquement Authorization — jamais Accept/Content-Type avec FormData
           'Authorization': `Bearer ${token.value}`
         }
       })
@@ -147,13 +173,11 @@ export const useShops = () => {
       })
 
       if (response.success && response.data) {
-        // Mettre à jour dans la liste
         const index = shops.value.findIndex(s => s.id === shopId)
         if (index !== -1) {
           shops.value[index] = response.data
         }
 
-        // Mettre à jour currentShop si c'est la même boutique
         if (currentShop.value?.id === shopId) {
           currentShop.value = response.data
         }
@@ -171,7 +195,6 @@ export const useShops = () => {
       const response = await apiRequest<Shop>(`/shops/${shopIdOrSlug}`)
       if (response.success && response.data) {
         currentShop.value = response.data
-        // Stocker les infos d'accès si présentes
         if ((response as any).access) {
           currentAccess.value = (response as any).access
           return true
@@ -180,7 +203,6 @@ export const useShops = () => {
       return false
     } catch (error) {
       console.error('Erreur lors de la récupération des détails de la boutique:', error)
-      // Propager l'erreur pour que le middleware puisse la gérer
       throw error
     }
   }
@@ -188,7 +210,6 @@ export const useShops = () => {
   // Vérifier si l'utilisateur a une permission spécifique
   const hasPermission = (permission: string): boolean => {
     if (!currentAccess.value) return false
-    // Le propriétaire a toutes les permissions
     if (currentAccess.value.is_owner) return true
     return currentAccess.value.permissions.includes(permission)
   }
@@ -216,7 +237,7 @@ export const useShops = () => {
       is_owner: true,
       is_collaborator: false,
       role: 'owner',
-      permissions: [] // Vide car le propriétaire a tout
+      permissions: []
     }
   }
 
