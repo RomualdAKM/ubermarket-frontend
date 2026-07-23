@@ -65,7 +65,9 @@ export function useAdminAffiliates() {
     const data = await response.json()
 
     if (!response.ok) {
+
       throw new Error(data.message || 'Une erreur est survenue')
+      
     }
 
     return data
